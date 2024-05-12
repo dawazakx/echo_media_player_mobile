@@ -16,6 +16,6 @@ function AppNavigator() {
       </SafeAreaProvider>
     </NavigationContainer>
   );
-};
+}
 
 export default AppNavigator;
