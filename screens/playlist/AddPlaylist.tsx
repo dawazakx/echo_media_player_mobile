@@ -6,8 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { View, Image } from "react-native";
 
-import { SELECT_PLAYLIST_ROUTE } from "../constants/Routes";
 import { Fontisto, MaterialIcons } from "@expo/vector-icons";
+import { SELECT_PLAYLIST_ROUTE } from "@/constants/Routes";
 
 const AddPlaylistScreen = () => {
   const navigation = useNavigation();
@@ -23,7 +23,7 @@ const AddPlaylistScreen = () => {
       >
         <Image
           style={{ width: 150, height: 120 }}
-          source={require("../assets/logo.png")}
+          source={require("../../assets/logo.png")}
           resizeMode="contain"
         />
       </View>
