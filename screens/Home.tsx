@@ -6,6 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { View, Image } from "react-native";
 
+import { SIGNIN_ROUTE, SELECT_PLAYLIST_ROUTE } from "../constants/Routes";
+
 const HomeScreen = () => {
   const navigation = useNavigation();
 
@@ -53,14 +55,14 @@ const HomeScreen = () => {
           width="70%"
           borderRadius={25}
           textColor={Colors.background}
-          onPress={() => navigation.navigate("Signin")}
+          onPress={() => navigation.navigate(SIGNIN_ROUTE)}
         />
         <CustomButton
           title="Continue with Basic"
           width="70%"
           borderRadius={25}
           textColor={Colors.background}
-          onPress={() => navigation.navigate("SelectPlaylist")}
+          onPress={() => navigation.navigate(SELECT_PLAYLIST_ROUTE)}
         />
       </CustomView>
     </CustomView>
