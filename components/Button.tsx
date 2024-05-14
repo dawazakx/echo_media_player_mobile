@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     color: Colors.background,
+    gap: 10,
   },
 });
 

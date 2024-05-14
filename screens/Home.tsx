@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { View, Image } from "react-native";
 
-import { SIGNIN_ROUTE, SELECT_PLAYLIST_ROUTE } from "../constants/Routes";
+import { SIGNIN_ROUTE, ADD_PLAYLIST_ROUTE } from "../constants/Routes";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -62,7 +62,7 @@ const HomeScreen = () => {
           width="70%"
           borderRadius={25}
           textColor={Colors.background}
-          onPress={() => navigation.navigate(SELECT_PLAYLIST_ROUTE)}
+          onPress={() => navigation.navigate(ADD_PLAYLIST_ROUTE)}
         />
       </CustomView>
     </CustomView>

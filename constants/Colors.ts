@@ -7,4 +7,5 @@ export const Colors = {
   icon: "#0E214F",
   tabIconDefault: "#0E214F",
   tabIconSelected: tintColor,
+  white: "#FFFFFF",
 };
