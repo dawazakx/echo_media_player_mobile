@@ -22,26 +22,26 @@ export default function XtremeForm() {
 
       <CustomInput
         placeholder="Username"
-        value={username}
+        // value={username}
         onChangeText={(text) => setUsername(text)}
       />
       <CustomInput
         placeholder="Password"
-        value={password}
+        // value={password}
         onChangeText={(text) => setPassword(text)}
       />
       <CustomInput
         placeholder="Portal"
-        value={url}
+        // value={url}
         onChangeText={(text) => setUrl(text)}
       />
-      <CustomInput placeholder="Nickname" value={username} />
+      <CustomInput placeholder="Nickname" />
 
       <CustomView style={styles.navigation}>
         <Button
           title="Back"
           borderRadius={25}
-          width="25%"
+          width="48%"
           textColor={Colors.background}
           onPress={() => navigation.goBack()}
         />
@@ -49,7 +49,7 @@ export default function XtremeForm() {
         <Button
           title="Next"
           borderRadius={25}
-          width="25%"
+          width="48%"
           textColor={Colors.background}
           onPress={() => navigation.navigate("tab")}
         />

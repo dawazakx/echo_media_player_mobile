@@ -28,18 +28,14 @@ export default function LocalForm() {
 
   return (
     <CustomView style={styles.container}>
-      <CustomText type="subtitle" style={{ padding: 20 }}>
+      <CustomText type="subtitle">
         Upload M3U File
       </CustomText>
 
       <Pressable onPress={pickFile} style={styles.uploadButton}>
         <CustomText
           type="subtitle"
-          style={{
-            paddingTop: 50,
-            color: Colors.background,
-          }}
-        >
+          style={{ color: Colors.background }}>
           Click to Select File
         </CustomText>
       </Pressable>
@@ -60,7 +56,7 @@ export default function LocalForm() {
         <Button
           title="Back"
           borderRadius={25}
-          width="25%"
+          width="48%"
           textColor={Colors.background}
           onPress={() => navigation.goBack()}
         />
@@ -68,7 +64,7 @@ export default function LocalForm() {
         <Button
           title="Next"
           borderRadius={25}
-          width="25%"
+          width="48%"
           textColor={Colors.background}
           onPress={() => navigation.navigate("tab")}
         />
@@ -81,16 +77,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
+    paddingTop: 50,
     gap: 30,
   },
 
   uploadButton: {
     backgroundColor: Colors.tint,
+    display: "flex",
+    justifyContent: "center",
     alignItems: "center",
     height: 100,
     borderRadius: 20,
     borderColor: "white",
   },
+
   navigation: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -15,7 +15,7 @@ export default function M3uForm() {
 
   return (
     <CustomView style={styles.container}>
-      <CustomText type="subtitle" style={{ paddingTop: 50 }}>
+      <CustomText type="subtitle">
         Connect with M3u Url
       </CustomText>
 
@@ -40,7 +40,7 @@ export default function M3uForm() {
         <Button
           title="Back"
           borderRadius={25}
-          width="25%"
+          width="48%"
           textColor={Colors.background}
           onPress={() => navigation.goBack()}
         />
@@ -48,7 +48,7 @@ export default function M3uForm() {
         <Button
           title="Next"
           borderRadius={25}
-          width="25%"
+          width="48%"
           textColor={Colors.background}
           onPress={() => navigation.navigate("tab")}
         />
@@ -61,8 +61,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
+    paddingTop: 50,
     gap: 30,
   },
+
   text: {
     fontWeight: "500",
     fontSize: 20,
@@ -70,6 +72,7 @@ const styles = StyleSheet.create({
     padding: 20,
     textAlign: "center",
   },
+
   navigation: {
     flexDirection: "row",
     justifyContent: "space-between",
