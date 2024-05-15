@@ -1,12 +1,13 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Colors } from "@/constants/Colors";
-import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import MoviesTab from "@/screens/tabs/MoviesTab";
 import LiveTvTab from "@/screens/tabs/LiveTvTab";
 import TvShowsTab from "@/screens/tabs/TvShowsTab";
 import SportsTab from "@/screens/tabs/SportsTab";
 import React from "react";
 import Header from "../components/Header";
+import { MaterialIcons } from "@expo/vector-icons";
+import SettingsTab from "@/screens/tabs/SettingsTab";
 
 const Tab = createBottomTabNavigator();
 
@@ -14,8 +15,12 @@ export default function Tabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: Colors.background,
+        tabBarActiveTintColor: Colors.white,
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: Colors.background,
+          paddingBottom: 5,
+        },
       }}
     >
       <Tab.Screen
@@ -23,10 +28,12 @@ export default function Tabs() {
         component={LiveTvTabWithHeader}
         options={{
           title: "Live TV",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons
+              name="live-tv"
               color={color}
+              size={28}
+              style={{ marginBottom: -3 }}
             />
           ),
         }}
@@ -36,10 +43,12 @@ export default function Tabs() {
         component={MoviesTabWithHeader}
         options={{
           title: "Movies",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons
+              name="movie"
               color={color}
+              size={28}
+              style={{ marginBottom: -3 }}
             />
           ),
         }}
@@ -49,10 +58,12 @@ export default function Tabs() {
         component={TvShowsTabWithHeader}
         options={{
           title: "TV Shows",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons
+              name="tv"
               color={color}
+              size={28}
+              style={{ marginBottom: -3 }}
             />
           ),
         }}
@@ -62,10 +73,27 @@ export default function Tabs() {
         component={SportsTabWithHeader}
         options={{
           title: "Sports",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons
+              name="sports-soccer"
               color={color}
+              size={28}
+              style={{ marginBottom: -3 }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SetttingstabWithHeader}
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons
+              name="settings"
+              color={color}
+              size={28}
+              style={{ marginBottom: -3 }}
             />
           ),
         }}
@@ -86,3 +114,4 @@ const MoviesTabWithHeader = withHeader(MoviesTab);
 const LiveTvTabWithHeader = withHeader(LiveTvTab);
 const TvShowsTabWithHeader = withHeader(TvShowsTab);
 const SportsTabWithHeader = withHeader(SportsTab);
+const SetttingstabWithHeader = withHeader(SettingsTab);

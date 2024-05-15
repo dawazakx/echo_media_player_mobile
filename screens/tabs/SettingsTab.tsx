@@ -1,7 +1,8 @@
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-const TvShowsTab = () => {
+import { StyleSheet, Text, View } from "react-native";
+const SettingsTab = () => {
   return (
     <CustomView
       style={{
@@ -12,9 +13,10 @@ const TvShowsTab = () => {
       }}
     >
       <CustomText type="title" style={{ textAlign: "center" }}>
-        TV Shows Tab
+        Settings Tab
       </CustomText>
     </CustomView>
   );
 };
-export default TvShowsTab;
+export default SettingsTab;
+const styles = StyleSheet.create({});

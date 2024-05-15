@@ -7,14 +7,11 @@ const MoviesTab = () => {
       style={{
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: Colors.tint,
+        backgroundColor: Colors.background,
         height: "100%",
       }}
     >
-      <CustomText
-        type="title"
-        style={{ textAlign: "center", color: Colors.background }}
-      >
+      <CustomText type="title" style={{ textAlign: "center" }}>
         Movies Tab
       </CustomText>
     </CustomView>
