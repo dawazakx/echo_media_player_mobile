@@ -3,6 +3,7 @@ import CustomInput from "@/components/Input";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
+import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { StyleSheet, Text } from "react-native";
@@ -51,7 +52,7 @@ export default function XtremeForm() {
           borderRadius={25}
           width="48%"
           textColor={Colors.background}
-          onPress={() => navigation.navigate("tab")}
+          onPress={() => navigation.navigate(PLAYER_INDEX_ROUTE)}
         />
       </CustomView>
     </CustomView>
