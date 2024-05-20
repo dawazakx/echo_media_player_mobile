@@ -3,11 +3,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import HomeScreen from "../screens/Home";
-import AddPlaylistScreen from "@/screens/playlist/AddPlaylist";
-import SelectPlaylistModal from "@/screens/playlist/layers/SelectPlaylist";
-import XtremeForm from "@/screens/playlist/layers/xtreme";
-import M3uForm from "@/screens/playlist/layers/m3u";
-import LocalForm from "@/screens/playlist/layers/local";
+import SearchScreen from "@/screens/SearchScreen";
+
+import PlaylistNavigator from "@/Navigators/PlaylistNavigator";
+import SideDrawer from "@/Navigators/DrawerNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,19 +15,13 @@ function AppNavigator() {
     <NavigationContainer>
       <SafeAreaProvider>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="Welcome"
           screenOptions={{ headerShown: false }}
         >
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="AddPlaylist" component={AddPlaylistScreen} />
-          <Stack.Screen
-            name="SelectPlaylist"
-            component={SelectPlaylistModal}
-            options={{ presentation: "modal" }}
-          />
-          <Stack.Screen name="xtreme" component={XtremeForm} />
-          <Stack.Screen name="m3u" component={M3uForm} />
-          <Stack.Screen name="local" component={LocalForm} />
+          <Stack.Screen name="Welcome" component={HomeScreen} />
+          <Stack.Screen name="Playlist" component={PlaylistNavigator} />
+          <Stack.Screen name="Home" component={SideDrawer} />
+          <Stack.Screen name="Search" component={SearchScreen} />
         </Stack.Navigator>
       </SafeAreaProvider>
     </NavigationContainer>

@@ -7,6 +7,7 @@ import { CustomText } from "@/components/Text";
 import { Colors } from "@/constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { CustomView } from "@/components/View";
+import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 
 export default function LocalForm() {
   const navigation = useNavigation();
@@ -28,14 +29,10 @@ export default function LocalForm() {
 
   return (
     <CustomView style={styles.container}>
-      <CustomText type="subtitle">
-        Upload M3U File
-      </CustomText>
+      <CustomText type="subtitle">Upload M3U File</CustomText>
 
       <Pressable onPress={pickFile} style={styles.uploadButton}>
-        <CustomText
-          type="subtitle"
-          style={{ color: Colors.background }}>
+        <CustomText type="subtitle" style={{ color: Colors.background }}>
           Click to Select File
         </CustomText>
       </Pressable>
@@ -66,7 +63,7 @@ export default function LocalForm() {
           borderRadius={25}
           width="48%"
           textColor={Colors.background}
-          onPress={() => navigation.navigate("tab")}
+          onPress={() => navigation.navigate(PLAYER_INDEX_ROUTE)}
         />
       </CustomView>
     </CustomView>

@@ -3,6 +3,7 @@ import CustomInput from "@/components/Input";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
+import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
@@ -15,9 +16,7 @@ export default function M3uForm() {
 
   return (
     <CustomView style={styles.container}>
-      <CustomText type="subtitle">
-        Connect with M3u Url
-      </CustomText>
+      <CustomText type="subtitle">Connect with M3u Url</CustomText>
 
       <CustomInput
         placeholder="Nickname"
@@ -50,7 +49,7 @@ export default function M3uForm() {
           borderRadius={25}
           width="48%"
           textColor={Colors.background}
-          onPress={() => navigation.navigate("tab")}
+          onPress={() => navigation.navigate(PLAYER_INDEX_ROUTE)}
         />
       </CustomView>
     </CustomView>
