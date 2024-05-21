@@ -17,8 +17,8 @@ type CustomButtonProps = {
   borderRadius?: number;
   iconLeft?: React.ReactNode;
   iconRight?: React.ReactNode;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  style?: ViewStyle | (ViewStyle | undefined)[];
+  textStyle?: TextStyle | (TextStyle | undefined)[];
   width?: DimensionValue | undefined;
   textColor?: string;
 };
@@ -40,7 +40,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       style={({ pressed }) => [
         styles.button,
         { borderRadius, opacity: pressed ? 0.8 : 1, width },
-        style,
+        ...(Array.isArray(style) ? style : [style]),
       ]}
     >
       <View style={styles.content}>
