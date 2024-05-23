@@ -1,16 +1,16 @@
 import { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Device from 'expo-device';
+import * as Device from "expo-device";
 
 import { BASE_URL } from "../constants/api";
 
 const initialContetxt: {
-  deviceId: string | null,
-  setDeviceId: (deviceId: string | null) => void
+  deviceId: string | null;
+  setDeviceId: (deviceId: string | null) => void;
 } = {
   deviceId: null,
   setDeviceId: () => {},
-}
+};
 
 export const DeviceContext = createContext(initialContetxt);
 
@@ -21,35 +21,36 @@ export const DeviceProvider = ({ children }) => {
   });
 
   const getDeviceId = async () => {
+    console.log(Device.osName);
     try {
-      const request = await fetch(
-        `${BASE_URL}generate-device-id`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            deviceId: Device.isDevice ? Device.isDevice : null,
-            type: 'mobile',
-            os: Device.osName?.toLowerCase(),
-          }),
-        }
-      );
-  
+      const request = await fetch(`${BASE_URL}generate-device-id`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          deviceId: Device.isDevice ? Device.isDevice : null,
+          type: "mobile",
+          // os: Device.osName?.toLowerCase(),
+          os: "android",
+        }),
+      });
+
       const response = await request.json();
+      console.log(response);
       await AsyncStorage.setItem(
-        "@app:deviceId", JSON.stringify(response?.device)
+        "@app:deviceId",
+        JSON.stringify(response?.device)
       );
       setDeviceId(response?.device);
-    } catch(error) {
+    } catch (error) {
       console.log(error?.message);
     }
-  }
+  };
 
   useEffect(() => {
-    if(!deviceId) {
-      // getDeviceId();
+    if (!deviceId) {
+      getDeviceId();
     }
   }, [deviceId]);
 
@@ -58,4 +59,4 @@ export const DeviceProvider = ({ children }) => {
       {children}
     </DeviceContext.Provider>
   );
-}
+};
