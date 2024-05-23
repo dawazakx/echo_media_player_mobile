@@ -4,8 +4,16 @@ import MovieCarousel from "@/components/MovieCarousel";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-import { useEffect, useState } from "react";
+import { TabParamList } from "@/constants/types";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { RouteProp } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { FlatList, SectionList, StyleSheet } from "react-native";
+
+export interface TvShowsProps {
+  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+  route: RouteProp<TabParamList, "TvShows">;
+}
 
 interface Item {
   id: number;
@@ -261,7 +269,7 @@ const data: Data = {
 };
 const filterOptions = Object.keys(data);
 
-const TvShowsTab = () => {
+const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
   const [filteredData, setFilteredData] = useState<Section[]>([]);
   const [allSections, setAllSections] = useState<Section[]>([]);
 

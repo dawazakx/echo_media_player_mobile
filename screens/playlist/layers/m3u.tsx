@@ -4,13 +4,20 @@ import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
-import { useNavigation } from "@react-navigation/native";
+import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
+import { CompositeNavigationProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
-export default function M3uForm() {
-  const navigation = useNavigation();
+export interface m3uPlaylistProps {
+  navigation: CompositeNavigationProp<
+    NativeStackNavigationProp<PlaylistStackParamList, "m3u">,
+    NativeStackNavigationProp<RootStackParamList, "Home">
+  >;
+}
 
+export default function M3uForm({ navigation }: m3uPlaylistProps) {
   const [nickname, setNickname] = useState("Dawazak");
   const [url, setUrl] = useState("https://ottkiller.pro");
 

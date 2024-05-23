@@ -5,12 +5,16 @@ import PremiumFeatures from "@/screens/drawer/PremiumFeatures";
 import Privacy from "@/screens/drawer/Privacy";
 import Terms from "@/screens/drawer/Terms";
 import Tabs from "@/Navigators/TabNavigator";
+import { DrawerParamList } from "@/constants/types";
 
-const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export default function SideDrawer() {
   return (
-    <Drawer.Navigator screenOptions={{ headerShown: false }}>
+    <Drawer.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Categories"
+    >
       <Drawer.Screen name="Categories" component={Tabs} />
       <Drawer.Screen name="About" component={About} />
       <Drawer.Screen name="Manage" component={ManagePlaylist} />

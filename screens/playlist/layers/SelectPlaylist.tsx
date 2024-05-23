@@ -7,19 +7,28 @@ import {
   XTREME_PLAYLIST_ROUTE,
   ADD_PLAYLIST_ROUTE,
 } from "@/constants/Routes";
+import { PlaylistStackParamList } from "@/constants/types";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet } from "react-native";
 
-export default function SelectPlaylistModal() {
-  const navigation = useNavigation();
+export interface SelectPlaylistProps {
+  navigation: NativeStackNavigationProp<
+    PlaylistStackParamList,
+    "SelectPlaylist"
+  >;
+}
+
+export default function SelectPlaylistModal({
+  navigation,
+}: SelectPlaylistProps) {
   return (
     <CustomView style={styles.container}>
       <Pressable
         style={styles.backBtn}
         onPress={() => {
-          navigation.navigate(ADD_PLAYLIST_ROUTE);
+          navigation.goBack();
         }}
       >
         <MaterialIcons name="arrow-back" size={32} color={Colors.tint} />
@@ -85,16 +94,18 @@ export default function SelectPlaylistModal() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   backBtn: {
-    marginTop: 50,
+    marginTop: 40,
     marginLeft: 15,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   innerContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.background,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   title: {
     fontSize: 20,

@@ -4,13 +4,20 @@ import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
-import { useNavigation } from "@react-navigation/native";
+import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
+import { CompositeNavigationProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
-export default function XtremeForm() {
-  const navigation = useNavigation();
+export interface XtremePlaylistProps {
+  navigation: CompositeNavigationProp<
+    NativeStackNavigationProp<PlaylistStackParamList, "xtreme">,
+    NativeStackNavigationProp<RootStackParamList, "Home">
+  >;
+}
 
+export default function XtremeForm({ navigation }: XtremePlaylistProps) {
   const [username, setUsername] = useState("Dawazak");
   const [password, setPassword] = useState("wcunmgpamy");
   const [url, setUrl] = useState("https://ottkiller.pro");
