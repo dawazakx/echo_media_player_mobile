@@ -2,16 +2,19 @@ import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { View, Image } from "react-native";
 
 import { Fontisto, MaterialIcons } from "@expo/vector-icons";
 import { SELECT_PLAYLIST_ROUTE } from "@/constants/Routes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { PlaylistStackParamList } from "@/constants/types";
 
-const AddPlaylistScreen = () => {
-  const navigation = useNavigation();
+export interface AddPlaylistProps {
+  navigation: NativeStackNavigationProp<PlaylistStackParamList, "AddPlaylist">;
+}
 
+const AddPlaylistScreen: React.FC<AddPlaylistProps> = ({ navigation }) => {
   return (
     <CustomView style={{ flex: 1, padding: 10, gap: 15 }}>
       <View

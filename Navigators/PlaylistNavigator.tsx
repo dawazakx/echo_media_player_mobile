@@ -4,8 +4,9 @@ import XtremeForm from "../screens/playlist/layers/xtreme";
 import M3uForm from "../screens/playlist/layers/m3u";
 import LocalForm from "../screens/playlist/layers/local";
 import SelectPlaylistModal from "../screens/playlist/layers/SelectPlaylist";
+import { PlaylistStackParamList } from "@/constants/types";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<PlaylistStackParamList>();
 
 function PlaylistNavigator() {
   return (
@@ -14,7 +15,7 @@ function PlaylistNavigator() {
       <Stack.Screen
         name="SelectPlaylist"
         component={SelectPlaylistModal}
-        options={{ presentation: "modal" }}
+        options={{ presentation: "transparentModal", headerShown: false }}
       />
       <Stack.Screen name="xtreme" component={XtremeForm} />
       <Stack.Screen name="m3u" component={M3uForm} />

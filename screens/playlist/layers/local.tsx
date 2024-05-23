@@ -5,13 +5,20 @@ import * as DocumentPicker from "expo-document-picker";
 import CustomInput from "@/components/Input";
 import { CustomText } from "@/components/Text";
 import { Colors } from "@/constants/Colors";
-import { useNavigation } from "@react-navigation/native";
+import { CompositeNavigationProp } from "@react-navigation/native";
 import { CustomView } from "@/components/View";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
 
-export default function LocalForm() {
-  const navigation = useNavigation();
+export interface localPlaylistProps {
+  navigation: CompositeNavigationProp<
+    NativeStackNavigationProp<PlaylistStackParamList, "m3u">,
+    NativeStackNavigationProp<RootStackParamList, "Home">
+  >;
+}
 
+export default function LocalForm({ navigation }: localPlaylistProps) {
   const [nickname, setNickname] = useState("Dawazak");
   const [url, setUrl] = useState("https://ottkiller.pro");
 

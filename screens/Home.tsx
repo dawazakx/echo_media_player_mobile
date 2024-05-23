@@ -2,15 +2,18 @@ import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { View, Image } from "react-native";
 
 import { SIGNIN_ROUTE, ADD_PLAYLIST_ROUTE } from "../constants/Routes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "@/constants/types";
 
-const HomeScreen = () => {
-  const navigation = useNavigation();
+export interface HomeProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
+}
 
+const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   return (
     <CustomView style={{ flex: 1, padding: 10 }}>
       <View

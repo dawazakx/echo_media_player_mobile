@@ -1,7 +1,17 @@
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-const SportsTab = () => {
+import { TabParamList } from "@/constants/types";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { RouteProp } from "@react-navigation/native";
+import React from "react";
+
+export interface SportsProps {
+  navigation: BottomTabScreenProps<TabParamList, "Sports">;
+  route: RouteProp<TabParamList, "Sports">;
+}
+
+const SportsTab: React.FC<SportsProps> = ({ navigation, route }) => {
   return (
     <CustomView
       style={{

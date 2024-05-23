@@ -8,8 +8,9 @@ import React from "react";
 import Header from "../components/Header";
 import { MaterialIcons } from "@expo/vector-icons";
 import SettingsTab from "@/screens/tabs/SettingsTab";
+import { TabParamList } from "@/constants/types";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function Tabs() {
   return (
