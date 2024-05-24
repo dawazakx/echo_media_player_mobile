@@ -21,6 +21,7 @@ type CustomButtonProps = {
   textStyle?: TextStyle | (TextStyle | undefined)[];
   width?: DimensionValue | undefined;
   textColor?: string;
+  disabled?: boolean;
 };
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -33,10 +34,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   textStyle,
   width,
   textColor = Colors.text,
+  disabled = false,
 }) => {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={disabled ? undefined : onPress}
       style={({ pressed }) => [
         styles.button,
         { borderRadius, opacity: pressed ? 0.8 : 1, width },
