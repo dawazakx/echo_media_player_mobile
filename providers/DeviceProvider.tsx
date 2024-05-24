@@ -21,7 +21,7 @@ export const DeviceProvider = ({ children }) => {
   });
 
   const getDeviceId = async () => {
-    console.log(Device.osName);
+    // console.log(Device.osName);
     try {
       const request = await fetch(`${BASE_URL}generate-device-id`, {
         method: "POST",
@@ -37,7 +37,7 @@ export const DeviceProvider = ({ children }) => {
       });
 
       const response = await request.json();
-      console.log(response);
+      // console.log(response);
       await AsyncStorage.setItem(
         "@app:deviceId",
         JSON.stringify(response?.device)
