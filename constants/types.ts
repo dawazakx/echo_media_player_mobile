@@ -1,3 +1,5 @@
+import { Movie } from "@/screens/tabs/MoviesTab";
+
 export type RootStackParamList = {
   Welcome: undefined;
   Playlist: undefined;
@@ -28,4 +30,9 @@ export type TabParamList = {
   TvShows: undefined;
   Sports: undefined;
   Settings: undefined;
+};
+
+export type MoviesStackParamList = {
+  MoviesList: undefined;
+  MovieDetails: { movie: Movie };
 };

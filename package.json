@@ -19,6 +19,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@shopify/flash-list": "1.6.3",
     "@types/react": "~18.2.45",
+    "axios": "^1.7.2",
     "expo": "~50.0.17",
     "expo-device": "~5.9.4",
     "expo-document-picker": "~11.10.1",

@@ -8,9 +8,21 @@ import React from "react";
 import Header from "../components/Header";
 import { MaterialIcons } from "@expo/vector-icons";
 import SettingsTab from "@/screens/tabs/SettingsTab";
-import { TabParamList } from "@/constants/types";
+import { MoviesStackParamList, TabParamList } from "@/constants/types";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MovieDetails from "@/screens/MovieDetails";
 
 const Tab = createBottomTabNavigator<TabParamList>();
+const Stack = createNativeStackNavigator<MoviesStackParamList>();
+
+const MoviesStackNavigator: React.FC = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MoviesList" component={MoviesTabWithHeader} />
+      <Stack.Screen name="MovieDetails" component={MovieDetails} />
+    </Stack.Navigator>
+  );
+};
 
 export default function Tabs() {
   return (
@@ -41,7 +53,7 @@ export default function Tabs() {
       />
       <Tab.Screen
         name="Movies"
-        component={MoviesTabWithHeader}
+        component={MoviesStackNavigator}
         options={{
           title: "Movies",
           tabBarIcon: ({ color }) => (
