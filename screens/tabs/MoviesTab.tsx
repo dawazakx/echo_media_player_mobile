@@ -1,14 +1,5 @@
-import React, {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-} from "react-native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
@@ -26,7 +17,6 @@ import { TabParamList } from "@/constants/types";
 
 import { Category, Movie } from "@/types";
 import { fetchAllMovies, fetchCategories } from "@/providers/api";
-
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -89,9 +79,18 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
 
   return (
     <CustomView style={styles.container}>
-      <CategoryFilter categories={categories} selectedCategory={selectedCategory} onSelect={handleCategoryPress} />
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelect={handleCategoryPress}
+      />
 
-      <MovieCategoryGroup navigation={navigation} categories={categories} movies={movies} flatListRef={flatListRef} />
+      <MovieCategoryGroup
+        navigation={navigation}
+        categories={categories}
+        movies={movies}
+        flatListRef={flatListRef}
+      />
     </CustomView>
   );
 };
@@ -100,7 +99,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.secBackground,
   },
-  
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",

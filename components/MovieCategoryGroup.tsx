@@ -26,31 +26,30 @@ const MovieCategoryGroup = ({
   movies,
   flatListRef,
 }: MoviesProps) => {
-  const renderMovieItem = useCallback(
-    ({ item }: { item: Movie }) => {
-      if (!item) {
-        return null;
-      }
+  const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
+    if (!item) {
+      return null;
+    }
 
-      return (
-        <Pressable
-          style={styles.movieItem}
-          onPress={() => navigation.navigate("MovieDetails")}
-        >
-          <Image
-            source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-            style={styles.movieImage}
-            resizeMode="contain"
-          />
+    return (
+      <Pressable
+        style={styles.movieItem}
+        onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+      >
+        <Image
+          source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
+          style={styles.movieImage}
+          resizeMode="contain"
+        />
 
-          <View style={styles.ratingTag}>
-            <CustomText>{Number(item.rating).toFixed(2)}</CustomText>
-          </View>
-        </Pressable>
-      );
-    },
-    []
-  );
+        <View style={styles.ratingTag}>
+          <CustomText type="extraSmall">
+            {Number(item.rating).toFixed(1)}
+          </CustomText>
+        </View>
+      </Pressable>
+    );
+  }, []);
 
   const renderCategorySection = useCallback(
     ({ item }: { item: Category }) => {
@@ -127,17 +126,17 @@ const styles = StyleSheet.create({
 
   ratingTag: {
     position: "absolute",
-    top: 10,
-    left: 10,
-    backgroundColor: Colors.tint,
+    top: 6,
+    left: 6,
+    backgroundColor: "rgb(190 18 60)",
     borderRadius: 5,
-    padding: 5,
+    padding: 3,
   },
 
   emptyStateText: {
     marginLeft: 10,
     color: Colors.tint,
-  }
+  },
 });
 
 export default MovieCategoryGroup;

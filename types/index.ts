@@ -22,4 +22,5 @@ export type Movie = {
   tv_archive: number;
   tv_archive_duration: number;
   stream_type: string;
+  tmdb: string;
 };
