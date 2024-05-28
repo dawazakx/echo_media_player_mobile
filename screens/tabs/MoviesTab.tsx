@@ -39,6 +39,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
 
       const moviesData = await fetchAllMovies(deviceId, categoriesData);
       setMovies(moviesData);
+      console.log(moviesData); // Debug log
 
       if (categoriesData.length > 0) {
         setSelectedCategory(categoriesData[0].category_id);

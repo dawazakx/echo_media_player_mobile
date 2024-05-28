@@ -1,5 +1,5 @@
 // MovieDetailsScreen.tsx
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -22,6 +22,8 @@ import axios from "axios";
 import { CustomText } from "@/components/Text";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomButton from "@/components/Button";
+import { fetchStreamUrl } from "@/providers/api";
+import { DeviceContext } from "@/providers/DeviceProvider";
 
 type MovieDetailsProps = {
   route: RouteProp<MoviesStackParamList, "MovieDetails">;
@@ -48,9 +50,10 @@ const formatRuntime = (runtime: number) => {
 
 const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
   const { movie } = route.params;
+  const { deviceId } = useContext(DeviceContext);
   const [movieDetails, setMovieDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  console.log(movie);
+  const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -76,6 +79,28 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
 
     fetchMovieDetails();
   }, [movie]);
+
+  const handleWatchNow = async () => {
+    if (!deviceId) {
+      console.error("Device ID is required to fetch the stream URL");
+      return;
+    }
+
+    try {
+      const streamUrl = await fetchStreamUrl(deviceId, movie);
+      if (streamUrl) {
+        setStreamUrl(streamUrl);
+        console.log("Stream URL:", streamUrl);
+        // Navigate to the video player screen or handle the stream URL as needed
+        // For example:
+        navigation.navigate("VideoPlayer", { streamUrl: streamUrl });
+      } else {
+        console.error("Failed to fetch the stream URL");
+      }
+    } catch (error) {
+      console.error("Error fetching stream URL:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -283,7 +308,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
                     />
                   }
                   title="WATCH NOW"
-                  onPress={() => {}}
+                  onPress={handleWatchNow}
                   style={{ paddingVertical: 7, paddingHorizontal: 10 }}
                   textStyle={{ fontSize: 14 }}
                   width="85%"
