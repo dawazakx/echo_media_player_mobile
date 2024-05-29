@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 10,
     paddingLeft: 10,
+    color: "white",
   },
 });
 
