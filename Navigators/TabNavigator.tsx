@@ -11,6 +11,7 @@ import SettingsTab from "@/screens/tabs/SettingsTab";
 import { MoviesStackParamList, TabParamList } from "@/constants/types";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MovieDetails from "@/screens/MovieDetails";
+import VideoPlayer from "@/screens/VideoPlayer";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
@@ -20,6 +21,7 @@ const MoviesStackNavigator: React.FC = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MoviesList" component={MoviesTabWithHeader} />
       <Stack.Screen name="MovieDetails" component={MovieDetails} />
+      <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
     </Stack.Navigator>
   );
 };

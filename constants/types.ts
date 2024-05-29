@@ -35,4 +35,5 @@ export type TabParamList = {
 export type MoviesStackParamList = {
   MoviesList: undefined;
   MovieDetails: { movie: Movie };
+  VideoPlayer: { streamUrl: string };
 };

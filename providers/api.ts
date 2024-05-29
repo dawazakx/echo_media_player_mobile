@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { BASE_URL } from "@/constants/api";
 
-import { type Category, type LiveStream } from "@/types";
+import { type Category, type LiveStream, type Movie } from "@/types";
 
 export const fetchLiveStreamCategories = async (
   deviceId: string | null
@@ -99,5 +99,35 @@ export const fetchAllMovies = async (
   } catch (error) {
     console.error(error);
     return {};
+  }
+};
+
+export const fetchStreamUrl = async (
+  deviceId: string | null,
+  movie: Movie
+): Promise<string | null> => {
+  if (!deviceId || typeof deviceId !== "string") {
+    throw new Error("Invalid device ID");
+  }
+
+  if (!movie.stream_id || !movie.container_extension) {
+    throw new Error("Invalid movie details");
+  }
+
+  try {
+    const response = await axios.get(
+      `${BASE_URL}stream-url?stream_id=${movie.stream_id}&stream_extension=${movie.container_extension}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+    console.log("Stream URL response:", response.data);
+    return response.data.streamURL; // Adjust this according to your actual API response structure
+  } catch (error) {
+    console.error(error);
+    return null; // Return null in case of error
   }
 };
