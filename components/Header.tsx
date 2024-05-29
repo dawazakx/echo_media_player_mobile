@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useContext} from "react";
 import { Pressable, StyleSheet } from "react-native";
+
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+
 import { DrawerActions } from "@react-navigation/native";
 import { CustomView } from "./View";
 import { Feather } from "@expo/vector-icons";
@@ -8,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 
 const Header = ({ navigation }) => {
+  const { currentPlaylist } = useContext(PlaylistContext);
   const insets = useSafeAreaInsets();
 
   return (
@@ -40,7 +44,7 @@ const Header = ({ navigation }) => {
           }}
         />
       </Pressable>
-      <CustomText type="subtitle">Playlist Name</CustomText>
+      <CustomText type="subtitle">{currentPlaylist?.nickname}</CustomText>
       <Pressable
         style={styles.iconContainer}
         onPress={() => navigation.navigate("Search")}
