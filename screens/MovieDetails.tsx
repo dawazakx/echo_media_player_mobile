@@ -57,7 +57,6 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
-      console.log("Fetching details for TMDB ID:", movie.tmdb); // Debug log
       try {
         const response = await axios.get(
           `https://api.themoviedb.org/3/movie/${movie.tmdb}`,

@@ -53,14 +53,14 @@ async function connectXtreme(
 }
 
 export default function XtremeForm({ navigation }: XtremePlaylistProps) {
-  const [username, setUsername] = useState("Dawazak");
-  const [nickname, setNickname] = useState("Dawazak");
-  const [password, setPassword] = useState("wcunmgpamy");
-  const [url, setUrl] = useState("https://ottkiller.pro");
-  // const [username, setUsername] = useState("");
-  // const [nickname, setNickname] = useState("");
-  // const [password, setPassword] = useState("");
-  // const [url, setUrl] = useState("");
+  // const [username, setUsername] = useState("Dawazak");
+  // const [nickname, setNickname] = useState("Dawazak");
+  // const [password, setPassword] = useState("wcunmgpamy");
+  // const [url, setUrl] = useState("https://ottkiller.pro");
+  const [username, setUsername] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
+  const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { deviceId } = useContext(DeviceContext);
@@ -139,6 +139,7 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
         textColor={Colors.background}
         onPress={handleSubmit}
         disabled={isLoading}
+        loading={isLoading}
       />
     </CustomView>
   );

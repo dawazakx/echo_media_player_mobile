@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
   DimensionValue,
+  ActivityIndicator,
 } from "react-native";
 import { CustomText } from "./Text";
 import { Colors } from "@/constants/Colors";
@@ -22,6 +23,7 @@ type CustomButtonProps = {
   width?: DimensionValue | undefined;
   textColor?: string;
   disabled?: boolean;
+  loading?: boolean;
 };
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -35,6 +37,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   width,
   textColor = Colors.text,
   disabled = false,
+  loading = false,
 }) => {
   return (
     <Pressable
@@ -47,9 +50,13 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     >
       <View style={styles.content}>
         {iconLeft && iconLeft}
-        <CustomText style={[{ color: textColor }, textStyle]}>
-          {title}
-        </CustomText>
+        {
+          loading
+            ? <ActivityIndicator size="small" color={textColor} />
+            : <CustomText style={[{ color: textColor }, textStyle]}>
+              {title}
+            </CustomText>
+        }
         {iconRight && iconRight}
       </View>
     </Pressable>
