@@ -73,7 +73,7 @@ export const fetchStreamUrl = async (
       }
     );
     console.log("Stream URL response:", response.data);
-    return response.data.streamUrl; // Adjust this according to your actual API response structure
+    return response.data.streamURL; // Adjust this according to your actual API response structure
   } catch (error) {
     console.error(error);
     return null; // Return null in case of error

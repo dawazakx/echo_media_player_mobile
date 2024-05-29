@@ -69,7 +69,6 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
           }
         );
         setMovieDetails(response.data);
-        console.log(response.data);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -90,9 +89,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
       const streamUrl = await fetchStreamUrl(deviceId, movie);
       if (streamUrl) {
         setStreamUrl(streamUrl);
-        console.log("Stream URL:", streamUrl);
         // Navigate to the video player screen or handle the stream URL as needed
-        // For example:
         navigation.navigate("VideoPlayer", { streamUrl: streamUrl });
       } else {
         console.error("Failed to fetch the stream URL");
