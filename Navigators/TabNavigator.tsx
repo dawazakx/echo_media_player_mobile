@@ -66,7 +66,7 @@ export default function Tabs() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="TvShows"
         component={TvShowsTabWithHeader}
         options={{
@@ -80,8 +80,8 @@ export default function Tabs() {
             />
           ),
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Sports"
         component={SportsTabWithHeader}
         options={{
@@ -95,7 +95,7 @@ export default function Tabs() {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Settings"
         component={SetttingstabWithHeader}
