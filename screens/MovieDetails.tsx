@@ -197,13 +197,13 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
             <Image
               source={{ uri: movie.stream_icon }}
               style={{
-                width: width * 0.32,
-                height: height * 0.25,
+                width: width * 0.3,
+                height: height * 0.23,
                 borderRadius: 15,
               }}
               resizeMode="contain"
             />
-            <View>
+            <View style={{ flex: 1 }}>
               <CustomText type="title" style={{ textAlign: "center" }}>
                 {movieDetails?.title}
               </CustomText>

@@ -1,4 +1,4 @@
-import React, { useContext} from "react";
+import React, { useContext } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
 import { PlaylistContext } from "@/providers/PlaylistProvider";
@@ -9,6 +9,7 @@ import { Feather } from "@expo/vector-icons";
 import { CustomText } from "./Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
+import SettingsTab from "@/screens/tabs/SettingsTab";
 
 const Header = ({ navigation }) => {
   const { currentPlaylist } = useContext(PlaylistContext);
@@ -27,10 +28,7 @@ const Header = ({ navigation }) => {
         borderBottomColor: "gray",
       }}
     >
-      <Pressable
-        style={styles.iconContainer}
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-      >
+      <Pressable style={styles.iconContainer} onPress={() => {}}>
         {/* <Feather name="menu" size={24} color="white" /> */}
         <Image
           source={require("../assets/whiteLogo.png")}

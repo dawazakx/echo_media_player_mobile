@@ -1,4 +1,4 @@
-import { Movie } from "@/screens/tabs/MoviesTab";
+import { Movie } from "@/types";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -15,15 +15,6 @@ export type PlaylistStackParamList = {
   local: undefined;
 };
 
-export type DrawerParamList = {
-  Categories: undefined;
-  About: undefined;
-  Manage: undefined;
-  Premium: undefined;
-  Privacy: undefined;
-  Terms: undefined;
-};
-
 export type TabParamList = {
   LiveTV: undefined;
   Movies: undefined;
@@ -36,4 +27,11 @@ export type MoviesStackParamList = {
   MoviesList: undefined;
   MovieDetails: { movie: Movie };
   VideoPlayer: { streamUrl: string };
+};
+export type SettingsStackParamList = {
+  index: undefined;
+  About: undefined;
+  Manage: undefined;
+  Profile: undefined;
+  Terms: undefined;
 };
