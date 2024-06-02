@@ -1,19 +1,31 @@
+import React, { useContext, useEffect } from "react";
+import { View, Image } from "react-native";
+
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
-import { Colors } from "@/constants/Colors";
-import * as React from "react";
-import { View, Image } from "react-native";
 
-import { SIGNIN_ROUTE, ADD_PLAYLIST_ROUTE } from "../constants/Routes";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Colors } from "@/constants/Colors";
 import { RootStackParamList } from "@/constants/types";
+import { SIGNIN_ROUTE, ADD_PLAYLIST_ROUTE, PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 
 export interface HomeProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
 }
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
+  const { currentPlaylist } = useContext(PlaylistContext);
+
+  useEffect(() => {
+    if(currentPlaylist) {
+      navigation.navigate(PLAYER_INDEX_ROUTE);
+    }
+  }, [currentPlaylist]);
+
   return (
     <CustomView style={{ flex: 1, padding: 10 }}>
       <View

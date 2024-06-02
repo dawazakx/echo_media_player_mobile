@@ -2,7 +2,7 @@ import { Text, type TextProps, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 
 export type CustomTextProps = TextProps & {
-  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
+  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "extraSmall";
 };
 
 export function CustomText({
@@ -20,7 +20,7 @@ export function CustomText({
         type === "title" ? styles.title : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
-        type === "link" ? styles.link : undefined,
+        type === "extraSmall" ? styles.extraSmall : undefined,
         style,
       ]}
       {...rest}
@@ -39,17 +39,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: "bold",
     lineHeight: 32,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: "#0a7ea4",
+  extraSmall: {
+    lineHeight: 16,
+    fontSize: 12,
   },
 });

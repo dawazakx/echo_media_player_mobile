@@ -26,6 +26,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   const isFocused = useSharedValue(false);
   const labelPosition = useSharedValue(props.value ? 1 : 0);
   const text = useRef(props.value || "").current;
+  const [inputValue, setInputValue] = useState(null);
 
   const [showPassword, setShowPassword] = useState<boolean>(
     props.secureTextEntry ?? false
@@ -38,7 +39,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   const handleBlur = () => {
     isFocused.value = false;
-    if (!text) {
+
+    if (!inputValue) {
       labelPosition.value = withTiming(0);
     }
   };
@@ -47,6 +49,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     text = text;
     if (onChangeText) {
       onChangeText(text);
+      setInputValue(text);
     }
     if (text) {
       labelPosition.value = withTiming(1);
@@ -77,7 +80,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChangeText={handleTextChange}
-            value={text}
+            // value={text}
             textAlignVertical="center"
             textContentType={props.secureTextEntry ? "password" : "none"}
             secureTextEntry={props.secureTextEntry ? showPassword : false}
@@ -125,6 +128,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 10,
     paddingLeft: 10,
+    color: "white",
   },
 });
 
