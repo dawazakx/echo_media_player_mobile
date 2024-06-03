@@ -1,7 +1,7 @@
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-const PremiumFeatures = () => {
+const Profile = () => {
   return (
     <CustomView
       style={{
@@ -17,4 +17,4 @@ const PremiumFeatures = () => {
     </CustomView>
   );
 };
-export default PremiumFeatures;
+export default Profile;
