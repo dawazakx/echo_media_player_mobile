@@ -98,23 +98,15 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
         paddingBottom: 20,
         paddingHorizontal: 8,
         backgroundColor: Colors.secBackground,
-      }}
-    >
-      <View
-        style={{
-          marginHorizontal: 12,
-          marginVertical: 15,
-          flexDirection: "row",
-          justifyContent: "center",
-        }}
-      >
+      }}>
+      <View style={styles.header}>
         <Pressable
           style={styles.backBtn}
           onPress={() => {
             navigation.goBack();
           }}
         >
-          <MaterialIcons name="arrow-back" size={32} color={Colors.tint} />
+          <MaterialIcons name="arrow-back" size={32} color={Colors.white} />
         </Pressable>
 
         <CustomText type="title">Settings</CustomText>
@@ -140,7 +132,6 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
         </View>
 
         {/* Support and About settings */}
-
         <View style={{ marginBottom: 12 }}>
           <CustomText type="subtitle" style={{ marginVertical: 10 }}>
             Support & About{" "}
@@ -176,7 +167,17 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
 };
 export default SettingsTab;
 const styles = StyleSheet.create({
-  container: { marginHorizontal: 12, marginTop: 25 },
+  header: {
+    marginHorizontal: 12,
+    marginVertical: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  container: { 
+    marginHorizontal: 12, 
+    marginTop: 15
+  },
   renderItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -184,7 +185,6 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
   },
   backBtn: {
-    position: "absolute",
     left: 0,
     backgroundColor: "transparent",
   },
