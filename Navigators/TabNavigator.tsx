@@ -20,6 +20,7 @@ import Profile from "@/screens/tabs/settings/Profile";
 import ManagePlaylist from "@/screens/tabs/settings/ManagePlaylist";
 import About from "@/screens/tabs/settings/About";
 import Terms from "@/screens/tabs/settings/Terms";
+import Support from "@/screens/tabs/settings/Support";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
@@ -37,11 +38,12 @@ const MoviesStackNavigator: React.FC = () => {
 const SettingsStackNavigator: React.FC = () => {
   return (
     <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
-      <SettingsStack.Screen name="index" component={SetttingsTabWithHeader} />
-      <SettingsStack.Screen name="About" component={About} />
+      <SettingsStack.Screen name="index" component={SettingsTab} />
       <SettingsStack.Screen name="Manage" component={ManagePlaylist} />
       <SettingsStack.Screen name="Profile" component={Profile} />
+      <SettingsStack.Screen name="About" component={About} />
       <SettingsStack.Screen name="Terms" component={Terms} />
+      <SettingsStack.Screen name="Support" component={Support} />
     </SettingsStack.Navigator>
   );
 };
@@ -149,4 +151,4 @@ const MoviesTabWithHeader = withHeader(MoviesTab);
 const LiveTvTabWithHeader = withHeader(LiveTvTab);
 const TvShowsTabWithHeader = withHeader(TvShowsTab);
 const SportsTabWithHeader = withHeader(SportsTab);
-const SetttingsTabWithHeader = withHeader(SettingsTab);
+const SettingsTabWithHeader = withHeader(SettingsTab);
