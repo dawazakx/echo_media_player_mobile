@@ -79,20 +79,11 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
   const actionsItems = [{ icon: "logout", text: "Log out", action: logout }];
 
   const renderSettingsItem = ({ icon, text, action }) => (
-    <Pressable
-      onPress={action}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 8,
-        paddingLeft: 12,
-        backgroundColor: Colors.tint,
-      }}
-    >
-      <MaterialIcons name={icon} size={24} color="black" />
+    <Pressable onPress={action} style={styles.renderItem}>
+      <MaterialIcons name={icon} size={24} color={Colors.background} />
       <CustomText
         type="defaultSemiBold"
-        style={{ marginLeft: 36, color: Colors.background }}
+        style={{ marginLeft: 15, color: Colors.background }}
       >
         {text}{" "}
       </CustomText>
@@ -117,35 +108,29 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
           justifyContent: "center",
         }}
       >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            position: "absolute",
-            left: 0,
+        <Pressable
+          style={styles.backBtn}
+          onPress={() => {
+            navigation.goBack();
           }}
         >
-          <MaterialIcons
-            name="keyboard-arrow-left"
-            size={30}
-            color={Colors.white}
-          />
-        </TouchableOpacity>
+          <MaterialIcons name="arrow-back" size={32} color={Colors.tint} />
+        </Pressable>
 
         <CustomText type="title">Settings</CustomText>
       </View>
 
-      <ScrollView style={{ marginHorizontal: 12 }}>
+      <ScrollView style={styles.container}>
         {/* Account Settings */}
-        <View style={{ marginBottom: 12 }}>
+        <View
+          style={{
+            marginBottom: 12,
+          }}
+        >
           <CustomText type="subtitle" style={{ marginVertical: 10 }}>
             Account
           </CustomText>
-          <View
-            style={{
-              borderRadius: 12,
-              backgroundColor: Colors.white,
-            }}
-          >
+          <View style={styles.renderItemContainer}>
             {accountItems.map((item, index) => (
               <React.Fragment key={index}>
                 {renderSettingsItem(item)}
@@ -160,12 +145,7 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
           <CustomText type="subtitle" style={{ marginVertical: 10 }}>
             Support & About{" "}
           </CustomText>
-          <View
-            style={{
-              borderRadius: 12,
-              backgroundColor: Colors.white,
-            }}
-          >
+          <View style={styles.renderItemContainer}>
             {supportItems.map((item, index) => (
               <React.Fragment key={index}>
                 {renderSettingsItem(item)}
@@ -182,12 +162,34 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
         iconLeft={
           <MaterialIcons name="logout" size={24} color={Colors.background} />
         }
-        width="35%"
-        style={{ backgroundColor: Colors.tint }}
+        width="30%"
+        borderRadius={12}
+        style={{
+          backgroundColor: Colors.tint,
+          bottom: 20,
+          left: 12,
+        }}
         textColor={Colors.background}
       />
     </SafeAreaView>
   );
 };
 export default SettingsTab;
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: { marginHorizontal: 12, marginTop: 25 },
+  renderItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingLeft: 12,
+  },
+  backBtn: {
+    position: "absolute",
+    left: 0,
+    backgroundColor: "transparent",
+  },
+  renderItemContainer: {
+    borderRadius: 12,
+    backgroundColor: Colors.tint,
+  },
+});
