@@ -1,7 +1,7 @@
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-const Privacy = () => {
+const Profile = () => {
   return (
     <CustomView
       style={{
@@ -12,9 +12,9 @@ const Privacy = () => {
       }}
     >
       <CustomText type="title" style={{ textAlign: "center" }}>
-        Privacy Policy
+        Downloads, Reminders and Recordings
       </CustomText>
     </CustomView>
   );
 };
-export default Privacy;
+export default Profile;

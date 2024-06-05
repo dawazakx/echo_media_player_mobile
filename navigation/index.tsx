@@ -6,7 +6,7 @@ import HomeScreen from "../screens/Home";
 import SearchScreen from "@/screens/SearchScreen";
 
 import PlaylistNavigator from "@/Navigators/PlaylistNavigator";
-import SideDrawer from "@/Navigators/DrawerNavigator";
+import Tabs from "@/Navigators/TabNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +20,7 @@ function AppNavigator() {
         >
           <Stack.Screen name="Welcome" component={HomeScreen} />
           <Stack.Screen name="Playlist" component={PlaylistNavigator} />
-          <Stack.Screen name="Home" component={SideDrawer} />
+          <Stack.Screen name="Home" component={Tabs} />
           <Stack.Screen name="Search" component={SearchScreen} />
         </Stack.Navigator>
       </SafeAreaProvider>

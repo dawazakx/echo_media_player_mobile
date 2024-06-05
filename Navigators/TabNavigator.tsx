@@ -8,13 +8,23 @@ import React from "react";
 import Header from "../components/Header";
 import { MaterialIcons } from "@expo/vector-icons";
 import SettingsTab from "@/screens/tabs/SettingsTab";
-import { MoviesStackParamList, TabParamList } from "@/constants/types";
+import {
+  MoviesStackParamList,
+  SettingsStackParamList,
+  TabParamList,
+} from "@/constants/types";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MovieDetails from "@/screens/MovieDetails";
 import VideoPlayer from "@/screens/VideoPlayer";
+import Profile from "@/screens/tabs/settings/Profile";
+import ManagePlaylist from "@/screens/tabs/settings/ManagePlaylist";
+import About from "@/screens/tabs/settings/About";
+import Terms from "@/screens/tabs/settings/Terms";
+import Support from "@/screens/tabs/settings/Support";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 
 const MoviesStackNavigator: React.FC = () => {
   return (
@@ -23,6 +33,18 @@ const MoviesStackNavigator: React.FC = () => {
       <Stack.Screen name="MovieDetails" component={MovieDetails} />
       <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
     </Stack.Navigator>
+  );
+};
+const SettingsStackNavigator: React.FC = () => {
+  return (
+    <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
+      <SettingsStack.Screen name="index" component={SettingsTab} />
+      <SettingsStack.Screen name="Manage" component={ManagePlaylist} />
+      <SettingsStack.Screen name="Profile" component={Profile} />
+      <SettingsStack.Screen name="About" component={About} />
+      <SettingsStack.Screen name="Terms" component={Terms} />
+      <SettingsStack.Screen name="Support" component={Support} />
+    </SettingsStack.Navigator>
   );
 };
 
@@ -100,7 +122,7 @@ export default function Tabs() {
       /> */}
       <Tab.Screen
         name="Settings"
-        component={SetttingstabWithHeader}
+        component={SettingsStackNavigator}
         options={{
           title: "Settings",
           tabBarIcon: ({ color }) => (
@@ -129,4 +151,4 @@ const MoviesTabWithHeader = withHeader(MoviesTab);
 const LiveTvTabWithHeader = withHeader(LiveTvTab);
 const TvShowsTabWithHeader = withHeader(TvShowsTab);
 const SportsTabWithHeader = withHeader(SportsTab);
-const SetttingstabWithHeader = withHeader(SettingsTab);
+const SettingsTabWithHeader = withHeader(SettingsTab);

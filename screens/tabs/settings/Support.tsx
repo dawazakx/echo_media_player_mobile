@@ -1,7 +1,7 @@
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-const PremiumFeatures = () => {
+const Support = () => {
   return (
     <CustomView
       style={{
@@ -12,9 +12,9 @@ const PremiumFeatures = () => {
       }}
     >
       <CustomText type="title" style={{ textAlign: "center" }}>
-        Downloads, Reminders and Recordings
+        Support and Feedback
       </CustomText>
     </CustomView>
   );
 };
-export default PremiumFeatures;
+export default Support;
