@@ -35,13 +35,14 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     const fetchData = async () => {
       setLoading(true);
       const categoriesData = await fetchCategories(deviceId);
-      setCategories(categoriesData);
+      const availableCategories = categoriesData.slice(0, 20);
+      setCategories(availableCategories);
 
-      const moviesData = await fetchAllMovies(deviceId, categoriesData);
+      const moviesData = await fetchAllMovies(deviceId, availableCategories);
       setMovies(moviesData);
 
-      if (categoriesData.length > 0) {
-        setSelectedCategory(categoriesData[0].category_id);
+      if (availableCategories.length > 0) {
+        setSelectedCategory(availableCategories[0].category_id);
       }
       setLoading(false);
     };

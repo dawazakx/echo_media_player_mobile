@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.echomedia.echomediaplayer"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,6 +32,9 @@
       "eas": {
         "projectId": "31163510-74d1-4e7a-bf2d-96b6a3eedbd8"
       }
-    }
+    },
+    "plugins": [
+      "react-native-vlc-media-player"
+    ]
   }
 }
