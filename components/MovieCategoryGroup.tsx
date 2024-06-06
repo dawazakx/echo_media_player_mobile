@@ -9,6 +9,7 @@ import { TabParamList } from "@/constants/types";
 import { Colors } from "@/constants/Colors";
 
 import { type Category, type Movie } from "@/types";
+import React = require("react");
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -61,9 +62,22 @@ const MovieCategoryGroup = ({
 
       return (
         <View key={item.category_id} style={styles.categorySection}>
-          <CustomText type="subtitle" style={styles.categoryTitle}>
-            {item.category_name}
-          </CustomText>
+          <View style={styles.categoryHeader}>
+            <CustomText type="subtitle" style={styles.categoryTitle}>
+              {item.category_name}
+            </CustomText>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("AllMovies", {
+                  categoryId: item.category_id,
+                })
+              }
+            >
+              <CustomText type="extraSmall" style={styles.seeAllText}>
+                See All
+              </CustomText>
+            </Pressable>
+          </View>
 
           <FlatList
             data={moviesForCategory}
@@ -116,6 +130,13 @@ const styles = StyleSheet.create({
   },
 
   categorySection: {
+    marginVertical: 10,
+  },
+  categoryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 10,
     marginVertical: 10,
   },
 

@@ -21,6 +21,7 @@ import ManagePlaylist from "@/screens/tabs/settings/ManagePlaylist";
 import About from "@/screens/tabs/settings/About";
 import Terms from "@/screens/tabs/settings/Terms";
 import Support from "@/screens/tabs/settings/Support";
+import AllMovies from "@/screens/tabs/movies/AllMovies";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
@@ -30,6 +31,7 @@ const MoviesStackNavigator: React.FC = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MoviesList" component={MoviesTabWithHeader} />
+      <Stack.Screen name="AllMovies" component={AllMovies} />
       <Stack.Screen name="MovieDetails" component={MovieDetails} />
       <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
     </Stack.Navigator>

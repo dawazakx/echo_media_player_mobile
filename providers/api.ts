@@ -125,9 +125,30 @@ export const fetchStreamUrl = async (
       }
     );
     console.log("Stream URL response:", response.data);
-    return response.data.streamURL; // Adjust this according to your actual API response structure
+    return response.data.streamURL;
   } catch (error) {
     console.error(error);
     return null; // Return null in case of error
+  }
+};
+
+export const fetchMoviesByCategory = async (
+  deviceId: string,
+  categoryId: string
+): Promise<Movie[]> => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}vod-stream?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+    return response.data.streams;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };
