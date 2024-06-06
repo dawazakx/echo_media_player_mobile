@@ -1,6 +1,5 @@
 import React from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
-import Video from "react-native-video";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { MoviesStackParamList } from "@/constants/types";
@@ -18,14 +17,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* <Video
-        source={{ uri: streamUrl }}
-        style={styles.video}
-        controls={true}
-        resizeMode="contain"
-        onBuffer={() => console.log("Buffering...")}
-        onError={(error) => console.log("Error:", error)}
-      /> */}
       <VLCPlayer
         style={[styles.video]}
         videoAspectRatio="16:9"
