@@ -62,7 +62,7 @@ const ManagePlaylist = ({ navigation }) => {
             padding: 15,
             backgroundColor: "gray",
             borderRadius: 10,
-            width: "90%",
+            width: "100%",
           }}
           onPress={() =>
             navigation.navigate("PlaylistDetails", {
