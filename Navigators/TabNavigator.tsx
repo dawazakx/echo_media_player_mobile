@@ -17,14 +17,17 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MovieDetails from "@/screens/MovieDetails";
 import VideoPlayer from "@/screens/VideoPlayer";
 import Profile from "@/screens/tabs/settings/Profile";
-import ManagePlaylist from "@/screens/tabs/settings/ManagePlaylist";
 import About from "@/screens/tabs/settings/About";
 import Terms from "@/screens/tabs/settings/Terms";
 import Support from "@/screens/tabs/settings/Support";
+import PlaylistNavigator from "./PlaylistNavigator";
+import ManagePlaylist from "@/screens/tabs/settings/managePlaylist/ManagePlaylist";
+import PlaylistDetails from "@/screens/tabs/settings/managePlaylist/PlaylistDetails";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
+const PlaylistManagerStack = createNativeStackNavigator();
 
 const MoviesStackNavigator: React.FC = () => {
   return (
@@ -35,11 +38,32 @@ const MoviesStackNavigator: React.FC = () => {
     </Stack.Navigator>
   );
 };
+const PlaylistManagerNavigator: React.FC = () => {
+  return (
+    <PlaylistManagerStack.Navigator screenOptions={{ headerShown: false }}>
+      <PlaylistManagerStack.Screen
+        name="playlist-manager"
+        component={ManagePlaylist}
+      />
+      <PlaylistManagerStack.Screen
+        name="PlaylistDetails"
+        component={PlaylistDetails}
+      />
+      <PlaylistManagerStack.Screen
+        name="add-playlist"
+        component={PlaylistNavigator}
+      />
+    </PlaylistManagerStack.Navigator>
+  );
+};
 const SettingsStackNavigator: React.FC = () => {
   return (
     <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
       <SettingsStack.Screen name="index" component={SettingsTab} />
-      <SettingsStack.Screen name="Manage" component={ManagePlaylist} />
+      <SettingsStack.Screen
+        name="Manage"
+        component={PlaylistManagerNavigator}
+      />
       <SettingsStack.Screen name="Profile" component={Profile} />
       <SettingsStack.Screen name="About" component={About} />
       <SettingsStack.Screen name="Terms" component={Terms} />
@@ -125,6 +149,7 @@ export default function Tabs() {
         component={SettingsStackNavigator}
         options={{
           title: "Settings",
+          tabBarStyle: { display: "none" },
           tabBarIcon: ({ color }) => (
             <MaterialIcons
               name="settings"
