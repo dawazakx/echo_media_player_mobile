@@ -4,6 +4,7 @@ import { FlatList, StyleSheet } from "react-native";
 import CustomButton from "@/components/Button";
 
 import { Colors } from "@/constants/Colors";
+import React = require("react");
 
 interface CategoryI {
   category_id: string;
@@ -14,10 +15,14 @@ interface CategoryI {
 interface CategoryFilterProps {
   categories: CategoryI[];
   selectedCategory: string | null;
-  onSelect: (category_id: string) => void;  
+  onSelect: (category_id: string) => void;
 }
 
-const CategoryFilter = ({ categories, selectedCategory, onSelect }: CategoryFilterProps) => {
+const CategoryFilter = ({
+  categories,
+  selectedCategory,
+  onSelect,
+}: CategoryFilterProps) => {
   // const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const renderCategoryItem = useCallback(
@@ -48,8 +53,8 @@ const CategoryFilter = ({ categories, selectedCategory, onSelect }: CategoryFilt
       keyExtractor={(item) => item.category_id}
       renderItem={renderCategoryItem}
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.categoryContainer} />
-
+      contentContainerStyle={styles.categoryContainer}
+    />
   );
 };
 

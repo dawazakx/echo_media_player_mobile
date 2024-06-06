@@ -1,5 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
@@ -15,8 +21,8 @@ import { Colors } from "@/constants/Colors";
 
 import { TabParamList } from "@/constants/types";
 
-import { Category, Movie } from "@/types";
 import { fetchAllMovies, fetchCategories } from "@/providers/api";
+import { useQuery } from "@tanstack/react-query";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -25,73 +31,78 @@ export interface MoviesProps {
 
 const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
   const { deviceId } = useContext(DeviceContext);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [movies, setMovies] = useState<{ [key: string]: Movie[] }>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const flatListRef = useRef<FlatList>(null);
 
+  const categoriesQuery = useQuery({
+    queryKey: ["categories", deviceId],
+    queryFn: () => fetchCategories(deviceId),
+  });
+
+  const availableCategories = categoriesQuery.data!;
+
+  // Then get the movies
+  const moviesQuery = useQuery({
+    queryKey: ["movies", availableCategories],
+    queryFn: () => fetchAllMovies(deviceId, availableCategories),
+    enabled: !!availableCategories,
+    staleTime: 20 * 60 * 1000, // 20 minutes
+  });
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const categoriesData = await fetchCategories(deviceId);
-      const availableCategories = categoriesData.slice(0, 20);
-      setCategories(availableCategories);
-
-      const moviesData = await fetchAllMovies(deviceId, availableCategories);
-      setMovies(moviesData);
-
-      if (availableCategories.length > 0) {
-        setSelectedCategory(availableCategories[0].category_id);
-      }
-      setLoading(false);
-    };
-    fetchData();
-  }, [deviceId]);
+    if (availableCategories && availableCategories.length > 0) {
+      setSelectedCategory(availableCategories[0].category_id);
+    }
+  }, [availableCategories]);
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const categoryIndex = categories.findIndex(
+    const categoryIndex = availableCategories?.findIndex(
       (category) => category.category_id === categoryId
     );
     if (flatListRef.current) {
       flatListRef.current.scrollToIndex({
-        index: categoryIndex,
+        index: categoryIndex!,
         animated: true,
       });
     }
   };
 
-  if (loading) {
-    return (
-      <CustomView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.white} />
-      </CustomView>
-    );
-  }
-
-  if (categories.length === 0) {
+  if (categoriesQuery.data && moviesQuery.data)
     return (
       <CustomView style={styles.container}>
-        <CustomText>No categories found.</CustomText>
+        <CategoryFilter
+          categories={availableCategories}
+          selectedCategory={selectedCategory}
+          onSelect={handleCategoryPress}
+        />
+        <MovieCategoryGroup
+          navigation={navigation}
+          categories={availableCategories}
+          flatListRef={flatListRef}
+        />
       </CustomView>
     );
-  }
+
+  if (categoriesQuery.isError || moviesQuery.isError)
+    return (
+      <CustomView
+        style={{
+          backgroundColor: Colors.secBackground,
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <CustomText type="extraSmall">
+          An error occurred. Message:{" "}
+          {categoriesQuery.error?.message || moviesQuery.error?.message}
+        </CustomText>
+      </CustomView>
+    );
 
   return (
-    <CustomView style={styles.container}>
-      <CategoryFilter
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelect={handleCategoryPress}
-      />
-
-      <MovieCategoryGroup
-        navigation={navigation}
-        categories={categories}
-        movies={movies}
-        flatListRef={flatListRef}
-      />
+    <CustomView style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color={Colors.white} />
     </CustomView>
   );
 };

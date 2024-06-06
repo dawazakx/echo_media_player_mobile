@@ -79,11 +79,11 @@ export const fetchCategories = async (
 export const fetchAllMovies = async (
   deviceId: string | null,
   categories: Category[]
-): Promise<{ [key: string]: Movie[] }> => {
+) => {
   try {
     const allMovies = await Promise.all(
       categories.map(async (category) => {
-        const response = await axios.get(
+        const response = await axios.get<{ streams: Movie[] }>(
           `${BASE_URL}vod-stream?category_id=${category.category_id}`,
           {
             headers: {
@@ -135,9 +135,9 @@ export const fetchStreamUrl = async (
 export const fetchMoviesByCategory = async (
   deviceId: string,
   categoryId: string
-): Promise<Movie[]> => {
+) => {
   try {
-    const response = await axios.get(
+    const response = await axios.get<{ streams: Movie[] }>(
       `${BASE_URL}vod-stream?category_id=${categoryId}`,
       {
         headers: {
