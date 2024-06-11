@@ -131,3 +131,38 @@ export const fetchStreamUrl = async (
     return null; // Return null in case of error
   }
 };
+
+export const searchLiveTV = async (deviceId: string | null, query: string) => {
+  if (!deviceId || typeof deviceId !== "string") {
+    throw new Error("Invalid device ID");
+  }
+  try {
+    const response = await axios.get(`${BASE_URL}search-livetv?name=${query}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "device-id": deviceId,
+      },
+    });
+    return response.data.liveTV;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+export const searchMovies = async (deviceId: string | null, query: string) => {
+  if (!deviceId || typeof deviceId !== "string") {
+    throw new Error("Invalid device ID");
+  }
+  try {
+    const response = await axios.get(`${BASE_URL}search-vod?name=${query}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "device-id": deviceId,
+      },
+    });
+    return response.data.vod;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
