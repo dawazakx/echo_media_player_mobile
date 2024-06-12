@@ -16,6 +16,7 @@ export interface MoviesProps {
   categories: Category[];
   movies: { [key: string]: Movie[] };
   flatListRef: RefObject<FlatList>;
+  onMovieLongPress: (movie: Movie) => void;
 }
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
@@ -25,6 +26,7 @@ const MovieCategoryGroup = ({
   categories,
   movies,
   flatListRef,
+  onMovieLongPress,
 }: MoviesProps) => {
   const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
     if (!item) {
@@ -35,6 +37,8 @@ const MovieCategoryGroup = ({
       <Pressable
         style={styles.movieItem}
         onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+        onLongPress={() => onMovieLongPress(item)}
+        delayLongPress={250}
       >
         <Image
           source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}

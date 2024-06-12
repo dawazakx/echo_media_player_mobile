@@ -1,5 +1,17 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
@@ -17,6 +29,8 @@ import { TabParamList } from "@/constants/types";
 
 import { Category, Movie } from "@/types";
 import { fetchAllMovies, fetchCategories } from "@/providers/api";
+import { MaterialIcons } from "@expo/vector-icons";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -30,6 +44,8 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const flatListRef = useRef<FlatList>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +78,24 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     }
   };
 
+  const handleMovieLongPress = (movie: Movie) => {
+    setSelectedMovie(movie);
+    bottomSheetRef.current?.expand();
+  };
+
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        pressBehavior="close"
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.7}
+      />
+    ),
+    []
+  );
+
   if (loading) {
     return (
       <CustomView style={styles.loadingContainer}>
@@ -91,7 +125,99 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         categories={categories}
         movies={movies}
         flatListRef={flatListRef}
+        onMovieLongPress={handleMovieLongPress}
       />
+
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={["45%"]}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: Colors.secBackground }}
+        handleIndicatorStyle={{ backgroundColor: Colors.white }}
+        backdropComponent={renderBackdrop}
+      >
+        {selectedMovie && (
+          <View style={{ padding: 1 }}>
+            <CustomText
+              type="subtitle"
+              style={{ textAlign: "center", marginBottom: 10 }}
+            >
+              {selectedMovie.name}
+            </CustomText>
+            <View
+              style={{
+                borderRadius: 15,
+                gap: 9,
+                padding: 20,
+                backgroundColor: Colors.tint,
+              }}
+            >
+              <Pressable
+                style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+              >
+                <MaterialIcons
+                  name="play-circle"
+                  size={24}
+                  color={Colors.background}
+                />
+                <CustomText
+                  type="subtitle"
+                  style={{ color: Colors.background }}
+                >
+                  Play
+                </CustomText>
+              </Pressable>
+              <View
+                style={{
+                  width: "88%",
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  borderBottomColor: Colors.secBackground,
+                  alignSelf: "flex-end",
+                }}
+              />
+              <Pressable
+                style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+              >
+                <MaterialIcons
+                  name="bookmark"
+                  size={24}
+                  color={Colors.background}
+                />
+                <CustomText
+                  type="subtitle"
+                  style={{ color: Colors.background }}
+                >
+                  Add to Watchlist
+                </CustomText>
+              </Pressable>
+              <View
+                style={{
+                  width: "88%",
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  borderBottomColor: Colors.secBackground,
+                  alignSelf: "flex-end",
+                }}
+              />
+              <Pressable
+                style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+              >
+                <MaterialIcons
+                  name="download"
+                  size={24}
+                  color={Colors.background}
+                />
+                <CustomText
+                  type="subtitle"
+                  style={{ color: Colors.background }}
+                >
+                  Download
+                </CustomText>
+              </Pressable>
+            </View>
+          </View>
+        )}
+      </BottomSheet>
     </CustomView>
   );
 };
