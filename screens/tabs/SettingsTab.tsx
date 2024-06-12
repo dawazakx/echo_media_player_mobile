@@ -97,7 +97,7 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
         paddingTop: insets.top,
         paddingBottom: 20,
         paddingHorizontal: 8,
-        backgroundColor: "#273444",
+        backgroundColor: Colors.secBackground,
       }}
     >
       <View style={styles.header}>
