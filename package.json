@@ -17,6 +17,7 @@
     "@react-navigation/drawer": "^6.6.15",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
+    "@reduxjs/toolkit": "^2.2.5",
     "@shopify/flash-list": "1.6.3",
     "@types/react": "~18.2.45",
     "axios": "^1.7.2",
@@ -36,6 +37,7 @@
     "react-native-video": "^6.1.2",
     "react-native-vlc-media-player": "^1.0.67",
     "react-native-web": "~0.19.6",
+    "react-redux": "^9.1.2",
     "typescript": "^5.3.0"
   },
   "devDependencies": {
