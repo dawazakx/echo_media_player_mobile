@@ -1,4 +1,4 @@
-import { useCallback, RefObject } from "react";
+import React, { useCallback, RefObject } from "react";
 import { FlatList, Pressable, Image, View, StyleSheet } from "react-native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
@@ -37,7 +37,12 @@ const MovieCategoryGroup = ({
         onPress={() => navigation.navigate("MovieDetails", { movie: item })}
       >
         <Image
-          source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
+          source={{ 
+            uri: item.stream_icon || PLACEHOLDER_IMAGE,
+            headers: {
+              Accept: '*/*',
+            }
+          }}
           style={styles.movieImage}
           resizeMode="contain"
         />

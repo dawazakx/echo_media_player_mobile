@@ -34,7 +34,13 @@
       }
     },
     "plugins": [
-      "react-native-vlc-media-player"
+      "react-native-vlc-media-player",
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ]
     ]
   }
 }
