@@ -1,21 +1,19 @@
 import CustomButton from "@/components/Button";
-import { Collapsible } from "@/components/Collapsible";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-import { SELECT_PLAYLIST_ROUTE } from "@/constants/Routes";
 import { PlaylistContext } from "@/providers/PlaylistProvider";
 import { Feather, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { useNavigation } from "@react-navigation/native";
-import { useCallback, useContext, useRef } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { useCallback, useContext, useRef, useState } from "react";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 const ManagePlaylist = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { currentPlaylist } = useContext(PlaylistContext);
   const snapPoints = ["30%"];
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleOpenPress = () => bottomSheetRef.current?.expand();
 
@@ -31,6 +29,11 @@ const ManagePlaylist = ({ navigation }) => {
     ),
     []
   );
+
+  const handleDeletePlaylist = () => {
+    // Implement playlist deletion logic here
+    setIsModalVisible(false);
+  };
 
   return (
     <CustomView
@@ -163,6 +166,7 @@ const ManagePlaylist = ({ navigation }) => {
           />
           <Pressable
             style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+            onPress={() => setIsModalVisible(true)}
           >
             <MaterialIcons name="delete" size={22} color={Colors.background} />
             <CustomText type="subtitle" style={{ color: Colors.background }}>
@@ -188,6 +192,49 @@ const ManagePlaylist = ({ navigation }) => {
         textColor={Colors.background}
         onPress={() => navigation.navigate("AddPlaylist")}
       />
+
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <CustomText
+              style={{
+                fontSize: 22,
+                fontWeight: "bold",
+                marginBottom: 5,
+              }}
+            >
+              Are you absolutely sure?
+            </CustomText>
+            <CustomText type="default" style={{ color: "#9ca3af" }}>
+              This action cannot be undone. This will permanently remove your
+              playlist from our servers.
+            </CustomText>
+            <View style={styles.modalButtons}>
+              <CustomButton
+                title="Cancel"
+                width="45%"
+                borderRadius={10}
+                style={styles.modalButton}
+                textColor={Colors.background}
+                onPress={() => setIsModalVisible(false)}
+              />
+              <CustomButton
+                title="Continue"
+                width="45%"
+                borderRadius={10}
+                style={[styles.modalButton, { backgroundColor: "#b91c1c" }]}
+                textColor={Colors.white}
+                onPress={handleDeletePlaylist}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </CustomView>
   );
 };
@@ -197,5 +244,27 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     backgroundColor: "transparent",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: Colors.secBackground,
+    borderRadius: 10,
+    alignItems: "flex-start",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    width: "100%",
+  },
+  modalButton: {
+    marginHorizontal: 10,
   },
 });
