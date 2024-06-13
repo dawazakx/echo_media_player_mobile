@@ -13,9 +13,10 @@ import {
   SettingsStackParamList,
   TabParamList,
 } from "@/constants/types";
+
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import MovieDetails from "@/screens/MovieDetails";
-import VideoPlayer from "@/screens/VideoPlayer";
 import Profile from "@/screens/tabs/settings/Profile";
 import About from "@/screens/tabs/settings/About";
 import Terms from "@/screens/tabs/settings/Terms";
@@ -36,7 +37,6 @@ const MoviesStackNavigator: React.FC = () => {
       <Stack.Screen name="MoviesList" component={MoviesTabWithHeader} />
       <Stack.Screen name="AllMovies" component={AllMovies} />
       <Stack.Screen name="MovieDetails" component={MovieDetails} />
-      <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
     </Stack.Navigator>
   );
 };
