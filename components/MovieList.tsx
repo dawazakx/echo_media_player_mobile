@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -8,15 +8,16 @@ import {
   Text,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMoviesByCategory } from "@/providers/api";
+import { fetchMovieImage, fetchMoviesByCategory } from "@/providers/api";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { type Movie } from "@/types";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "@/constants/types";
+import { image500 } from "@/constants/api";
 
-const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
+export const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 
 const MovieList = ({
   categoryId,
@@ -37,6 +38,18 @@ const MovieList = ({
 
   const renderMovieItem = useCallback(
     ({ item }: { item: Movie }) => {
+      const [imageUrl, setImageUrl] = useState<string>(PLACEHOLDER_IMAGE);
+
+      useEffect(() => {
+        const fetchImage = async () => {
+          if (item.tmdb) {
+            const fetchedImage = await fetchMovieImage(item.tmdb);
+            setImageUrl(fetchedImage);
+          }
+        };
+
+        fetchImage();
+      }, [item.tmdb]);
       if (!item) {
         return null;
       }
@@ -49,7 +62,7 @@ const MovieList = ({
           delayLongPress={250}
         >
           <Image
-            source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
+            source={{ uri: image500(imageUrl) || item.stream_icon }}
             style={styles.movieImage}
             resizeMode="contain"
           />
