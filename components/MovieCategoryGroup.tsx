@@ -1,5 +1,5 @@
-import { useCallback, RefObject } from "react";
-import { FlatList, Pressable, Image, View, StyleSheet } from "react-native";
+import React, { useCallback, RefObject, useContext } from "react";
+import { FlatList, Pressable, View, StyleSheet } from "react-native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 
@@ -10,82 +10,52 @@ import { Colors } from "@/constants/Colors";
 
 import { type Category, type Movie } from "@/types";
 
+import MovieList from "./MovieList";
+
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
   route?: RouteProp<TabParamList, "Movies">;
   categories: Category[];
-  movies: { [key: string]: Movie[] };
   flatListRef: RefObject<FlatList>;
+  onMovieLongPress: (movie: Movie) => void;
 }
-
-const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 
 const MovieCategoryGroup = ({
   navigation,
   categories,
-  movies,
   flatListRef,
+  onMovieLongPress,
 }: MoviesProps) => {
-  const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
+  const renderCategorySection = ({ item }: { item: Category }) => {
     if (!item) {
       return null;
     }
 
     return (
-      <Pressable
-        style={styles.movieItem}
-        onPress={() => navigation.navigate("MovieDetails", { movie: item })}
-      >
-        <Image
-          source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-          style={styles.movieImage}
-          resizeMode="contain"
-        />
-
-        <View style={styles.ratingTag}>
-          <CustomText type="extraSmall">
-            {Number(item.rating).toFixed(1)}
-          </CustomText>
-        </View>
-      </Pressable>
-    );
-  }, []);
-
-  const renderCategorySection = useCallback(
-    ({ item }: { item: Category }) => {
-      if (!item) {
-        return null;
-      }
-
-      const moviesForCategory = movies[item.category_id] || [];
-
-      return (
-        <View key={item.category_id} style={styles.categorySection}>
+      <View key={item.category_id} style={styles.categorySection}>
+        <View style={styles.categoryHeader}>
           <CustomText type="subtitle" style={styles.categoryTitle}>
             {item.category_name}
           </CustomText>
-
-          <FlatList
-            data={moviesForCategory}
-            horizontal
-            keyExtractor={(movie) => movie.stream_id.toString()}
-            renderItem={renderMovieItem}
-            showsHorizontalScrollIndicator={false}
-            initialNumToRender={5}
-            maxToRenderPerBatch={5}
-            windowSize={3}
-            updateCellsBatchingPeriod={50}
-            ListEmptyComponent={
-              <CustomText style={styles.emptyStateText}>
-                No movies available
-              </CustomText>
+          <Pressable
+            onPress={() =>
+              navigation.navigate("AllMovies", {
+                category: item,
+              })
             }
-          />
+          >
+            <CustomText type="default">See All</CustomText>
+          </Pressable>
         </View>
-      );
-    },
-    [movies]
-  );
+
+        <MovieList
+          categoryId={item.category_id}
+          navigation={navigation}
+          onMovieLongPress={onMovieLongPress}
+        />
+      </View>
+    );
+  };
 
   return (
     <FlatList
@@ -116,6 +86,13 @@ const styles = StyleSheet.create({
   },
 
   categorySection: {
+    marginVertical: 10,
+  },
+  categoryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 10,
     marginVertical: 10,
   },
 

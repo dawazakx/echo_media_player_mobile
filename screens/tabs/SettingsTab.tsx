@@ -98,7 +98,8 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
         paddingBottom: 20,
         paddingHorizontal: 8,
         backgroundColor: Colors.secBackground,
-      }}>
+      }}
+    >
       <View style={styles.header}>
         <Pressable
           style={styles.backBtn}
@@ -174,9 +175,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  container: { 
-    marginHorizontal: 12, 
-    marginTop: 15
+  container: {
+    marginHorizontal: 12,
+    marginTop: 15,
   },
   renderItem: {
     flexDirection: "row",

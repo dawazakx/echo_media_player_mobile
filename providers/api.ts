@@ -1,8 +1,9 @@
 import axios from "axios";
 
-import { BASE_URL } from "@/constants/api";
+import { BASE_URL, TMDB_API_KEY } from "@/constants/api";
 
 import { type Category, type LiveStream, type Movie } from "@/types";
+import { PLACEHOLDER_IMAGE } from "@/components/MovieList";
 
 export const fetchLiveStreamCategories = async (
   deviceId: string | null
@@ -79,11 +80,11 @@ export const fetchCategories = async (
 export const fetchAllMovies = async (
   deviceId: string | null,
   categories: Category[]
-): Promise<{ [key: string]: Movie[] }> => {
+) => {
   try {
     const allMovies = await Promise.all(
       categories.map(async (category) => {
-        const response = await axios.get(
+        const response = await axios.get<{ streams: Movie[] }>(
           `${BASE_URL}vod-stream?category_id=${category.category_id}`,
           {
             headers: {
@@ -125,9 +126,48 @@ export const fetchStreamUrl = async (
       }
     );
     console.log("Stream URL response:", response.data);
-    return response.data.streamURL; // Adjust this according to your actual API response structure
+    return response.data.streamURL;
   } catch (error) {
     console.error(error);
     return null; // Return null in case of error
+  }
+};
+
+export const fetchMoviesByCategory = async (
+  deviceId: string,
+  categoryId: string
+) => {
+  try {
+    const response = await axios.get<{ streams: Movie[] }>(
+      `${BASE_URL}vod-stream?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+    return response.data.streams;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+export const fetchMovieImage = async (tmdbId: string) => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${tmdbId}`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${TMDB_API_KEY}`,
+        },
+      }
+    );
+    return response.data.poster_path;
+  } catch (error) {
+    console.error("Error fetching movie image:", error);
+    return [];
   }
 };

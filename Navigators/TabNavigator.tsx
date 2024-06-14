@@ -13,13 +13,15 @@ import {
   SettingsStackParamList,
   TabParamList,
 } from "@/constants/types";
+
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import MovieDetails from "@/screens/MovieDetails";
-import VideoPlayer from "@/screens/VideoPlayer";
 import Profile from "@/screens/tabs/settings/Profile";
 import About from "@/screens/tabs/settings/About";
 import Terms from "@/screens/tabs/settings/Terms";
 import Support from "@/screens/tabs/settings/Support";
+import AllMovies from "@/screens/tabs/movies/AllMovies";
 import PlaylistNavigator from "./PlaylistNavigator";
 import ManagePlaylist from "@/screens/tabs/settings/managePlaylist/ManagePlaylist";
 import PlaylistDetails from "@/screens/tabs/settings/managePlaylist/PlaylistDetails";
@@ -33,8 +35,8 @@ const MoviesStackNavigator: React.FC = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MoviesList" component={MoviesTabWithHeader} />
+      <Stack.Screen name="AllMovies" component={AllMovies} />
       <Stack.Screen name="MovieDetails" component={MovieDetails} />
-      <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
     </Stack.Navigator>
   );
 };
