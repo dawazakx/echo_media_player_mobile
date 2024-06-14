@@ -49,6 +49,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Back Arrow */}
       {/* <TouchableOpacity style={styles.backButtonContainer} onPress={() => navigation.goBack()}>
         <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity> */}
