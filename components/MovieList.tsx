@@ -2,11 +2,13 @@ import React, { useCallback, useContext } from "react";
 import {
   FlatList,
   Pressable,
-  Image,
+  // Image,
   View,
   StyleSheet,
   Text,
 } from "react-native";
+
+import { Image } from 'expo-image';
 
 import { type Movie } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +20,8 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "@/constants/types";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 const MovieList = ({
   categoryId,
@@ -45,7 +49,9 @@ const MovieList = ({
         onPress={() => navigation.navigate("MovieDetails", { movie: item })}
       >
         <Image
-          source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
+          // source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
+          source={item.stream_icon}
+          placeholder={{ blurhash }}
           style={styles.movieImage}
           resizeMode="contain"
         />

@@ -148,6 +148,7 @@ export const searchLiveTV = async (deviceId: string | null, query: string) => {
     return [];
   }
 };
+
 export const searchMovies = async (deviceId: string | null, query: string) => {
   if (!deviceId || typeof deviceId !== "string") {
     throw new Error("Invalid device ID");
@@ -160,6 +161,11 @@ export const searchMovies = async (deviceId: string | null, query: string) => {
       },
     });
     return response.data.vod;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
 
 export const fetchMoviesByCategory = async (
   deviceId: string,
