@@ -89,7 +89,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
       if (streamUrl) {
         setStreamUrl(streamUrl);
         // Navigate to the video player screen or handle the stream URL as needed
-        navigation.navigate("VideoPlayer", { streamUrl: streamUrl });
+        navigation.navigate("VideoPlayer", { streamUrl: streamUrl, title: movieDetails?.title });
       } else {
         console.error("Failed to fetch the stream URL");
       }

@@ -25,8 +25,9 @@ export type TabParamList = {
 
 export type MoviesStackParamList = {
   MoviesList: undefined;
+  AllMovies: undefined;
   MovieDetails: { movie: Movie };
-  VideoPlayer: { streamUrl: string };
+  VideoPlayer: { streamUrl: string, title: string };
 };
 export type SettingsStackParamList = {
   index: undefined;
@@ -34,4 +35,5 @@ export type SettingsStackParamList = {
   Manage: undefined;
   Profile: undefined;
   Terms: undefined;
+  Support: undefined;
 };

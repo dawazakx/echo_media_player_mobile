@@ -1,3 +1,4 @@
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -34,6 +35,7 @@ function AppNavigator() {
           <Stack.Screen name="Playlist" component={PlaylistNavigator} />
           <Stack.Screen name="Home" component={Tabs} />
           <Stack.Screen name="Search" component={SearchStackNavigator} />
+          <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
         </Stack.Navigator>
       </SafeAreaProvider>
     </NavigationContainer>

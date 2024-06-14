@@ -79,11 +79,11 @@ export const fetchCategories = async (
 export const fetchAllMovies = async (
   deviceId: string | null,
   categories: Category[]
-): Promise<{ [key: string]: Movie[] }> => {
+) => {
   try {
     const allMovies = await Promise.all(
       categories.map(async (category) => {
-        const response = await axios.get(
+        const response = await axios.get<{ streams: Movie[] }>(
           `${BASE_URL}vod-stream?category_id=${category.category_id}`,
           {
             headers: {
@@ -125,13 +125,12 @@ export const fetchStreamUrl = async (
       }
     );
     console.log("Stream URL response:", response.data);
-    return response.data.streamURL; // Adjust this according to your actual API response structure
+    return response.data.streamURL;
   } catch (error) {
     console.error(error);
     return null; // Return null in case of error
   }
 };
-
 export const searchLiveTV = async (deviceId: string | null, query: string) => {
   if (!deviceId || typeof deviceId !== "string") {
     throw new Error("Invalid device ID");
@@ -161,6 +160,22 @@ export const searchMovies = async (deviceId: string | null, query: string) => {
       },
     });
     return response.data.vod;
+
+export const fetchMoviesByCategory = async (
+  deviceId: string,
+  categoryId: string
+) => {
+  try {
+    const response = await axios.get<{ streams: Movie[] }>(
+      `${BASE_URL}vod-stream?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+    return response.data.streams;
   } catch (error) {
     console.error(error);
     return [];
