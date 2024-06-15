@@ -36,47 +36,28 @@ const MovieList = ({
     staleTime: 20 * 60 * 1000, // 20 minutes
   });
 
-  const renderMovieItem = useCallback(
-    ({ item }: { item: Movie }) => {
-      const [imageUrl, setImageUrl] = useState<string>(PLACEHOLDER_IMAGE);
+  const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
+    return (
+      <Pressable
+        style={styles.movieItem}
+        onLongPress={() => onMovieLongPress(item)}
+        onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+        delayLongPress={250}
+      >
+        <Image
+          source={{ uri: `${item.stream_icon}` || PLACEHOLDER_IMAGE }}
+          style={styles.movieImage}
+          resizeMode="contain"
+        />
 
-      useEffect(() => {
-        const fetchImage = async () => {
-          if (item.tmdb) {
-            const fetchedImage = await fetchMovieImage(item.tmdb);
-            setImageUrl(fetchedImage);
-          }
-        };
-
-        fetchImage();
-      }, [item.tmdb]);
-      if (!item) {
-        return null;
-      }
-
-      return (
-        <Pressable
-          style={styles.movieItem}
-          onLongPress={() => onMovieLongPress(item)}
-          onPress={() => navigation.navigate("MovieDetails", { movie: item })}
-          delayLongPress={250}
-        >
-          <Image
-            source={{ uri: image500(imageUrl) || item.stream_icon }}
-            style={styles.movieImage}
-            resizeMode="contain"
-          />
-
-          <View style={styles.ratingTag}>
-            <CustomText type="extraSmall">
-              {Number(item.rating).toFixed(1)}
-            </CustomText>
-          </View>
-        </Pressable>
-      );
-    },
-    [onMovieLongPress]
-  );
+        <View style={styles.ratingTag}>
+          <CustomText type="extraSmall">
+            {Number(item.rating).toFixed(1)}
+          </CustomText>
+        </View>
+      </Pressable>
+    );
+  }, []);
 
   if (moviesQuery.data)
     return (
@@ -98,12 +79,13 @@ const MovieList = ({
       />
     );
 
-  if (moviesQuery.isError)
+  if (moviesQuery.isError) {
     return (
       <View>
         <Text>Error</Text>
       </View>
     );
+  }
 
   return (
     <View>

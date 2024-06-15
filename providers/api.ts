@@ -147,6 +147,7 @@ export const fetchMoviesByCategory = async (
         },
       }
     );
+
     return response.data.streams;
   } catch (error) {
     console.error(error);
