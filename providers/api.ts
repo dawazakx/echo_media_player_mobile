@@ -1,8 +1,9 @@
 import axios from "axios";
 
-import { BASE_URL } from "@/constants/api";
+import { BASE_URL, TMDB_API_KEY } from "@/constants/api";
 
 import { type Category, type LiveStream, type Movie } from "@/types";
+import { PLACEHOLDER_IMAGE } from "@/components/MovieList";
 
 export const fetchLiveStreamCategories = async (
   deviceId: string | null
@@ -181,9 +182,28 @@ export const fetchMoviesByCategory = async (
         },
       }
     );
+
     return response.data.streams;
   } catch (error) {
     console.error(error);
+    return [];
+  }
+};
+
+export const fetchMovieImage = async (tmdbId: string) => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${tmdbId}`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${TMDB_API_KEY}`,
+        },
+      }
+    );
+    return response.data.poster_path;
+  } catch (error) {
+    console.error("Error fetching movie image:", error);
     return [];
   }
 };

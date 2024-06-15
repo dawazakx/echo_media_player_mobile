@@ -17,12 +17,14 @@ export interface MoviesProps {
   route?: RouteProp<TabParamList, "Movies">;
   categories: Category[];
   flatListRef: RefObject<FlatList>;
+  onMovieLongPress: (movie: Movie) => void;
 }
 
 const MovieCategoryGroup = ({
   navigation,
   categories,
   flatListRef,
+  onMovieLongPress,
 }: MoviesProps) => {
   const renderCategorySection = ({ item }: { item: Category }) => {
     if (!item) {
@@ -46,7 +48,11 @@ const MovieCategoryGroup = ({
           </Pressable>
         </View>
 
-        <MovieList categoryId={item.category_id} navigation={navigation} />
+        <MovieList
+          categoryId={item.category_id}
+          navigation={navigation}
+          onMovieLongPress={onMovieLongPress}
+        />
       </View>
     );
   };

@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -12,12 +12,13 @@ import { Image } from 'expo-image';
 
 import { type Movie } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMoviesByCategory } from "@/providers/api";
+import { fetchMovieImage, fetchMoviesByCategory } from "@/providers/api";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "@/constants/types";
+import { image500 } from "@/constants/api";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const blurhash =
@@ -26,9 +27,11 @@ const blurhash =
 const MovieList = ({
   categoryId,
   navigation,
+  onMovieLongPress,
 }: {
   categoryId: string;
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
+  onMovieLongPress: (movie: Movie) => void;
 }) => {
   const { deviceId } = useContext(DeviceContext);
 
@@ -39,21 +42,19 @@ const MovieList = ({
   });
 
   const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
-    if (!item) {
-      return null;
-    }
-
     return (
       <Pressable
         style={styles.movieItem}
+        onLongPress={() => onMovieLongPress(item)}
         onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+        delayLongPress={250}
       >
         <Image
           // source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-          source={item.stream_icon}
+          source={`${item.stream_icon}`}
           placeholder={{ blurhash }}
           style={styles.movieImage}
-          resizeMode="contain"
+          // resizeMode="contain"
         />
 
         <View style={styles.ratingTag}>
@@ -85,12 +86,13 @@ const MovieList = ({
       />
     );
 
-  if (moviesQuery.isError)
+  if (moviesQuery.isError) {
     return (
       <View>
         <Text>Error</Text>
       </View>
     );
+  }
 
   return (
     <View>
