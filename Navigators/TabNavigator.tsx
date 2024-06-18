@@ -26,6 +26,8 @@ import PlaylistNavigator from "./PlaylistNavigator";
 import ManagePlaylist from "@/screens/tabs/settings/managePlaylist/ManagePlaylist";
 import PlaylistDetails from "@/screens/tabs/settings/managePlaylist/PlaylistDetails";
 
+import { useNavigationState } from "@react-navigation/native";
+
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
@@ -75,6 +77,9 @@ const SettingsStackNavigator: React.FC = () => {
 };
 
 export default function Tabs() {
+  const routeName = useNavigationState(
+    (state) => state?.routes[state.index]?.name
+  );
   return (
     <Tab.Navigator
       screenOptions={{
@@ -83,6 +88,7 @@ export default function Tabs() {
         tabBarStyle: {
           backgroundColor: Colors.background,
           paddingBottom: 5,
+          display: routeName === "MovieDetails" ? "none" : "flex",
         },
       }}
     >
