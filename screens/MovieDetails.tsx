@@ -10,12 +10,12 @@ import {
   ScrollView,
   ActivityIndicator,
   Pressable,
+  FlatList,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { MoviesStackParamList } from "@/constants/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors } from "@/constants/Colors";
-import { CustomView } from "@/components/View";
 import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { TMDB_API_KEY, image500 } from "@/constants/api";
 import axios from "axios";
@@ -24,12 +24,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import CustomButton from "@/components/Button";
 import { fetchStreamUrl } from "@/providers/api";
 import { DeviceContext } from "@/providers/DeviceProvider";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import WebView from "react-native-webview";
 
 type MovieDetailsProps = {
   route: RouteProp<MoviesStackParamList, "MovieDetails">;
   navigation: NativeStackNavigationProp<MoviesStackParamList, "MovieDetails">;
 };
 var { width, height } = Dimensions.get("window");
+const IMG_HEIGHT = 262;
 
 const formatPopularity = (popularity: number) => {
   const percentage = (popularity / 1000) * 170;
@@ -52,6 +55,8 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
   const { movie } = route.params;
   const { deviceId } = useContext(DeviceContext);
   const [movieDetails, setMovieDetails] = useState<any>(null);
+  const [movieCast, setMovieCast] = useState<any>(null);
+  const [movieVideos, setMovieVideos] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
@@ -75,8 +80,55 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
       }
     };
 
+    const fetchMovieCast = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movie.tmdb}/credits`,
+          {
+            headers: {
+              accept: "application/json",
+              Authorization: TMDB_API_KEY,
+            },
+          }
+        );
+        setMovieCast(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchMovieVideos = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movie.tmdb}/videos`,
+          {
+            headers: {
+              accept: "application/json",
+              Authorization: TMDB_API_KEY,
+            },
+          }
+        );
+        setMovieVideos(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchMovieDetails();
+    fetchMovieCast();
+    fetchMovieVideos();
   }, [movie]);
+
+  const castData =
+    movieCast?.cast
+      ?.filter((member: any) => member.known_for_department === "Acting")
+      ?.slice(0, 12) || [];
+
+  const youtubeTrailers = movieVideos
+    ? movieVideos?.results
+        ?.filter((video) => video.site === "YouTube")
+        .slice(0, 3)
+    : [];
 
   const handleWatchNow = async () => {
     if (!deviceId) {
@@ -89,7 +141,10 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
       if (streamUrl) {
         setStreamUrl(streamUrl);
         // Navigate to the video player screen or handle the stream URL as needed
-        navigation.navigate("VideoPlayer", { streamUrl: streamUrl, title: movieDetails?.title });
+        navigation.navigate("VideoPlayer", {
+          streamUrl: streamUrl,
+          title: movieDetails?.title,
+        });
       } else {
         console.error("Failed to fetch the stream URL");
       }
@@ -130,229 +185,215 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
     );
   }
   return (
-    <ScrollView
-      contentContainerStyle={{
-        paddingBottom: 20,
-        flex: 1,
-        backgroundColor: "rgb(23 23 23)",
-      }}
-    >
-      <View style={{ width: "100%" }}>
-        <View
-          style={{
-            position: "absolute",
-            top: 40,
-            left: 12,
-            zIndex: 10,
-          }}
-        >
+    <ParallaxScrollView
+      headerBackgroundColor="rgb(23 23 23)"
+      headerImage={
+        <View style={{ marginTop: 0 }}>
           <View
             style={{
-              backgroundColor: "transparent",
-              padding: 8,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Ionicons name="arrow-back" size={30} color="white" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <Image
-            source={{
-              uri:
-                image500(movieDetails.backdrop_path) ||
-                "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
-            }}
-            style={{
-              width,
-              height: height * 0.35,
-            }}
-            resizeMode="contain"
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(23,23,23,0.6)", "rgba(23,23,23,1)"]}
-            style={{
-              width: "100%",
-              height: height * 0.4,
               position: "absolute",
-              bottom: 0,
-            }}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          />
-        </View>
-        <View style={{ marginTop: -(height * 0.095) }}>
-          <View
-            style={{
-              padding: 15,
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              gap: 10,
+              top: 40,
+              left: 12,
+              zIndex: 10,
             }}
           >
-            <Image
-              source={{ uri: movie.stream_icon }}
+            <View
               style={{
-                width: width * 0.3,
-                height: height * 0.23,
-                borderRadius: 15,
+                backgroundColor: "transparent",
+                padding: 8,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={30} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View>
+            <Image
+              source={{
+                uri:
+                  image500(movieDetails.backdrop_path) ||
+                  "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
+              }}
+              style={{
+                width,
+                height: IMG_HEIGHT,
               }}
               resizeMode="contain"
             />
-            <View style={{ flex: 1 }}>
-              <CustomText type="title" style={{ textAlign: "center" }}>
-                {movieDetails?.title}
-              </CustomText>
+            <LinearGradient
+              colors={["transparent", "rgba(23,23,23,0.6)", "rgba(23,23,23,1)"]}
+              style={{
+                width: "100%",
+                height: height * 0.4,
+                position: "absolute",
+                bottom: 0,
+              }}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+            />
+          </View>
+        </View>
+      }
+    >
+      <View
+        style={{
+          // marginTop: -(height * 0.095),
+          paddingVertical: 10,
+          backgroundColor: "rgb(23 23 23)",
+        }}
+      >
+        <View
+          style={{
+            padding: 15,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <Image
+            source={{ uri: movie.stream_icon }}
+            style={{
+              width: width * 0.3,
+              height: height * 0.18,
+              borderRadius: 15,
+            }}
+            resizeMode="contain"
+          />
+          <View style={{ flex: 1 }}>
+            <CustomText type="title" style={{ textAlign: "center" }}>
+              {movieDetails?.title}
+            </CustomText>
 
-              {/* Genres */}
-              <CustomText
-                style={{
-                  marginLeft: 8,
-                  flexDirection: "row",
-                  textAlign: "center",
-                }}
-              >
-                {movieDetails?.genres?.map((genre, index) => {
-                  let showDot = index + 1 != movieDetails.genres.length;
-
-                  return (
-                    <CustomText
-                      key={index}
-                      type="default"
-                      style={{
-                        fontWeight: "600",
-                        textAlign: "center",
-                        marginHorizontal: 16,
-                        color: "rgb(163 163 163)",
-                      }}
-                    >
-                      {genre?.name} {showDot ? "• " : null}
-                    </CustomText>
-                  );
-                })}
-              </CustomText>
-
-              {/* Release Year, Runtime */}
-              {movieDetails?.id ? (
-                <View
-                  style={{
-                    padding: 8,
-                    gap: 10,
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Ionicons name="stopwatch" size={16} color="white" />
-                    <CustomText type="extraSmall">
-                      {formatRuntime(movieDetails?.runtime)}
-                    </CustomText>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Ionicons name="calendar" size={16} color="white" />
-                    <CustomText type="extraSmall">
-                      {movieDetails?.release_date}
-                    </CustomText>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Ionicons name="star" size={16} color="gold" />
-                    <CustomText type="extraSmall">
-                      {movie?.rating_5based}
-                    </CustomText>
-                  </View>
-                </View>
-              ) : null}
+            {/* Release Year, Runtime */}
+            {movieDetails?.id ? (
               <View
                 style={{
-                  height: 38,
-                  marginTop: 15,
+                  padding: 8,
+                  gap: 10,
+                  flexDirection: "row",
+                  justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <CustomButton
-                  iconLeft={
-                    <Ionicons
-                      name="play-sharp"
-                      size={24}
-                      color={Colors.background}
-                    />
-                  }
-                  title="WATCH NOW"
-                  onPress={handleWatchNow}
-                  style={{ paddingVertical: 7, paddingHorizontal: 10 }}
-                  textStyle={{ fontSize: 14 }}
-                  width="85%"
-                  borderRadius={25}
-                  textColor={Colors.background}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 8,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Ionicons name="stopwatch" size={16} color="white" />
+                  <CustomText type="extraSmall">
+                    {formatRuntime(movieDetails?.runtime)}
+                  </CustomText>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 8,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Ionicons name="calendar" size={16} color="white" />
+                  <CustomText type="extraSmall">
+                    {movieDetails?.release_date}
+                  </CustomText>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 8,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Ionicons name="star" size={16} color="gold" />
+                  <CustomText type="extraSmall">
+                    {movie?.rating_5based}
+                  </CustomText>
+                </View>
+              </View>
+            ) : null}
+            <CustomButton
+              iconLeft={
+                <Ionicons
+                  name="play-sharp"
+                  size={24}
+                  color={Colors.background}
                 />
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 25,
-                  marginTop: 15,
-                }}
-              >
-                <Pressable
-                  style={{
-                    borderRadius: 30,
-                    backgroundColor: "gray",
-                    padding: 10,
-                  }}
-                >
-                  <MaterialIcons
-                    name="favorite-outline"
-                    size={20}
-                    color="white"
-                  />
-                </Pressable>
-                <Pressable
-                  style={{
-                    borderRadius: 30,
-                    backgroundColor: "gray",
-                    padding: 10,
-                  }}
-                >
-                  <Entypo
-                    name="dots-three-horizontal"
-                    size={20}
-                    color="white"
-                  />
-                </Pressable>
-              </View>
-            </View>
+              }
+              title="Play"
+              onPress={handleWatchNow}
+              style={{
+                paddingVertical: 7,
+                paddingHorizontal: 10,
+                marginTop: 10,
+                alignSelf: "center",
+              }}
+              textStyle={{ fontSize: 14, fontWeight: "bold" }}
+              width="50%"
+              borderRadius={10}
+              textColor={Colors.background}
+            />
           </View>
-          {/* Description */}
-
-          <View style={{ marginHorizontal: 16, gap: 5 }}>
-            <CustomText>Synopsis</CustomText>
+        </View>
+        <View
+          style={{
+            height: 38,
+            marginVertical: 15,
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <CustomButton
+            iconLeft={
+              <AntDesign name="download" size={24} color={Colors.white} />
+            }
+            title="Download"
+            onPress={handleWatchNow}
+            style={{
+              paddingVertical: 7,
+              paddingHorizontal: 10,
+              backgroundColor: "transparent",
+              borderColor: "white",
+              borderWidth: 1,
+            }}
+            textStyle={{ fontSize: 14, fontWeight: "bold" }}
+            width="45%"
+            borderRadius={10}
+            textColor={Colors.white}
+          />
+          <CustomButton
+            iconLeft={
+              <MaterialIcons name="bookmark" size={24} color={Colors.white} />
+            }
+            title="Watch Later"
+            onPress={handleWatchNow}
+            style={{
+              paddingVertical: 7,
+              paddingHorizontal: 10,
+              backgroundColor: "transparent",
+              borderColor: "white",
+              borderWidth: 1,
+            }}
+            textStyle={{ fontSize: 14, fontWeight: "bold" }}
+            width="45%"
+            borderRadius={10}
+            textColor={Colors.white}
+          />
+        </View>
+        {/* Description */}
+        <View style={styles.detailsContainer}>
+          <View style={{ marginHorizontal: 16, marginVertical: 5, gap: 5 }}>
+            <CustomText type="subtitle">Synopsis</CustomText>
             <CustomText
               type="extraSmall"
               style={{
@@ -363,10 +404,112 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
               {movieDetails?.overview}
             </CustomText>
           </View>
+          <View style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}>
+            <CustomText>Genres</CustomText>
+            <CustomText
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              {movieDetails?.genres?.map((genre, index) => {
+                let showDot = index + 1 != movieDetails.genres.length;
+
+                return (
+                  <CustomText
+                    key={index}
+                    type="extraSmall"
+                    style={{
+                      fontWeight: "600",
+                      textAlign: "auto",
+                      marginHorizontal: 16,
+                      color: "rgb(163 163 163)",
+                    }}
+                  >
+                    {genre?.name} {showDot ? "• " : null}
+                  </CustomText>
+                );
+              })}
+            </CustomText>
+          </View>
+          <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
+            <CustomText>Cast</CustomText>
+            <CustomText
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              {castData.length > 0 ? (
+                castData.map((member: any) => (
+                  <CustomText
+                    key={member.id}
+                    type="extraSmall"
+                    style={{
+                      fontWeight: "600",
+                      lineHeight: 20,
+                      textAlign: "auto",
+                      marginHorizontal: 16,
+                      color: "rgb(163 163 163)",
+                    }}
+                  >
+                    {member.name},{" "}
+                  </CustomText>
+                ))
+              ) : (
+                <Text>No cast information available</Text>
+              )}
+            </CustomText>
+          </View>
+          <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
+            <CustomText>Trailers and Videos</CustomText>
+
+            {youtubeTrailers?.length > 0 ? (
+              <FlatList
+                data={youtubeTrailers}
+                horizontal
+                keyExtractor={(item) => item.key}
+                renderItem={({ item }) => (
+                  <WebView
+                    style={{
+                      width: width - 74,
+                      height: 180,
+                      marginVertical: 10,
+                      marginRight: 15,
+                    }}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    source={{
+                      uri: `https://www.youtube.com/embed/${item.key}`,
+                    }}
+                  />
+                )}
+              />
+            ) : (
+              <CustomText type="title">No trailers available</CustomText>
+            )}
+          </View>
         </View>
       </View>
-    </ScrollView>
+    </ParallaxScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    height: 100,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  detailsContainer: {
+    padding: 5,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.text,
+  },
+});
 
 export default MovieDetails;
