@@ -59,7 +59,7 @@ const CategoryFilter = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginLeft: 5,
+        paddingLeft: 5,
         gap: 10,
       }}
     >
