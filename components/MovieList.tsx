@@ -56,6 +56,12 @@ const MovieList = ({
           style={styles.movieImage}
           // resizeMode="contain"
         />
+        <CustomText
+          type="extraSmall"
+          style={{ textAlign: "center", color: "#9ca3af" }}
+        >
+          {item.name}
+        </CustomText>
 
         <View style={styles.ratingTag}>
           <CustomText type="extraSmall">
@@ -111,7 +117,8 @@ const styles = StyleSheet.create({
 
   movieImage: {
     width: "100%",
-    height: "100%",
+    height: "90%",
+    marginBottom: 3,
     borderRadius: 10,
   },
 
