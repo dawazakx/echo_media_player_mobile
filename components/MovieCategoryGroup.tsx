@@ -1,5 +1,17 @@
-import React, { useCallback, RefObject, useContext } from "react";
-import { FlatList, Pressable, View, StyleSheet } from "react-native";
+import React, {
+  useCallback,
+  RefObject,
+  useContext,
+  forwardRef,
+  ElementRef,
+} from "react";
+import {
+  FlatList,
+  Pressable,
+  View,
+  StyleSheet,
+  FlatListProps,
+} from "react-native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 
@@ -20,12 +32,10 @@ export interface MoviesProps {
   onMovieLongPress: (movie: Movie) => void;
 }
 
-const MovieCategoryGroup = ({
-  navigation,
-  categories,
-  flatListRef,
-  onMovieLongPress,
-}: MoviesProps) => {
+const MovieCategoryGroup = forwardRef<
+  ElementRef<typeof FlatList<Category>>,
+  MoviesProps
+>(({ navigation, categories, flatListRef, onMovieLongPress }, ref) => {
   const renderCategorySection = ({ item }: { item: Category }) => {
     if (!item) {
       return null;
@@ -59,17 +69,73 @@ const MovieCategoryGroup = ({
 
   return (
     <FlatList
-      ref={flatListRef}
+      ref={ref}
       data={categories}
-      keyExtractor={(item) => item.category_id}
       renderItem={renderCategorySection}
+      keyExtractor={(item) => item.category_id}
+      showsVerticalScrollIndicator={false}
       initialNumToRender={5}
       maxToRenderPerBatch={5}
       windowSize={3}
-      updateCellsBatchingPeriod={50}
     />
   );
-};
+});
+
+// const MovieCategoryGroup = ({
+//   navigation,
+//   categories,
+//   flatListRef,
+//   onMovieLongPress,
+// }: MoviesProps) => {
+//   const renderCategorySection = ({ item }: { item: Category }) => {
+//     if (!item) {
+//       return null;
+//     }
+
+//     return (
+//       <View key={item.category_id} style={styles.categorySection}>
+//         <View style={styles.categoryHeader}>
+//           <CustomText type="subtitle" style={styles.categoryTitle}>
+//             {item.category_name}
+//           </CustomText>
+//           <Pressable
+//             onPress={() =>
+//               navigation.navigate("AllMovies", {
+//                 category: item,
+//               })
+//             }
+//           >
+//             <CustomText type="default">See All</CustomText>
+//           </Pressable>
+//         </View>
+
+//         <MovieList
+//           categoryId={item.category_id}
+//           navigation={navigation}
+//           onMovieLongPress={onMovieLongPress}
+//         />
+//       </View>
+//     );
+//   };
+
+//   return (
+//     <FlatList
+//       ref={flatListRef}
+//       data={categories}
+//       keyExtractor={(item) => item.category_id}
+//       renderItem={renderCategorySection}
+//       initialNumToRender={5}
+//       maxToRenderPerBatch={5}
+//       windowSize={3}
+//       updateCellsBatchingPeriod={50}
+//       getItemLayout={(data, index) => ({
+//         length: 262,
+//         offset: 262 * index,
+//         index,
+//       })}
+//     />
+//   );
+// };
 
 const styles = StyleSheet.create({
   movieItem: {

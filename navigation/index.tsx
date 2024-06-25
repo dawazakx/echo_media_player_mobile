@@ -34,6 +34,7 @@ function AppNavigator() {
           <Stack.Screen name="Welcome" component={HomeScreen} />
           <Stack.Screen name="Playlist" component={PlaylistNavigator} />
           <Stack.Screen name="Home" component={Tabs} />
+          <Stack.Screen name="MovieDetails" component={MovieDetails} />
           <Stack.Screen name="Search" component={SearchStackNavigator} />
           <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
         </Stack.Navigator>

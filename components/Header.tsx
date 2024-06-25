@@ -1,9 +1,6 @@
 import React, { useContext } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
-import { PlaylistContext } from "@/providers/PlaylistProvider";
-
-import { DrawerActions } from "@react-navigation/native";
 import { CustomView } from "./View";
 import { Feather } from "@expo/vector-icons";
 import { CustomText } from "./Text";
@@ -12,7 +9,6 @@ import { Image } from "expo-image";
 import SettingsTab from "@/screens/tabs/SettingsTab";
 
 const Header = ({ navigation }) => {
-  const { currentPlaylist } = useContext(PlaylistContext);
   const insets = useSafeAreaInsets();
 
   return (
@@ -21,11 +17,11 @@ const Header = ({ navigation }) => {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingTop: insets.top,
+        marginTop: insets.top,
         paddingBottom: 5,
         paddingHorizontal: 5,
-        borderBottomWidth: 1,
-        borderBottomColor: "gray",
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        backgroundColor: "#111827F2",
       }}
     >
       <Pressable style={styles.iconContainer} onPress={() => {}}>
@@ -41,8 +37,8 @@ const Header = ({ navigation }) => {
             padding: 10,
           }}
         />
+        <CustomText type="defaultSemiBold">Echo Media Player</CustomText>
       </Pressable>
-      <CustomText type="subtitle">{currentPlaylist?.nickname}</CustomText>
       <Pressable
         style={styles.iconContainer}
         onPress={() => navigation.navigate("Search")}
@@ -56,6 +52,9 @@ const Header = ({ navigation }) => {
 const styles = StyleSheet.create({
   iconContainer: {
     padding: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
   playlistName: {
     fontSize: 16,

@@ -8,7 +8,7 @@ import {
   Text,
 } from "react-native";
 
-import { Image } from 'expo-image';
+import { Image } from "expo-image";
 
 import { type Movie } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ import { image500 } from "@/constants/api";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const blurhash =
-  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+  "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 const MovieList = ({
   categoryId,
@@ -69,7 +69,7 @@ const MovieList = ({
   if (moviesQuery.data)
     return (
       <FlatList
-        data={moviesQuery.data}
+        data={moviesQuery.data.slice(0, 15)}
         horizontal
         keyExtractor={(movie) => movie.stream_id.toString()}
         renderItem={renderMovieItem}

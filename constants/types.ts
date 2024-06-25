@@ -5,6 +5,8 @@ export type RootStackParamList = {
   Playlist: undefined;
   Home: undefined;
   Search: undefined;
+  MovieDetails: { movie: Movie };
+  VideoPlayer: { streamUrl: string; title: string };
 };
 
 export type PlaylistStackParamList = {
@@ -27,7 +29,7 @@ export type MoviesStackParamList = {
   MoviesList: undefined;
   AllMovies: undefined;
   MovieDetails: { movie: Movie };
-  VideoPlayer: { streamUrl: string, title: string };
+  VideoPlayer: { streamUrl: string; title: string };
 };
 export type SettingsStackParamList = {
   index: undefined;
