@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   Text,
+  ActivityIndicator,
 } from "react-native";
 
 import { Image } from "expo-image";
@@ -102,7 +103,7 @@ const MovieList = ({
 
   return (
     <View>
-      <Text>Loading...</Text>
+      <ActivityIndicator size="large" color={Colors.white} />
     </View>
   );
 };

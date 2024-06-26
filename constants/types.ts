@@ -1,4 +1,4 @@
-import { Movie } from "@/types";
+import { LiveStream, Movie } from "@/types";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Home: undefined;
   Search: undefined;
   MovieDetails: { movie: Movie };
+  LiveStreamDetails: { stream: LiveStream };
   VideoPlayer: { streamUrl: string; title: string };
 };
 

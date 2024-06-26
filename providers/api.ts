@@ -226,3 +226,25 @@ export const fetchTopRatedMovies = async () => {
     throw error;
   }
 };
+
+export const fetchLiveTvByCategory = async (
+  deviceId: string,
+  categoryId: string
+) => {
+  try {
+    const response = await axios.get<{ streams: LiveStream[] }>(
+      `${BASE_URL}live-stream?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+
+    return response.data.streams;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};

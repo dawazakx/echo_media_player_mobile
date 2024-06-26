@@ -26,6 +26,7 @@ import { fetchStreamUrl } from "@/providers/api";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import WebView from "react-native-webview";
+import { StatusBar } from "expo-status-bar";
 
 type MovieDetailsProps = {
   route: RouteProp<MoviesStackParamList, "MovieDetails">;
@@ -185,311 +186,318 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
     );
   }
   return (
-    <ParallaxScrollView
-      headerBackgroundColor="rgb(23 23 23)"
-      headerImage={
-        <View style={{ marginTop: 0 }}>
-          <View
-            style={{
-              position: "absolute",
-              top: 40,
-              left: 12,
-              zIndex: 10,
-            }}
-          >
+    <>
+      <StatusBar style="light" />
+      <ParallaxScrollView
+        headerBackgroundColor="rgb(23 23 23)"
+        headerImage={
+          <View style={{ marginTop: 0 }}>
             <View
               style={{
-                backgroundColor: "transparent",
-                padding: 8,
-                alignItems: "center",
-                justifyContent: "center",
+                position: "absolute",
+                top: 40,
+                left: 12,
+                zIndex: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={30} color="white" />
-              </TouchableOpacity>
+              <View
+                style={{
+                  backgroundColor: "transparent",
+                  padding: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <Ionicons name="arrow-back" size={30} color="white" />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View>
+              <Image
+                source={{
+                  uri:
+                    image500(movieDetails.backdrop_path) ||
+                    "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
+                }}
+                style={{
+                  width,
+                  height: IMG_HEIGHT,
+                }}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={[
+                  "transparent",
+                  "rgba(23,23,23,0.6)",
+                  "rgba(23,23,23,1)",
+                ]}
+                style={{
+                  width: "100%",
+                  height: height * 0.4,
+                  position: "absolute",
+                  bottom: 0,
+                }}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+              />
             </View>
           </View>
-          <View>
-            <Image
-              source={{
-                uri:
-                  image500(movieDetails.backdrop_path) ||
-                  "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
-              }}
-              style={{
-                width,
-                height: IMG_HEIGHT,
-              }}
-              resizeMode="cover"
-            />
-            <LinearGradient
-              colors={["transparent", "rgba(23,23,23,0.6)", "rgba(23,23,23,1)"]}
-              style={{
-                width: "100%",
-                height: height * 0.4,
-                position: "absolute",
-                bottom: 0,
-              }}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
-            />
-          </View>
-        </View>
-      }
-    >
-      <View
-        style={{
-          // marginTop: -(height * 0.095),
-          paddingVertical: 10,
-          backgroundColor: "rgb(23 23 23)",
-        }}
+        }
       >
         <View
           style={{
-            padding: 15,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            gap: 10,
+            // marginTop: -(height * 0.095),
+            paddingVertical: 10,
+            backgroundColor: "rgb(23 23 23)",
           }}
         >
-          <Image
-            source={{ uri: movie.stream_icon }}
+          <View
             style={{
-              width: width * 0.3,
-              height: height * 0.18,
-              borderRadius: 15,
+              padding: 15,
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              gap: 10,
             }}
-            resizeMode="contain"
-          />
-          <View style={{ flex: 1 }}>
-            <CustomText type="title" style={{ textAlign: "center" }}>
-              {movieDetails?.title}
-            </CustomText>
+          >
+            <Image
+              source={{ uri: movie.stream_icon }}
+              style={{
+                width: width * 0.3,
+                height: height * 0.18,
+                borderRadius: 15,
+              }}
+              resizeMode="contain"
+            />
+            <View style={{ flex: 1 }}>
+              <CustomText type="title" style={{ textAlign: "center" }}>
+                {movieDetails?.title}
+              </CustomText>
 
-            {/* Release Year, Runtime */}
-            {movieDetails?.id ? (
-              <View
+              {/* Release Year, Runtime */}
+              {movieDetails?.id ? (
+                <View
+                  style={{
+                    padding: 8,
+                    gap: 10,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      gap: 8,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name="stopwatch" size={16} color="white" />
+                    <CustomText type="extraSmall">
+                      {formatRuntime(movieDetails?.runtime)}
+                    </CustomText>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      gap: 8,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name="calendar" size={16} color="white" />
+                    <CustomText type="extraSmall">
+                      {movieDetails?.release_date}
+                    </CustomText>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      gap: 8,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name="star" size={16} color="gold" />
+                    <CustomText type="extraSmall">
+                      {movie?.rating_5based}
+                    </CustomText>
+                  </View>
+                </View>
+              ) : null}
+              <CustomButton
+                iconLeft={
+                  <Ionicons
+                    name="play-sharp"
+                    size={24}
+                    color={Colors.background}
+                  />
+                }
+                title="Play"
+                onPress={handleWatchNow}
                 style={{
-                  padding: 8,
-                  gap: 10,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  paddingVertical: 7,
+                  paddingHorizontal: 10,
+                  marginTop: 10,
+                  alignSelf: "center",
                 }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 8,
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Ionicons name="stopwatch" size={16} color="white" />
-                  <CustomText type="extraSmall">
-                    {formatRuntime(movieDetails?.runtime)}
-                  </CustomText>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 8,
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Ionicons name="calendar" size={16} color="white" />
-                  <CustomText type="extraSmall">
-                    {movieDetails?.release_date}
-                  </CustomText>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 8,
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Ionicons name="star" size={16} color="gold" />
-                  <CustomText type="extraSmall">
-                    {movie?.rating_5based}
-                  </CustomText>
-                </View>
-              </View>
-            ) : null}
+                textStyle={{ fontSize: 14, fontWeight: "bold" }}
+                width="50%"
+                borderRadius={10}
+                textColor={Colors.background}
+              />
+            </View>
+          </View>
+          <View
+            style={{
+              height: 38,
+              marginVertical: 15,
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
             <CustomButton
               iconLeft={
-                <Ionicons
-                  name="play-sharp"
-                  size={24}
-                  color={Colors.background}
-                />
+                <AntDesign name="download" size={24} color={Colors.white} />
               }
-              title="Play"
+              title="Download"
               onPress={handleWatchNow}
               style={{
                 paddingVertical: 7,
                 paddingHorizontal: 10,
-                marginTop: 10,
-                alignSelf: "center",
+                backgroundColor: "transparent",
+                borderColor: "white",
+                borderWidth: 1,
               }}
               textStyle={{ fontSize: 14, fontWeight: "bold" }}
-              width="50%"
+              width="45%"
               borderRadius={10}
-              textColor={Colors.background}
+              textColor={Colors.white}
+            />
+            <CustomButton
+              iconLeft={
+                <MaterialIcons name="bookmark" size={24} color={Colors.white} />
+              }
+              title="Watch Later"
+              onPress={handleWatchNow}
+              style={{
+                paddingVertical: 7,
+                paddingHorizontal: 10,
+                backgroundColor: "transparent",
+                borderColor: "white",
+                borderWidth: 1,
+              }}
+              textStyle={{ fontSize: 14, fontWeight: "bold" }}
+              width="45%"
+              borderRadius={10}
+              textColor={Colors.white}
             />
           </View>
-        </View>
-        <View
-          style={{
-            height: 38,
-            marginVertical: 15,
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <CustomButton
-            iconLeft={
-              <AntDesign name="download" size={24} color={Colors.white} />
-            }
-            title="Download"
-            onPress={handleWatchNow}
-            style={{
-              paddingVertical: 7,
-              paddingHorizontal: 10,
-              backgroundColor: "transparent",
-              borderColor: "white",
-              borderWidth: 1,
-            }}
-            textStyle={{ fontSize: 14, fontWeight: "bold" }}
-            width="45%"
-            borderRadius={10}
-            textColor={Colors.white}
-          />
-          <CustomButton
-            iconLeft={
-              <MaterialIcons name="bookmark" size={24} color={Colors.white} />
-            }
-            title="Watch Later"
-            onPress={handleWatchNow}
-            style={{
-              paddingVertical: 7,
-              paddingHorizontal: 10,
-              backgroundColor: "transparent",
-              borderColor: "white",
-              borderWidth: 1,
-            }}
-            textStyle={{ fontSize: 14, fontWeight: "bold" }}
-            width="45%"
-            borderRadius={10}
-            textColor={Colors.white}
-          />
-        </View>
-        {/* Description */}
-        <View style={styles.detailsContainer}>
-          <View style={{ marginHorizontal: 16, marginVertical: 5, gap: 5 }}>
-            <CustomText type="subtitle">Synopsis</CustomText>
-            <CustomText
-              type="extraSmall"
-              style={{
-                letterSpacing: 0.4,
-                color: "rgb(163 163 163)",
-              }}
-            >
-              {movieDetails?.overview}
-            </CustomText>
-          </View>
-          <View style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}>
-            <CustomText>Genres</CustomText>
-            <CustomText
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              {movieDetails?.genres?.map((genre, index) => {
-                let showDot = index + 1 != movieDetails.genres.length;
+          {/* Description */}
+          <View style={styles.detailsContainer}>
+            <View style={{ marginHorizontal: 16, marginVertical: 5, gap: 5 }}>
+              <CustomText type="subtitle">Synopsis</CustomText>
+              <CustomText
+                type="extraSmall"
+                style={{
+                  letterSpacing: 0.4,
+                  color: "rgb(163 163 163)",
+                }}
+              >
+                {movieDetails?.overview}
+              </CustomText>
+            </View>
+            <View style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}>
+              <CustomText>Genres</CustomText>
+              <CustomText
+                style={{
+                  flexDirection: "row",
+                }}
+              >
+                {movieDetails?.genres?.map((genre, index) => {
+                  let showDot = index + 1 != movieDetails.genres.length;
 
-                return (
-                  <CustomText
-                    key={index}
-                    type="extraSmall"
-                    style={{
-                      fontWeight: "600",
-                      textAlign: "auto",
-                      marginHorizontal: 16,
-                      color: "rgb(163 163 163)",
-                    }}
-                  >
-                    {genre?.name} {showDot ? "• " : null}
-                  </CustomText>
-                );
-              })}
-            </CustomText>
-          </View>
-          <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
-            <CustomText>Cast</CustomText>
-            <CustomText
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              {castData.length > 0 ? (
-                castData.map((member: any) => (
-                  <CustomText
-                    key={member.id}
-                    type="extraSmall"
-                    style={{
-                      fontWeight: "600",
-                      lineHeight: 20,
-                      textAlign: "auto",
-                      marginHorizontal: 16,
-                      color: "rgb(163 163 163)",
-                    }}
-                  >
-                    {member.name},{" "}
-                  </CustomText>
-                ))
-              ) : (
-                <Text>No cast information available</Text>
-              )}
-            </CustomText>
-          </View>
-          <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
-            <CustomText>Trailers and Videos</CustomText>
-
-            {youtubeTrailers?.length > 0 ? (
-              <FlatList
-                data={youtubeTrailers}
-                horizontal
-                keyExtractor={(item) => item.key}
-                renderItem={({ item }) => (
-                  <WebView
-                    style={{
-                      width: width - 74,
-                      height: 180,
-                      marginVertical: 10,
-                      marginRight: 15,
-                    }}
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    source={{
-                      uri: `https://www.youtube.com/embed/${item.key}`,
-                    }}
-                  />
+                  return (
+                    <CustomText
+                      key={index}
+                      type="extraSmall"
+                      style={{
+                        fontWeight: "600",
+                        textAlign: "auto",
+                        marginHorizontal: 16,
+                        color: "rgb(163 163 163)",
+                      }}
+                    >
+                      {genre?.name} {showDot ? "• " : null}
+                    </CustomText>
+                  );
+                })}
+              </CustomText>
+            </View>
+            <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
+              <CustomText>Cast</CustomText>
+              <CustomText
+                style={{
+                  flexDirection: "row",
+                }}
+              >
+                {castData.length > 0 ? (
+                  castData.map((member: any) => (
+                    <CustomText
+                      key={member.id}
+                      type="extraSmall"
+                      style={{
+                        fontWeight: "600",
+                        lineHeight: 20,
+                        textAlign: "auto",
+                        marginHorizontal: 16,
+                        color: "rgb(163 163 163)",
+                      }}
+                    >
+                      {member.name},{" "}
+                    </CustomText>
+                  ))
+                ) : (
+                  <Text>No cast information available</Text>
                 )}
-              />
-            ) : (
-              <CustomText type="title">No trailers available</CustomText>
-            )}
+              </CustomText>
+            </View>
+            <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
+              <CustomText>Trailers and Videos</CustomText>
+
+              {youtubeTrailers?.length > 0 ? (
+                <FlatList
+                  data={youtubeTrailers}
+                  horizontal
+                  keyExtractor={(item) => item.key}
+                  renderItem={({ item }) => (
+                    <WebView
+                      style={{
+                        width: width - 74,
+                        height: 180,
+                        marginVertical: 10,
+                        marginRight: 15,
+                      }}
+                      javaScriptEnabled={true}
+                      domStorageEnabled={true}
+                      source={{
+                        uri: `https://www.youtube.com/embed/${item.key}`,
+                      }}
+                    />
+                  )}
+                />
+              ) : (
+                <CustomText type="title">No trailers available</CustomText>
+              )}
+            </View>
           </View>
         </View>
-      </View>
-    </ParallaxScrollView>
+      </ParallaxScrollView>
+    </>
   );
 };
 

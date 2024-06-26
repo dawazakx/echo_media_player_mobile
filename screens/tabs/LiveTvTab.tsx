@@ -45,11 +45,11 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
       const availableCategories = categoriesData.slice(0, 30);
       setCategories(availableCategories);
 
-      const liveStreamData = await fetchLiveStreams(
-        deviceId,
-        availableCategories
-      );
-      setLiveStreams(liveStreamData);
+      // const liveStreamData = await fetchLiveStreams(
+      //   deviceId,
+      //   availableCategories
+      // );
+      // setLiveStreams(liveStreamData);
 
       if (categoriesData.length > 0) {
         setSelectedCategory(categoriesData[0].category_id);
@@ -63,15 +63,6 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const categoryIndex = categories.findIndex(
-      (category) => category.category_id === categoryId
-    );
-    if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({
-        index: categoryIndex,
-        animated: true,
-      });
-    }
   };
 
   if (loading) {
@@ -94,7 +85,8 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
     <CustomView
       style={{
         backgroundColor: Colors.secBackground,
-        paddingBottom: tabBarHeight,
+        flex: 1,
+        paddingBottom: tabBarHeight + 50,
       }}
     >
       <CategoryFilter
@@ -103,12 +95,12 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
         onSelect={handleCategoryPress}
       />
 
-      <LiveStreamCategoryGroup
-        navigation={navigation}
-        categories={categories}
-        streams={liveStreams}
-        flatListRef={flatListRef}
-      />
+      {selectedCategory && (
+        <LiveStreamCategoryGroup
+          navigation={navigation}
+          categoryId={selectedCategory}
+        />
+      )}
     </CustomView>
   );
 };

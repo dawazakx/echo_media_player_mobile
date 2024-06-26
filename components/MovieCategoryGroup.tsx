@@ -68,16 +68,18 @@ const MovieCategoryGroup = forwardRef<
   };
 
   return (
-    <FlatList
-      ref={ref}
-      data={categories}
-      renderItem={renderCategorySection}
-      keyExtractor={(item) => item.category_id}
-      showsVerticalScrollIndicator={false}
-      initialNumToRender={5}
-      maxToRenderPerBatch={5}
-      windowSize={3}
-    />
+    <View style={{ flex: 1 }}>
+      <FlatList
+        ref={ref}
+        data={categories}
+        renderItem={renderCategorySection}
+        keyExtractor={(item) => item.category_id}
+        showsVerticalScrollIndicator={false}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={3}
+      />
+    </View>
   );
 });
 
