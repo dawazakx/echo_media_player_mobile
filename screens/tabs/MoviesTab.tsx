@@ -7,12 +7,19 @@ import React, {
 } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
+  Image,
+  Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import {
+  BottomTabScreenProps,
+  useBottomTabBarHeight,
+} from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import { CustomText } from "@/components/Text";
@@ -21,18 +28,50 @@ import CategoryFilter from "@/components/CategoryFilter";
 import MovieCategoryGroup from "@/components/MovieCategoryGroup";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
-import { fetchAllMovies, fetchCategories } from "@/providers/api";
+import {
+  fetchAllMovies,
+  fetchCategories,
+  fetchTopRatedMovies,
+} from "@/providers/api";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Movie } from "@/types";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  SharedValue,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
   route: RouteProp<TabParamList, "Movies">;
 }
 
+const { width, height } = Dimensions.get("window");
+const ITEM_SIZE = Platform.OS === "ios" ? width * 0.62 : width * 0.64;
+const EMPTY_ITEM_SIZE = (width - ITEM_SIZE) / 2;
+
+interface Poster {
+  id: number;
+  title: string;
+  poster_path: string;
+}
+
+interface RenderItemProps {
+  item: Poster;
+  index: number;
+  scrollX: SharedValue<number>;
+}
+
 const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
+  const tabBarHeight = useBottomTabBarHeight();
   const { deviceId } = useContext(DeviceContext);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
@@ -50,6 +89,12 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     queryKey: ["movies", availableCategories],
     queryFn: () => fetchAllMovies(deviceId, availableCategories),
     enabled: !!availableCategories,
+    staleTime: 20 * 60 * 1000, // 20 minutes
+  });
+
+  const topRatedMoviesQuery = useQuery({
+    queryKey: ["topRatedMovies"],
+    queryFn: fetchTopRatedMovies,
     staleTime: 20 * 60 * 1000, // 20 minutes
   });
 
@@ -90,14 +135,144 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     []
   );
 
-  if (categoriesQuery.data && moviesQuery.data)
+  const scrollX = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+  });
+
+  const topRatedMoviesData = [
+    { key: "empty-left" }, // Empty item at the beginning
+    ...(topRatedMoviesQuery.data || []).map((movie: Poster) => ({
+      ...movie,
+      key: movie.id.toString(),
+    })),
+    { key: "empty-right" }, // Empty item at the end
+  ];
+
+  const RenderItem: React.FC<RenderItemProps> = ({ item, index, scrollX }) => {
+    if (!item.poster_path) {
+      return <View style={{ width: EMPTY_ITEM_SIZE }} />;
+    }
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          translateY: interpolate(
+            scrollX.value,
+            [
+              (index - 2) * ITEM_SIZE,
+              (index - 1) * ITEM_SIZE,
+              index * ITEM_SIZE,
+            ],
+            [-10, 25, -10],
+            Extrapolation.CLAMP
+          ),
+        },
+      ],
+    }));
+    const animatedHeaderStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          translateY: interpolate(
+            scrollX.value,
+            [
+              (index - 2) * ITEM_SIZE,
+              (index - 1) * ITEM_SIZE,
+              index * ITEM_SIZE,
+            ],
+            [-10, 25, -10],
+            Extrapolation.CLAMP
+          ),
+        },
+      ],
+    }));
+
     return (
-      <CustomView style={styles.container}>
+      <View style={{ width: ITEM_SIZE }}>
+        <Animated.View
+          style={[
+            {
+              marginHorizontal: 8,
+              marginVertical: 8,
+              padding: 5,
+              alignItems: "center",
+              borderRadius: 8,
+              backgroundColor: "transparent",
+              flex: 1,
+            },
+            animatedStyle,
+          ]}
+        >
+          <Image
+            source={{
+              uri: `https://image.tmdb.org/t/p/original${item.poster_path}`,
+            }}
+            style={{
+              width: "100%",
+              height: ITEM_SIZE * 1.2,
+              resizeMode: "cover",
+              borderRadius: 10,
+              margin: 0,
+              marginBottom: 10,
+            }}
+          />
+          <CustomText
+            type="extraSmall"
+            style={{ color: Colors.white }}
+            numberOfLines={1}
+          >
+            {item.title}
+          </CustomText>
+        </Animated.View>
+      </View>
+    );
+  };
+
+  if (categoriesQuery.data && topRatedMoviesQuery.data)
+    return (
+      <ScrollView
+        stickyHeaderIndices={[1]}
+        style={{
+          backgroundColor: Colors.secBackground,
+          marginBottom: tabBarHeight,
+          flex: 1,
+        }}
+      >
+        <View>
+          <CustomText style={{ padding: 10, fontSize: 20, fontWeight: "bold" }}>
+            Popular Movies
+          </CustomText>
+          <Animated.FlatList
+            // ref={animatedRef}
+            showsHorizontalScrollIndicator={false}
+            data={topRatedMoviesData}
+            horizontal
+            snapToInterval={ITEM_SIZE}
+            snapToAlignment="start"
+            decelerationRate={Platform.OS === "ios" ? 0 : 0.98}
+            renderToHardwareTextureAndroid
+            bounces={false}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            renderItem={({ item, index }) => (
+              <RenderItem item={item} index={index} scrollX={scrollX} />
+            )}
+            keyExtractor={(item) => item.id?.toString() || item.key}
+            contentContainerStyle={{
+              // paddingHorizontal: EMPTY_ITEM_SIZE,
+              paddingTop: 10,
+              paddingBottom: 20,
+            }}
+          />
+        </View>
+
         <CategoryFilter
           categories={availableCategories}
           selectedCategory={selectedCategory}
           onSelect={handleCategoryPress}
         />
+
         <MovieCategoryGroup
           navigation={navigation}
           categories={availableCategories}
@@ -108,7 +283,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         <BottomSheet
           ref={bottomSheetRef}
           index={-1}
-          snapPoints={["45%"]}
+          snapPoints={["30%"]}
           enablePanDownToClose={true}
           backgroundStyle={{ backgroundColor: Colors.secBackground }}
           handleIndicatorStyle={{ backgroundColor: Colors.white }}
@@ -207,10 +382,14 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
             </View>
           )}
         </BottomSheet>
-      </CustomView>
+      </ScrollView>
     );
 
-  if (categoriesQuery.isError || moviesQuery.isError)
+  if (
+    categoriesQuery.isError ||
+    moviesQuery.isError ||
+    topRatedMoviesQuery.isError
+  )
     return (
       <CustomView
         style={{
@@ -221,7 +400,9 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
       >
         <CustomText type="extraSmall">
           An error occurred. Message:{" "}
-          {categoriesQuery.error?.message || moviesQuery.error?.message}
+          {categoriesQuery.error?.message ||
+            moviesQuery.error?.message ||
+            topRatedMoviesQuery.error?.message}
         </CustomText>
       </CustomView>
     );
@@ -244,6 +425,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.secBackground,
   },
+  carouselContainer: {},
 });
 
 export default MoviesTab;

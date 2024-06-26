@@ -38,7 +38,7 @@ const MoviesStackNavigator: React.FC = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MoviesList" component={MoviesTabWithHeader} />
       <Stack.Screen name="AllMovies" component={AllMovies} />
-      <Stack.Screen name="MovieDetails" component={MovieDetails} />
+      {/* <Stack.Screen name="MovieDetails" component={MovieDetails} /> */}
     </Stack.Navigator>
   );
 };
@@ -83,12 +83,14 @@ export default function Tabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: Colors.white,
+        tabBarActiveTintColor: Colors.tint,
+        tabBarInactiveTintColor: Colors.white,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors.background,
+          backgroundColor: "#1f2937F2",
+          borderTopColor: "transparent",
           paddingBottom: 5,
-          display: routeName === "MovieDetails" ? "none" : "flex",
+          position: "absolute",
         },
       }}
     >
@@ -122,7 +124,7 @@ export default function Tabs() {
           ),
         }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="TvShows"
         component={TvShowsTabWithHeader}
         options={{
@@ -136,7 +138,7 @@ export default function Tabs() {
             />
           ),
         }}
-      /> */}
+      />
       {/* <Tab.Screen
         name="Sports"
         component={SportsTabWithHeader}

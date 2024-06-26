@@ -1,7 +1,10 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
 
-import { StyleSheet, ActivityIndicator, FlatList, } from "react-native";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { StyleSheet, ActivityIndicator, FlatList } from "react-native";
+import {
+  BottomTabScreenProps,
+  useBottomTabBarHeight,
+} from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 
 import { DeviceContext } from "@/providers/DeviceProvider";
@@ -24,9 +27,12 @@ export interface LiveTvProps {
 }
 
 const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
+  const tabBarHeight = useBottomTabBarHeight();
   const { deviceId } = useContext(DeviceContext);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [liveStreams, setLiveStreams] = useState<{ [key: string]: LiveStream[] }>({});
+  const [liveStreams, setLiveStreams] = useState<{
+    [key: string]: LiveStream[];
+  }>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const flatListRef = useRef<FlatList>(null);
@@ -34,18 +40,21 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-  
+
       const categoriesData = await fetchLiveStreamCategories(deviceId);
       const availableCategories = categoriesData.slice(0, 30);
       setCategories(availableCategories);
-  
-      const liveStreamData = await fetchLiveStreams(deviceId, availableCategories);
+
+      const liveStreamData = await fetchLiveStreams(
+        deviceId,
+        availableCategories
+      );
       setLiveStreams(liveStreamData);
-  
+
       if (categoriesData.length > 0) {
         setSelectedCategory(categoriesData[0].category_id);
       }
-  
+
       setLoading(false);
     };
 
@@ -82,10 +91,24 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
   }
 
   return (
-    <CustomView style={styles.container}>
-      <CategoryFilter categories={categories} selectedCategory={selectedCategory} onSelect={handleCategoryPress} />
+    <CustomView
+      style={{
+        backgroundColor: Colors.secBackground,
+        paddingBottom: tabBarHeight,
+      }}
+    >
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelect={handleCategoryPress}
+      />
 
-      <LiveStreamCategoryGroup navigation={navigation} categories={categories} streams={liveStreams} flatListRef={flatListRef} />
+      <LiveStreamCategoryGroup
+        navigation={navigation}
+        categories={categories}
+        streams={liveStreams}
+        flatListRef={flatListRef}
+      />
     </CustomView>
   );
 };
@@ -94,7 +117,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.secBackground,
   },
-  
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",

@@ -39,7 +39,7 @@ const ManagePlaylist = ({ navigation }) => {
     <CustomView
       style={{
         paddingTop: insets.top,
-        backgroundColor: Colors.background,
+        backgroundColor: Colors.secBackground,
         height: "100%",
       }}
     >

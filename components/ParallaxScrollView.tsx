@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import { StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -8,6 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 const HEADER_HEIGHT = 250;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
@@ -29,7 +30,7 @@ export default function ParallaxScrollView({
           translateY: interpolate(
             scrollOffset.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
+            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.15]
           ),
         },
         {
@@ -58,15 +59,17 @@ export default function ParallaxScrollView({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "rgb(23 23 23)",
   },
   header: {
-    height: 240,
+    height: HEADER_HEIGHT,
     overflow: "hidden",
   },
   content: {
     flex: 1,
+    minHeight: SCREEN_HEIGHT,
     // padding: 10,
-    gap: 16,
-    overflow: "hidden",
+    // gap: 16,
+    // overflow: "hidden",
   },
 });

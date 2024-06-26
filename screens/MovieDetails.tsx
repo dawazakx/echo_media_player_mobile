@@ -221,7 +221,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
                 width,
                 height: IMG_HEIGHT,
               }}
-              resizeMode="contain"
+              resizeMode="cover"
             />
             <LinearGradient
               colors={["transparent", "rgba(23,23,23,0.6)", "rgba(23,23,23,1)"]}
