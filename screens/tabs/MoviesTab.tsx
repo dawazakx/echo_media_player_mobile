@@ -231,55 +231,80 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
 
   if (categoriesQuery.data && topRatedMoviesQuery.data)
     return (
-      <ScrollView
-        stickyHeaderIndices={[1]}
+      <View
         style={{
+          flex: 1,
           backgroundColor: Colors.secBackground,
           marginBottom: tabBarHeight,
-          flex: 1,
         }}
       >
         <View>
-          <CustomText style={{ padding: 10, fontSize: 20, fontWeight: "bold" }}>
-            Popular Movies
-          </CustomText>
-          <Animated.FlatList
-            // ref={animatedRef}
-            showsHorizontalScrollIndicator={false}
-            data={topRatedMoviesData}
-            horizontal
-            snapToInterval={ITEM_SIZE}
-            snapToAlignment="start"
-            decelerationRate={Platform.OS === "ios" ? 0 : 0.98}
-            renderToHardwareTextureAndroid
-            bounces={false}
-            onScroll={onScroll}
-            scrollEventThrottle={16}
-            renderItem={({ item, index }) => (
-              <RenderItem item={item} index={index} scrollX={scrollX} />
-            )}
-            keyExtractor={(item) => item.id?.toString() || item.key}
-            contentContainerStyle={{
-              // paddingHorizontal: EMPTY_ITEM_SIZE,
-              paddingTop: 10,
-              paddingBottom: 20,
-            }}
+          <CategoryFilter
+            categories={availableCategories}
+            selectedCategory={selectedCategory}
+            onSelect={handleCategoryPress}
           />
         </View>
 
-        <CategoryFilter
-          categories={availableCategories}
-          selectedCategory={selectedCategory}
-          onSelect={handleCategoryPress}
+        <FlatList
+          data={[1, 1]}
+          renderItem={({ item, index }) => {
+            return (
+              <View style={{ width: "100%" }}>
+                {index === 0 && (
+                  <View>
+                    <View>
+                      <CustomText
+                        style={{
+                          padding: 10,
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Popular Movies
+                      </CustomText>
+                      <Animated.FlatList
+                        showsHorizontalScrollIndicator={false}
+                        data={topRatedMoviesData}
+                        horizontal
+                        snapToInterval={ITEM_SIZE}
+                        snapToAlignment="start"
+                        decelerationRate={Platform.OS === "ios" ? 0 : 0.98}
+                        renderToHardwareTextureAndroid
+                        bounces={false}
+                        onScroll={onScroll}
+                        scrollEventThrottle={16}
+                        renderItem={({ item, index }) => (
+                          <RenderItem
+                            item={item}
+                            index={index}
+                            scrollX={scrollX}
+                          />
+                        )}
+                        keyExtractor={(item) => item.id?.toString() || item.key}
+                        contentContainerStyle={{
+                          // paddingHorizontal: EMPTY_ITEM_SIZE,
+                          paddingTop: 10,
+                          paddingBottom: 20,
+                        }}
+                      />
+                    </View>
+                  </View>
+                )}
+                {index === 1 && (
+                  <View>
+                    <MovieCategoryGroup
+                      navigation={navigation}
+                      categories={availableCategories}
+                      flatListRef={flatListRef}
+                      onMovieLongPress={handleMovieLongPress}
+                    />
+                  </View>
+                )}
+              </View>
+            );
+          }}
         />
-
-        <MovieCategoryGroup
-          navigation={navigation}
-          categories={availableCategories}
-          flatListRef={flatListRef}
-          onMovieLongPress={handleMovieLongPress}
-        />
-
         <BottomSheet
           ref={bottomSheetRef}
           index={-1}
@@ -382,7 +407,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
             </View>
           )}
         </BottomSheet>
-      </ScrollView>
+      </View>
     );
 
   if (
