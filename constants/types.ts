@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Home: undefined;
   Search: undefined;
   MovieDetails: { movie: Movie };
+  TvSeriesDetails: undefined;
   LiveStreamDetails: { stream: LiveStream };
   VideoPlayer: { streamUrl: string; title: string };
 };

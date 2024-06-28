@@ -226,6 +226,24 @@ export const fetchTopRatedMovies = async () => {
     throw error;
   }
 };
+export const fetchTopRatedShows = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/tv/top_rated`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: TMDB_API_KEY,
+        },
+      }
+    );
+    // console.log(response.data);
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching top rated movies:", error);
+    throw error;
+  }
+};
 
 export const fetchLiveTvByCategory = async (
   deviceId: string,
