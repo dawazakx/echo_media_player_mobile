@@ -112,8 +112,9 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
       (category) => category.category_id === categoryId
     );
     if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({
-        index: categoryIndex!,
+      const targetPosition = 262 * categoryIndex + 428;
+      flatListRef.current.scrollToOffset({
+        offset: targetPosition,
         animated: true,
       });
     }
@@ -252,6 +253,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
             style={{
               padding: 10,
               marginHorizontal: 15,
+              marginBottom: 20,
               backgroundColor: "gray",
               width: "45%",
             }}
@@ -262,13 +264,14 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         </View>
 
         <FlatList
+          ref={flatListRef}
           data={[1, 1]}
           renderItem={({ item, index }) => {
             return (
               <View style={{ width: "100%" }}>
                 {index === 0 && (
                   <View>
-                    <View>
+                    <View style={{ marginTop: 10 }}>
                       <CustomText
                         style={{
                           padding: 10,
@@ -319,6 +322,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
               </View>
             );
           }}
+          keyExtractor={(item, index) => index.toString()}
         />
         <BottomSheet
           ref={bottomSheetRef}
