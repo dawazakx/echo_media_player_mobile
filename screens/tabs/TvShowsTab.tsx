@@ -26,19 +26,17 @@ import { DeviceContext } from "@/providers/DeviceProvider";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import CategoryFilter from "@/components/CategoryFilter";
-import MovieCategoryGroup from "@/components/MovieCategoryGroup";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
 import {
   fetchAllMovies,
-  fetchCategories,
-  fetchTopRatedMovies,
   fetchTopRatedShows,
+  fetchTvCategories,
 } from "@/providers/api";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { Movie } from "@/types";
+import { Movie, Show } from "@/types";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -50,10 +48,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { PlaylistContext } from "@/providers/PlaylistProvider";
+import TvShowsCategoryGroup from "@/components/TvShowsCategoryGroup";
 
-export interface MoviesProps {
-  navigation: BottomTabScreenProps<TabParamList, "Movies">;
-  route: RouteProp<TabParamList, "Movies">;
+export interface TvShowsProps {
+  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+  route: RouteProp<TabParamList, "TvShows">;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -72,17 +71,17 @@ interface RenderItemProps {
   scrollX: SharedValue<number>;
 }
 
-const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
+const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
   const { deviceId } = useContext(DeviceContext);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Show | null>(null);
 
   const categoriesQuery = useQuery({
     queryKey: ["categories", deviceId],
-    queryFn: () => fetchCategories(deviceId),
+    queryFn: () => fetchTvCategories(deviceId),
   });
 
   const availableCategories = categoriesQuery.data!;
@@ -120,7 +119,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     }
   };
 
-  const handleMovieLongPress = (movie: Movie) => {
+  const handleMovieLongPress = (movie: Show) => {
     setSelectedMovie(movie);
     bottomSheetRef.current?.expand();
   };
@@ -248,20 +247,6 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
             onSelect={handleCategoryPress}
           />
         </View>
-        <View>
-          <Pressable
-            style={{
-              padding: 10,
-              marginHorizontal: 15,
-              marginBottom: 20,
-              backgroundColor: "gray",
-              width: "45%",
-            }}
-            onPress={() => navigation.navigate("TvSeriesDetails")}
-          >
-            <Text style={{ color: "white" }}>tvSeries details test</Text>
-          </Pressable>
-        </View>
 
         <FlatList
           ref={flatListRef}
@@ -311,7 +296,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
                 )}
                 {index === 1 && (
                   <View>
-                    <MovieCategoryGroup
+                    <TvShowsCategoryGroup
                       navigation={navigation}
                       categories={availableCategories}
                       flatListRef={flatListRef}
@@ -472,4 +457,4 @@ const styles = StyleSheet.create({
   carouselContainer: {},
 });
 
-export default MoviesTab;
+export default TvShowsTab;

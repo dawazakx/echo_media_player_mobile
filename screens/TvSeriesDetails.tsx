@@ -14,7 +14,7 @@ import {
   Modal,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
-import { MoviesStackParamList } from "@/constants/types";
+import { MoviesStackParamList, TvShowsStackParamList } from "@/constants/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors } from "@/constants/Colors";
 import {
@@ -37,9 +37,12 @@ import { StatusBar } from "expo-status-bar";
 import { useQuery } from "@tanstack/react-query";
 import EpisodesList from "@/components/EpisodesList";
 
-type MovieDetailsProps = {
-  route: RouteProp<MoviesStackParamList, "MovieDetails">;
-  navigation: NativeStackNavigationProp<MoviesStackParamList, "MovieDetails">;
+type TvShowDetailsProps = {
+  route: RouteProp<TvShowsStackParamList, "TvSeriesDetails">;
+  navigation: NativeStackNavigationProp<
+    TvShowsStackParamList,
+    "TvSeriesDetails"
+  >;
 };
 var { width, height } = Dimensions.get("window");
 const IMG_HEIGHT = 262;
@@ -61,64 +64,68 @@ const formatRuntime = (runtime: number) => {
   }
 };
 
-const fetchSeriesDetails = async () => {
-  const response = await axios.get(`https://api.themoviedb.org/3/tv/94997`, {
-    headers: {
-      accept: "application/json",
-      Authorization: TMDB_API_KEY,
-    },
-  });
-  return response.data;
-};
-
-const fetchSeasonDetails = async (seasonNumber: number) => {
-  const response = await axios.get(
-    `https://api.themoviedb.org/3/tv/94997/season/${seasonNumber}`,
-    {
-      headers: {
-        accept: "application/json",
-        Authorization: TMDB_API_KEY,
-      },
-    }
-  );
-  return response.data;
-};
-
-const fetchSeriesCast = async () => {
-  const response = await axios.get(
-    `https://api.themoviedb.org/3/tv/94997/credits`,
-    {
-      headers: {
-        accept: "application/json",
-        Authorization: TMDB_API_KEY,
-      },
-    }
-  );
-  return response.data;
-};
-
-const fetchSeriesVideos = async () => {
-  const response = await axios.get(
-    `https://api.themoviedb.org/3/tv/94997/videos`,
-    {
-      headers: {
-        accept: "application/json",
-        Authorization: TMDB_API_KEY,
-      },
-    }
-  );
-  return response.data;
-};
-
-const TvSeriesDetails: React.FC<MovieDetailsProps> = ({
+const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
   route,
   navigation,
 }) => {
+  const { tvshows } = route.params;
   const { deviceId } = useContext(DeviceContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [activeSegment, setActiveSegment] = useState("overview");
+
+  const fetchSeriesDetails = async () => {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: TMDB_API_KEY,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  const fetchSeasonDetails = async (seasonNumber: number) => {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}/season/${seasonNumber}`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: TMDB_API_KEY,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  const fetchSeriesCast = async () => {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}/credits`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: TMDB_API_KEY,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  const fetchSeriesVideos = async () => {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}/videos`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: TMDB_API_KEY,
+        },
+      }
+    );
+    return response.data;
+  };
 
   const { data: seriesDetails, isLoading: isLoadingDetails } = useQuery({
     queryKey: ["seriesDetails"],
@@ -157,7 +164,7 @@ const TvSeriesDetails: React.FC<MovieDetailsProps> = ({
     }
 
     try {
-      const streamUrl = await fetchStreamUrl(deviceId, movie);
+      const streamUrl = await fetchStreamUrl(deviceId, tvshow);
       if (streamUrl) {
         setStreamUrl(streamUrl);
         // Navigate to the video player screen or handle the stream URL as needed

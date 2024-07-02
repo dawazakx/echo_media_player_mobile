@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { BASE_URL, TMDB_API_KEY } from "@/constants/api";
 
-import { type Category, type LiveStream, type Movie } from "@/types";
+import { Show, type Category, type LiveStream, type Movie } from "@/types";
 import { PLACEHOLDER_IMAGE } from "@/components/MovieList";
 
 export const fetchLiveStreamCategories = async (
@@ -71,6 +71,25 @@ export const fetchCategories = async (
       },
     });
     return response.data.vodCategories;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+export const fetchTvCategories = async (
+  deviceId: string | null
+): Promise<Category[]> => {
+  if (!deviceId || typeof deviceId !== "string") {
+    throw new Error("Invalid device ID");
+  }
+  try {
+    const response = await axios.get(`${BASE_URL}series-category`, {
+      headers: {
+        "Content-Type": "application/json",
+        "device-id": deviceId,
+      },
+    });
+    return response.data.seriesCategories;
   } catch (error) {
     console.error(error);
     return [];
@@ -184,6 +203,27 @@ export const fetchMoviesByCategory = async (
     );
 
     return response.data.streams;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+export const fetchTvShowsByCategory = async (
+  deviceId: string,
+  categoryId: string
+) => {
+  try {
+    const response = await axios.get<{ series: Show[] }>(
+      `${BASE_URL}series-streams?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+
+    return response.data.series;
   } catch (error) {
     console.error(error);
     return [];

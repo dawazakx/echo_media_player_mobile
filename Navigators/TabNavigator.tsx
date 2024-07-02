@@ -12,6 +12,7 @@ import {
   MoviesStackParamList,
   SettingsStackParamList,
   TabParamList,
+  TvShowsStackParamList,
 } from "@/constants/types";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -27,9 +28,11 @@ import ManagePlaylist from "@/screens/tabs/settings/managePlaylist/ManagePlaylis
 import PlaylistDetails from "@/screens/tabs/settings/managePlaylist/PlaylistDetails";
 
 import { useNavigationState } from "@react-navigation/native";
+import AllTvShows from "@/screens/tabs/tvshows/AllTvShows";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
+const TvStack = createNativeStackNavigator<TvShowsStackParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 const PlaylistManagerStack = createNativeStackNavigator();
 
@@ -40,6 +43,15 @@ const MoviesStackNavigator: React.FC = () => {
       <Stack.Screen name="AllMovies" component={AllMovies} />
       {/* <Stack.Screen name="MovieDetails" component={MovieDetails} /> */}
     </Stack.Navigator>
+  );
+};
+const TvShowsStackNavigator: React.FC = () => {
+  return (
+    <TvStack.Navigator screenOptions={{ headerShown: false }}>
+      <TvStack.Screen name="TvShowsList" component={TvShowsTabWithHeader} />
+      <TvStack.Screen name="AllTvShows" component={AllTvShows} />
+      {/* <TvStack.Screen name="MovieDetails" component={MovieDetails} /> */}
+    </TvStack.Navigator>
   );
 };
 const PlaylistManagerNavigator: React.FC = () => {
@@ -126,7 +138,7 @@ export default function Tabs() {
       />
       <Tab.Screen
         name="TvShows"
-        component={TvShowsTabWithHeader}
+        component={TvShowsStackNavigator}
         options={{
           title: "TV Shows",
           tabBarIcon: ({ color }) => (
