@@ -20,21 +20,21 @@ import { CustomText } from "@/components/Text";
 import { TabParamList } from "@/constants/types";
 import { Colors } from "@/constants/Colors";
 
-import { type Category, type Movie } from "@/types";
+import { Show, type Category, type Movie } from "@/types";
 
-import MovieList from "./MovieList";
+import TvShowsList from "./TvShowsList";
 
-export interface MoviesProps {
-  navigation: BottomTabScreenProps<TabParamList, "Movies">;
-  route?: RouteProp<TabParamList, "Movies">;
+export interface TvShowsProps {
+  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+  route?: RouteProp<TabParamList, "TvShows">;
   categories: Category[];
   flatListRef: RefObject<FlatList>;
-  onMovieLongPress: (movie: Movie) => void;
+  onMovieLongPress: (movie: Show) => void;
 }
 
-const MovieCategoryGroup = forwardRef<
+const TvShowsCategoryGroup = forwardRef<
   ElementRef<typeof FlatList<Category>>,
-  MoviesProps
+  TvShowsProps
 >(({ navigation, categories, flatListRef, onMovieLongPress }, ref) => {
   const renderCategorySection = ({ item }: { item: Category }) => {
     if (!item) {
@@ -49,7 +49,7 @@ const MovieCategoryGroup = forwardRef<
           </CustomText>
           <Pressable
             onPress={() =>
-              navigation.navigate("AllMovies", {
+              navigation.navigate("AllTvShows", {
                 category: item,
               })
             }
@@ -58,7 +58,7 @@ const MovieCategoryGroup = forwardRef<
           </Pressable>
         </View>
 
-        <MovieList
+        <TvShowsList
           categoryId={item.category_id}
           navigation={navigation}
           onMovieLongPress={onMovieLongPress}
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MovieCategoryGroup;
+export default TvShowsCategoryGroup;

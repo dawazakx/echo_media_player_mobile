@@ -1,341 +1,460 @@
-import HorizontalFilter from "@/components/HorizontalFilter";
-import MovieCard from "@/components/MovieCard";
-import MovieCarousel from "@/components/MovieCarousel";
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import {
+  BottomTabScreenProps,
+  useBottomTabBarHeight,
+} from "@react-navigation/bottom-tabs";
+import { RouteProp } from "@react-navigation/native";
+import { DeviceContext } from "@/providers/DeviceProvider";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
+import CategoryFilter from "@/components/CategoryFilter";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { RouteProp } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { FlatList, SectionList, StyleSheet } from "react-native";
+import {
+  fetchAllMovies,
+  fetchTopRatedShows,
+  fetchTvCategories,
+} from "@/providers/api";
+import { useQuery } from "@tanstack/react-query";
+import { MaterialIcons } from "@expo/vector-icons";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { Movie, Show } from "@/types";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  SharedValue,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+import TvShowsCategoryGroup from "@/components/TvShowsCategoryGroup";
 
 export interface TvShowsProps {
   navigation: BottomTabScreenProps<TabParamList, "TvShows">;
   route: RouteProp<TabParamList, "TvShows">;
 }
 
-interface Item {
+const { width, height } = Dimensions.get("window");
+const ITEM_SIZE = Platform.OS === "ios" ? width * 0.62 : width * 0.64;
+const EMPTY_ITEM_SIZE = (width - ITEM_SIZE) / 2;
+
+interface Poster {
   id: number;
   title: string;
-  posterUrl: string;
-  rating: number;
+  poster_path: string;
 }
 
-interface Section {
-  title: string;
-  data: Item[];
+interface RenderItemProps {
+  item: Poster;
+  index: number;
+  scrollX: SharedValue<number>;
 }
-
-interface Data {
-  [key: string]: Item[];
-}
-
-const data: Data = {
-  "Recently Watched": [
-    {
-      id: 1,
-      title: "Watched 1",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.5087,
-    },
-    {
-      id: 2,
-      title: "Watched 2",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.8087,
-    },
-    {
-      id: 3,
-      title: "Watched 3",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.8087,
-    },
-    {
-      id: 4,
-      title: "Watched 4",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.8087,
-    },
-    {
-      id: 5,
-      title: "Watched 5",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.8087,
-    },
-    {
-      id: 6,
-      title: "Watched 6",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.8087,
-    },
-    {
-      id: 7,
-      title: "Watched 7",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.8087,
-    },
-  ],
-  Favorites: [
-    {
-      id: 8,
-      title: "Favorite 1",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 5.9866,
-    },
-    {
-      id: 9,
-      title: "Favorite 2",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.2976,
-    },
-    {
-      id: 10,
-      title: "Favorite 3",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.2976,
-    },
-    {
-      id: 11,
-      title: "Favorite 4",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.2976,
-    },
-    {
-      id: 12,
-      title: "Favorite 5",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.2976,
-    },
-    {
-      id: 13,
-      title: "Favorite 6",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.2976,
-    },
-    {
-      id: 14,
-      title: "Favorite 7",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.2976,
-    },
-  ],
-  Netflix: [
-    {
-      id: 15,
-      title: "Netflix 1",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.7876,
-    },
-    {
-      id: 16,
-      title: "Netflix 2",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.1855,
-    },
-    {
-      id: 17,
-      title: "Netflix 3",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.1855,
-    },
-    {
-      id: 18,
-      title: "Netflix 4",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.1855,
-    },
-    {
-      id: 19,
-      title: "Netflix 5",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.1855,
-    },
-    {
-      id: 20,
-      title: "Netflix 6",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.1855,
-    },
-    {
-      id: 21,
-      title: "Netflix 7",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.1855,
-    },
-  ],
-  HBO: [
-    {
-      id: 22,
-      title: "HBO 1",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.9655,
-    },
-    {
-      id: 23,
-      title: "HBO 2",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.3876,
-    },
-    {
-      id: 24,
-      title: "HBO 3",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.3876,
-    },
-    {
-      id: 25,
-      title: "HBO 4",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.3876,
-    },
-    {
-      id: 37,
-      title: "HBO 5",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.3876,
-    },
-    {
-      id: 26,
-      title: "HBO 6",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.3876,
-    },
-    {
-      id: 27,
-      title: "HBO 7",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.3876,
-    },
-  ],
-  AppleTV: [
-    {
-      id: 28,
-      title: "AppleTV 1",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.665,
-    },
-    {
-      id: 29,
-      title: "AppleTV 2",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4653,
-    },
-    {
-      id: 30,
-      title: "AppleTV 3",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4653,
-    },
-    {
-      id: 31,
-      title: "AppleTV 4",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4653,
-    },
-    {
-      id: 32,
-      title: "AppleTV 5",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4653,
-    },
-    {
-      id: 33,
-      title: "AppleTV 6",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4653,
-    },
-    {
-      id: 34,
-      title: "AppleTV 7",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4653,
-    },
-  ],
-  "All TV Shows": [
-    {
-      id: 35,
-      title: "Show 1",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 4.4705,
-    },
-    {
-      id: 36,
-      title: "Show 2",
-      posterUrl: "https://via.placeholder.com/150",
-      rating: 3.7643,
-    },
-  ],
-};
-const filterOptions = Object.keys(data);
 
 const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
-  const [filteredData, setFilteredData] = useState<Section[]>([]);
-  const [allSections, setAllSections] = useState<Section[]>([]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const { deviceId } = useContext(DeviceContext);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const flatListRef = useRef<FlatList>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Show | null>(null);
+
+  const categoriesQuery = useQuery({
+    queryKey: ["categories", deviceId],
+    queryFn: () => fetchTvCategories(deviceId),
+  });
+
+  const availableCategories = categoriesQuery.data!;
+
+  const moviesQuery = useQuery({
+    queryKey: ["movies", availableCategories],
+    queryFn: () => fetchAllMovies(deviceId, availableCategories),
+    enabled: !!availableCategories,
+    staleTime: 20 * 60 * 1000, // 20 minutes
+  });
+
+  const topRatedShowsQuery = useQuery({
+    queryKey: ["topRatedShows"],
+    queryFn: fetchTopRatedShows,
+    staleTime: 20 * 60 * 1000, // 20 minutes
+  });
 
   useEffect(() => {
-    // Convert data object to array of sections
-    const sections = Object.keys(data).map((key) => ({
-      title: key,
-      data: data[key],
-    }));
-    setAllSections(sections);
-    setFilteredData(sections);
-  }, []);
+    if (availableCategories && availableCategories.length > 0) {
+      setSelectedCategory(availableCategories[0].category_id);
+    }
+  }, [availableCategories]);
 
-  const handleFilterSelect = (filter: string) => {
-    const selectedSection = allSections.find(
-      (section) => section.title === filter
+  const handleCategoryPress = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    const categoryIndex = availableCategories?.findIndex(
+      (category) => category.category_id === categoryId
     );
-    const otherSections = allSections.filter(
-      (section) => section.title !== filter
-    );
-
-    if (selectedSection) {
-      setFilteredData([selectedSection, ...otherSections]);
+    if (flatListRef.current) {
+      const targetPosition = 262 * categoryIndex + 428;
+      flatListRef.current.scrollToOffset({
+        offset: targetPosition,
+        animated: true,
+      });
     }
   };
 
-  const handleMoviePress = (movie: Item) => {
-    // Handle the movie card press action
-    console.log(`Pressed on ${movie.title}`);
+  const handleMovieLongPress = (movie: Show) => {
+    setSelectedMovie(movie);
+    bottomSheetRef.current?.expand();
   };
 
-  return (
-    <CustomView>
-      <HorizontalFilter
-        filterOptions={filterOptions}
-        onSelect={handleFilterSelect}
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        pressBehavior="close"
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.7}
       />
-      <SectionList
-        sections={filteredData}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => null}
-        renderSectionHeader={({ section: { title, data } }) => (
-          <CustomView
-            style={{ padding: 10, backgroundColor: Colors.secBackground }}
+    ),
+    []
+  );
+
+  const scrollX = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+  });
+
+  const topRatedShowsData = [
+    { key: "empty-left" }, // Empty item at the beginning
+    ...(topRatedShowsQuery.data || []).map((movie: Poster) => ({
+      ...movie,
+      key: movie.id.toString(),
+    })),
+    { key: "empty-right" }, // Empty item at the end
+  ];
+
+  const RenderItem: React.FC<RenderItemProps> = ({ item, index, scrollX }) => {
+    if (!item.poster_path) {
+      return <View style={{ width: EMPTY_ITEM_SIZE }} />;
+    }
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          translateY: interpolate(
+            scrollX.value,
+            [
+              (index - 2) * ITEM_SIZE,
+              (index - 1) * ITEM_SIZE,
+              index * ITEM_SIZE,
+            ],
+            [-10, 25, -10],
+            Extrapolation.CLAMP
+          ),
+        },
+      ],
+    }));
+    const animatedHeaderStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          translateY: interpolate(
+            scrollX.value,
+            [
+              (index - 2) * ITEM_SIZE,
+              (index - 1) * ITEM_SIZE,
+              index * ITEM_SIZE,
+            ],
+            [-10, 25, -10],
+            Extrapolation.CLAMP
+          ),
+        },
+      ],
+    }));
+
+    return (
+      <View style={{ width: ITEM_SIZE }}>
+        <Animated.View
+          style={[
+            {
+              marginHorizontal: 8,
+              marginVertical: 8,
+              padding: 5,
+              alignItems: "center",
+              borderRadius: 8,
+              backgroundColor: "transparent",
+              flex: 1,
+            },
+            animatedStyle,
+          ]}
+        >
+          <Image
+            source={{
+              uri: `https://image.tmdb.org/t/p/original${item.poster_path}`,
+            }}
+            style={{
+              width: "100%",
+              height: ITEM_SIZE * 1.2,
+              resizeMode: "cover",
+              borderRadius: 10,
+              margin: 0,
+              marginBottom: 10,
+            }}
+          />
+          <CustomText
+            type="extraSmall"
+            style={{ color: Colors.white }}
+            numberOfLines={1}
           >
-            <CustomText
-              type="defaultSemiBold"
-              style={{ marginBottom: 5 }}
-            >{`${title} (${data.length})`}</CustomText>
-            <MovieCarousel movies={data} onPress={handleMoviePress} />
-          </CustomView>
-        )}
-        contentContainerStyle={styles.list}
-      />
+            {item.title}
+          </CustomText>
+        </Animated.View>
+      </View>
+    );
+  };
+
+  if (categoriesQuery.data && topRatedShowsQuery.data)
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: Colors.secBackground,
+          marginBottom: tabBarHeight,
+        }}
+      >
+        <View>
+          <CategoryFilter
+            categories={availableCategories}
+            selectedCategory={selectedCategory}
+            onSelect={handleCategoryPress}
+          />
+        </View>
+
+        <FlatList
+          ref={flatListRef}
+          data={[1, 1]}
+          renderItem={({ item, index }) => {
+            return (
+              <View style={{ width: "100%" }}>
+                {index === 0 && (
+                  <View>
+                    <View style={{ marginTop: 10 }}>
+                      <CustomText
+                        style={{
+                          padding: 10,
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Top Rated TV Shows
+                      </CustomText>
+                      <Animated.FlatList
+                        showsHorizontalScrollIndicator={false}
+                        data={topRatedShowsData}
+                        horizontal
+                        snapToInterval={ITEM_SIZE}
+                        snapToAlignment="start"
+                        decelerationRate={Platform.OS === "ios" ? 0 : 0.98}
+                        renderToHardwareTextureAndroid
+                        bounces={false}
+                        onScroll={onScroll}
+                        scrollEventThrottle={16}
+                        renderItem={({ item, index }) => (
+                          <RenderItem
+                            item={item}
+                            index={index}
+                            scrollX={scrollX}
+                          />
+                        )}
+                        keyExtractor={(item) => item.id?.toString() || item.key}
+                        contentContainerStyle={{
+                          // paddingHorizontal: EMPTY_ITEM_SIZE,
+                          paddingTop: 10,
+                          paddingBottom: 20,
+                        }}
+                      />
+                    </View>
+                  </View>
+                )}
+                {index === 1 && (
+                  <View>
+                    <TvShowsCategoryGroup
+                      navigation={navigation}
+                      categories={availableCategories}
+                      flatListRef={flatListRef}
+                      onMovieLongPress={handleMovieLongPress}
+                    />
+                  </View>
+                )}
+              </View>
+            );
+          }}
+          keyExtractor={(item, index) => index.toString()}
+        />
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={["30%"]}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: Colors.secBackground }}
+          handleIndicatorStyle={{ backgroundColor: Colors.white }}
+          backdropComponent={renderBackdrop}
+        >
+          {selectedMovie && (
+            <View style={{ padding: 1 }}>
+              <CustomText
+                type="subtitle"
+                style={{ textAlign: "center", marginBottom: 10 }}
+              >
+                {selectedMovie.name}
+              </CustomText>
+              <View
+                style={{
+                  borderRadius: 15,
+                  gap: 9,
+                  padding: 20,
+                  backgroundColor: Colors.tint,
+                }}
+              >
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    gap: 20,
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons
+                    name="play-circle"
+                    size={24}
+                    color={Colors.background}
+                  />
+                  <CustomText
+                    type="subtitle"
+                    style={{ color: Colors.background }}
+                  >
+                    Play
+                  </CustomText>
+                </Pressable>
+                <View
+                  style={{
+                    width: "88%",
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                    borderBottomColor: Colors.secBackground,
+                    alignSelf: "flex-end",
+                  }}
+                />
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    gap: 20,
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons
+                    name="bookmark"
+                    size={24}
+                    color={Colors.background}
+                  />
+                  <CustomText
+                    type="subtitle"
+                    style={{ color: Colors.background }}
+                  >
+                    Add to Watchlist
+                  </CustomText>
+                </Pressable>
+                <View
+                  style={{
+                    width: "88%",
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                    borderBottomColor: Colors.secBackground,
+                    alignSelf: "flex-end",
+                  }}
+                />
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    gap: 20,
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons
+                    name="download"
+                    size={24}
+                    color={Colors.background}
+                  />
+                  <CustomText
+                    type="subtitle"
+                    style={{ color: Colors.background }}
+                  >
+                    Download
+                  </CustomText>
+                </Pressable>
+              </View>
+            </View>
+          )}
+        </BottomSheet>
+      </View>
+    );
+
+  if (
+    categoriesQuery.isError ||
+    moviesQuery.isError ||
+    topRatedShowsQuery.isError
+  )
+    return (
+      <CustomView
+        style={{
+          backgroundColor: Colors.secBackground,
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <CustomText type="extraSmall">
+          An error occurred. Message:{" "}
+          {categoriesQuery.error?.message ||
+            moviesQuery.error?.message ||
+            topRatedShowsQuery.error?.message}
+        </CustomText>
+      </CustomView>
+    );
+
+  return (
+    <CustomView style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color={Colors.white} />
     </CustomView>
   );
 };
-export default TvShowsTab;
 
 const styles = StyleSheet.create({
-  list: {
-    paddingBottom: 150,
+  container: {
+    backgroundColor: Colors.secBackground,
   },
-  item: {
-    padding: 20,
-    marginVertical: 8,
-    backgroundColor: "#f9c2ff",
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.secBackground,
   },
+  carouselContainer: {},
 });
+
+export default TvShowsTab;

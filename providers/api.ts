@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { BASE_URL, TMDB_API_KEY } from "@/constants/api";
 
-import { type Category, type LiveStream, type Movie } from "@/types";
+import { Show, type Category, type LiveStream, type Movie } from "@/types";
 import { PLACEHOLDER_IMAGE } from "@/components/MovieList";
 
 export const fetchLiveStreamCategories = async (
@@ -71,6 +71,25 @@ export const fetchCategories = async (
       },
     });
     return response.data.vodCategories;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+export const fetchTvCategories = async (
+  deviceId: string | null
+): Promise<Category[]> => {
+  if (!deviceId || typeof deviceId !== "string") {
+    throw new Error("Invalid device ID");
+  }
+  try {
+    const response = await axios.get(`${BASE_URL}series-category`, {
+      headers: {
+        "Content-Type": "application/json",
+        "device-id": deviceId,
+      },
+    });
+    return response.data.seriesCategories;
   } catch (error) {
     console.error(error);
     return [];
@@ -189,6 +208,27 @@ export const fetchMoviesByCategory = async (
     return [];
   }
 };
+export const fetchTvShowsByCategory = async (
+  deviceId: string,
+  categoryId: string
+) => {
+  try {
+    const response = await axios.get<{ series: Show[] }>(
+      `${BASE_URL}series-streams?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+
+    return response.data.series;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
 
 export const fetchMovieImage = async (tmdbId: string) => {
   try {
@@ -224,5 +264,45 @@ export const fetchTopRatedMovies = async () => {
   } catch (error) {
     console.error("Error fetching top rated movies:", error);
     throw error;
+  }
+};
+export const fetchTopRatedShows = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/tv/top_rated`,
+      {
+        headers: {
+          accept: "application/json",
+          Authorization: TMDB_API_KEY,
+        },
+      }
+    );
+    // console.log(response.data);
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching top rated movies:", error);
+    throw error;
+  }
+};
+
+export const fetchLiveTvByCategory = async (
+  deviceId: string,
+  categoryId: string
+) => {
+  try {
+    const response = await axios.get<{ streams: LiveStream[] }>(
+      `${BASE_URL}live-stream?category_id=${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "device-id": deviceId,
+        },
+      }
+    );
+
+    return response.data.streams;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };

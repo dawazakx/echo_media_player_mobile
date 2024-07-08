@@ -11,9 +11,13 @@ import {
 
 import { Image } from "expo-image";
 
-import { type Movie } from "@/types";
+import { Show, type Movie } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMovieImage, fetchMoviesByCategory } from "@/providers/api";
+import {
+  fetchMovieImage,
+  fetchMoviesByCategory,
+  fetchTvShowsByCategory,
+} from "@/providers/api";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
@@ -25,34 +29,36 @@ const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-const MovieList = ({
+const TvShowsList = ({
   categoryId,
   navigation,
   onMovieLongPress,
 }: {
   categoryId: string;
-  navigation: BottomTabScreenProps<TabParamList, "Movies">;
-  onMovieLongPress: (movie: Movie) => void;
+  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+  onMovieLongPress: (movie: Show) => void;
 }) => {
   const { deviceId } = useContext(DeviceContext);
 
-  const moviesQuery = useQuery({
-    queryKey: ["movies", categoryId],
-    queryFn: () => fetchMoviesByCategory(deviceId!, categoryId),
+  const TvShowsQuery = useQuery({
+    queryKey: ["tvshows", categoryId],
+    queryFn: () => fetchTvShowsByCategory(deviceId!, categoryId),
     staleTime: 20 * 60 * 1000, // 20 minutes
   });
 
-  const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
+  const renderTvShowItem = useCallback(({ item }: { item: Show }) => {
     return (
       <Pressable
         style={styles.movieItem}
         onLongPress={() => onMovieLongPress(item)}
-        onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+        onPress={() =>
+          navigation.navigate("TvSeriesDetails", { tvshows: item })
+        }
         delayLongPress={250}
       >
         <Image
           // source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-          source={`${item.stream_icon}`}
+          source={`${item.cover}`}
           placeholder={{ blurhash }}
           style={styles.movieImage}
           // resizeMode="contain"
@@ -73,13 +79,13 @@ const MovieList = ({
     );
   }, []);
 
-  if (moviesQuery.data)
+  if (TvShowsQuery.data)
     return (
       <FlatList
-        data={moviesQuery.data.slice(0, 15)}
+        data={TvShowsQuery.data.slice(0, 15)}
         horizontal
-        keyExtractor={(movie) => movie.stream_id.toString()}
-        renderItem={renderMovieItem}
+        keyExtractor={(tvshow) => tvshow.series_id.toString()}
+        renderItem={renderTvShowItem}
         showsHorizontalScrollIndicator={false}
         initialNumToRender={5}
         maxToRenderPerBatch={5}
@@ -87,13 +93,13 @@ const MovieList = ({
         updateCellsBatchingPeriod={50}
         ListEmptyComponent={
           <CustomText style={styles.emptyStateText}>
-            No movies available
+            No Tv Shows available
           </CustomText>
         }
       />
     );
 
-  if (moviesQuery.isError) {
+  if (TvShowsQuery.isError) {
     return (
       <View>
         <Text>Error</Text>
@@ -138,4 +144,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MovieList;
+export default TvShowsList;

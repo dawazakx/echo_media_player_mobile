@@ -10,8 +10,11 @@ import PlaylistNavigator from "@/Navigators/PlaylistNavigator";
 import Tabs from "@/Navigators/TabNavigator";
 import MovieDetails from "@/screens/MovieDetails";
 import VideoPlayer from "@/screens/VideoPlayer";
+import LiveStreamDetails from "@/screens/LiveStreamDetails";
+import TvSeriesDetails from "@/screens/TvSeriesDetails";
+import { RootStackParamList } from "@/constants/types";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const SearchStackNavigator: React.FC = () => {
   return (
@@ -35,6 +38,11 @@ function AppNavigator() {
           <Stack.Screen name="Playlist" component={PlaylistNavigator} />
           <Stack.Screen name="Home" component={Tabs} />
           <Stack.Screen name="MovieDetails" component={MovieDetails} />
+          <Stack.Screen name="TvSeriesDetails" component={TvSeriesDetails} />
+          <Stack.Screen
+            name="LiveStreamDetails"
+            component={LiveStreamDetails}
+          />
           <Stack.Screen name="Search" component={SearchStackNavigator} />
           <Stack.Screen name="VideoPlayer" component={VideoPlayer} />
         </Stack.Navigator>

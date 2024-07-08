@@ -6,6 +6,7 @@ import { TabParamList } from "@/constants/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   Pressable,
@@ -100,6 +101,7 @@ const SettingsTab: React.FC<SettingsProps> = ({ navigation, route }) => {
         backgroundColor: Colors.secBackground,
       }}
     >
+      <StatusBar style="light" />
       <View style={styles.header}>
         <Pressable
           style={styles.backBtn}

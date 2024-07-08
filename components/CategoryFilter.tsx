@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import React, { useCallback, useContext } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import CustomButton from "@/components/Button";
