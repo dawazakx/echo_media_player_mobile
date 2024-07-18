@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "echo-media-player",
+    "name": "Echo Media Player",
     "slug": "echo-media-player",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.echomedia.echomediaplayer"
