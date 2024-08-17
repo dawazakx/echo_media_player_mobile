@@ -3,15 +3,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import HomeScreen from "../screens/Home";
-import SearchScreen from "@/screens/SearchScreen";
-
 import PlaylistNavigator from "@/Navigators/PlaylistNavigator";
 import Tabs from "@/Navigators/TabNavigator";
+
+import HomeScreen from "@/screens/Home";
+import SearchScreen from "@/screens/SearchScreen";
 import MovieDetails from "@/screens/MovieDetails";
 import VideoPlayer from "@/screens/VideoPlayer";
 import LiveStreamDetails from "@/screens/LiveStreamDetails";
 import TvSeriesDetails from "@/screens/TvSeriesDetails";
+
 import { RootStackParamList } from "@/constants/types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

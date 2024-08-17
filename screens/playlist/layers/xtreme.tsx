@@ -1,23 +1,22 @@
-import { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Alert, StyleSheet, View, Pressable } from "react-native";
-
-import { DeviceContext } from "@/providers/DeviceProvider";
-import { PlaylistContext } from "@/providers/PlaylistProvider";
-
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MaterialIcons } from "@expo/vector-icons";
+import { useAsyncStorage } from "@/hooks/useAsyncStorage";
 
 import Button from "@/components/Button";
 import CustomInput from "@/components/Input";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 
+import useCreatePlaylist from "@/hooks/api/useCreatePlaylist";
+
 import { Colors } from "@/constants/Colors";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
-import { BASE_URL } from "@/constants/api";
 import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
+import { STORAGE_KEYS } from "@/constants";
 
+import { MaterialIcons } from "@expo/vector-icons";
 
 export interface XtremePlaylistProps {
   navigation: CompositeNavigationProp<
@@ -26,45 +25,26 @@ export interface XtremePlaylistProps {
   >;
 }
 
-type dataProps = {
-  username: string;
-  nickname: string;
-  password: string;
-  url: string;
-};
-
-async function connectXtreme(
-  data: dataProps & { device_id: string | null }
-): Promise<any> {
-  const response = await fetch(`${BASE_URL}/connect-xstream`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Something went wrong!");
-  }
-
-  return response.json();
-}
-
 export default function XtremeForm({ navigation }: XtremePlaylistProps) {
-  // const [username, setUsername] = useState("Dawazak");
-  // const [nickname, setNickname] = useState("Dawazak");
-  // const [password, setPassword] = useState("wcunmgpamy");
-  // const [url, setUrl] = useState("https://ottkiller.pro");
-  const [username, setUsername] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [password, setPassword] = useState("");
-  const [url, setUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { deviceId } = useContext(DeviceContext);
-  const { setCurrentPlaylist } = useContext(PlaylistContext);
+  const storage = useAsyncStorage();
+  const deviceId = storage.getItem(STORAGE_KEYS.deviceId);
+  
+  const [username, setUsername] = useState("Dawazak");
+  const [nickname, setNickname] = useState("Dawazak");
+  const [password, setPassword] = useState("wcunmgpamy");
+  const [url, setUrl] = useState("https://ottkiller.pro");
+  // const [username, setUsername] = useState("");
+  // const [nickname, setNickname] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [url, setUrl] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
+  
+  const { 
+    mutate: connectXtreme, 
+    isPending: isLoading, 
+    isSuccess: createPlaylistSuccess, 
+    error: createPlaylistError
+  } = useCreatePlaylist();
 
   const validateForm = () => {
     return username && password && url && nickname;
@@ -72,27 +52,27 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      Alert.alert("Validation Error", "All fields are required.");
-      return;
+      return Alert.alert("Validation Error", "All fields are required.");
     }
 
-    setIsLoading(true);
-
     try {
-      const requestAddPlaylist = await connectXtreme({
+      await connectXtreme({
         username,
         password,
         url,
         nickname,
-        device_id: deviceId,
+        device_id: await deviceId || "",
       });
 
-      setCurrentPlaylist(requestAddPlaylist?.isConnected);
-      navigation.navigate(PLAYER_INDEX_ROUTE);
+      if(createPlaylistError) {
+        Alert.alert("Error", createPlaylistError.message);
+      }
+
+      if(createPlaylistSuccess) {
+        navigation.navigate(PLAYER_INDEX_ROUTE);
+      }
     } catch (error: any) {
       Alert.alert("Error", error.message);
-    } finally {
-      setIsLoading(false);
     }
   };
   return (
