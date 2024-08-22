@@ -25,8 +25,9 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
 
   const { mutate: generateDeviceId } = useGenerateDeviceId();
 
-  const checkActivePlaylist = () => {
-    if(activePlaylist?._id) {
+  const checkActivePlaylist = async () => {
+    console.log(activePlaylist)
+    if(await activePlaylist?._id) {
       navigation.navigate(PLAYER_INDEX_ROUTE);
     }
   }

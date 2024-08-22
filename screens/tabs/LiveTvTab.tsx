@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, ActivityIndicator, FlatList } from "react-native";
 import {
   BottomTabScreenProps,
@@ -16,8 +16,6 @@ import useGetLiveStreamCategories from "@/hooks/api/useGetLiveStreamCategories";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
 
-import { Category, LiveStream } from "@/types";
-
 export interface LiveTvProps {
   navigation: BottomTabScreenProps<TabParamList, "LiveTV">;
   route: RouteProp<TabParamList, "LiveTV">;
@@ -25,13 +23,19 @@ export interface LiveTvProps {
 
 const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
   const { data: categories, isLoading } = useGetLiveStreamCategories();
 
+  useEffect(() => {
+    if (categories && categories.length > 0) {
+      setSelectedCategoryId(categories[0].category_id);
+    }
+  }, [categories]);
+
   const handleCategoryPress = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+    setSelectedCategoryId(categoryId);
   };
 
   if (isLoading) {
@@ -61,17 +65,17 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
       {categories && (
         <CategoryFilter
           categories={categories}
-          selectedCategory={selectedCategory}
+          selectedCategory={selectedCategoryId}
           onSelect={handleCategoryPress}
         />
       )}
 
-      {/* {selectedCategory && (
+      {selectedCategoryId && (
         <LiveStreamCategoryGroup
           navigation={navigation}
-          categoryId={selectedCategory}
+          categoryId={selectedCategoryId}
         />
-      )} */}
+      )}
     </CustomView>
   );
 };

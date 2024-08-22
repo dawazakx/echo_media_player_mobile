@@ -1,4 +1,4 @@
-import { useCallback, RefObject, useContext } from "react";
+import React, { useCallback, useEffect, useState, RefObject, useContext } from "react";
 import {
   FlatList,
   Pressable,
@@ -10,16 +10,17 @@ import {
 } from "react-native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
+import { useQueryClient } from '@tanstack/react-query'
 
 import { CustomText } from "@/components/Text";
 
+import useGetLiveStreamContent from "@/hooks/api/useGetLiveStreamContent";
+
 import { TabParamList } from "@/constants/types";
 import { Colors } from "@/constants/Colors";
+import { QUERY_KEYS } from "@/constants";
 
-import { type Category, type LiveStream } from "@/types";
-import { DeviceContext } from "@/providers/DeviceProvider";
-import { useQuery } from "@tanstack/react-query";
-import { fetchLiveTvByCategory } from "@/providers/api";
+import { type LiveStream } from "@/types";
 
 export interface LiveStreamProps {
   navigation: BottomTabScreenProps<TabParamList, "LiveTV">;
@@ -34,16 +35,14 @@ const LiveStreamCategoryGroup = ({
   navigation,
   categoryId,
 }: LiveStreamProps) => {
-  const { deviceId } = useContext(DeviceContext);
+  const queryClient = useQueryClient();
+  const { data: liveStreams, isError } = useGetLiveStreamContent({ categoryId });
 
-  const liveTvQuery = useQuery({
-    queryKey: ["tv", categoryId],
-    queryFn: () => fetchLiveTvByCategory(deviceId!, categoryId),
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.liveStreamContent] });
+  }, [categoryId]);
 
   const renderLiveStreamItem = useCallback(({ item }: { item: LiveStream }) => {
-    // console.log("item:", item);
     if (!item) {
       return null;
     }
@@ -72,46 +71,11 @@ const LiveStreamCategoryGroup = ({
     );
   }, []);
 
-  // const renderCategorySection = useCallback(
-  //   ({ item }: { item: Category }) => {
-  //     if (!item) {
-  //       return null;
-  //     }
-
-  //     const streamsForCategory = streams[item.category_id] || [];
-
-  //     return (
-  //       <View key={item.category_id} style={styles.categorySection}>
-  //         <CustomText type="subtitle" style={styles.categoryTitle}>
-  //           {item.category_name}
-  //         </CustomText>
-
-  //         <FlatList
-  //           data={streamsForCategory}
-  //           horizontal
-  //           keyExtractor={(stream) => stream.stream_id.toString()}
-  //           renderItem={renderItem}
-  //           showsHorizontalScrollIndicator={false}
-  //           initialNumToRender={5}
-  //           maxToRenderPerBatch={5}
-  //           windowSize={3}
-  //           updateCellsBatchingPeriod={50}
-  //           ListEmptyComponent={
-  //             <CustomText style={styles.emptyStateText}>
-  //               No live streams available
-  //             </CustomText>
-  //           }
-  //         />
-  //       </View>
-  //     );
-  //   },
-  //   [streams]
-  // );
-  if (liveTvQuery.data)
+  if (liveStreams) {
     return (
       <View style={{ marginTop: 10 }}>
         <FlatList
-          data={liveTvQuery.data}
+          data={liveStreams}
           keyExtractor={(tv) => tv.stream_id.toString()}
           renderItem={renderLiveStreamItem}
           initialNumToRender={5}
@@ -126,7 +90,9 @@ const LiveStreamCategoryGroup = ({
         />
       </View>
     );
-  if (liveTvQuery.isError) {
+  }
+    
+  if (isError) {
     return (
       <View>
         <Text>Error</Text>
@@ -135,7 +101,7 @@ const LiveStreamCategoryGroup = ({
   }
 
   return (
-    <View>
+    <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color={Colors.white} />
     </View>
   );
@@ -173,6 +139,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: Colors.tint,
   },
+
+  loadingContainer: {
+    marginTop: 10,
+  }
 });
 
 export default LiveStreamCategoryGroup;

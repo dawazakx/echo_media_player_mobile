@@ -1,28 +1,27 @@
+import { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-import { useAsyncStorage } from "../useAsyncStorage";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
 
 import type { LiveStream } from "@/types";
 
 import { BASE_URL } from "@/constants/api";
-import { QUERY_KEYS, STORAGE_KEYS } from "@/constants";
+import { QUERY_KEYS } from "@/constants";
 
-const useGetLiveStreamContent = () => {
-  const storage = useAsyncStorage();
-  const deviceId = storage.getItem(STORAGE_KEYS.deviceId);
+const useGetLiveStreamContent = ({ categoryId }: { categoryId: string}) => {
+  const { activePlaylist } = useContext(PlaylistContext);
 
-  const getLiveStreamContent = async ({ queryKey }: { queryKey: string[] }): Promise<LiveStream[]> => {
-    const categoryId = queryKey[1];
-
+  const getLiveStreamContent = async(): Promise<LiveStream[]> => {
     const response = await axios.get(`${BASE_URL}live-stream?category_id=${categoryId}`, {
       headers: {
         "Content-Type": "application/json",
-        "device-id": await deviceId,
+        "deviceid": activePlaylist?.device_id,
+        "playlistid": activePlaylist?._id
       },
     });
 
-    return response.data.categories;
+    return response.data.streams;
   };
 
   return useQuery({
