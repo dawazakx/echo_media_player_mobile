@@ -1,5 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
-
+import React, { useState, useRef } from "react";
 import { StyleSheet, ActivityIndicator, FlatList } from "react-native";
 import {
   BottomTabScreenProps,
@@ -7,17 +6,15 @@ import {
 } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 
-import { DeviceContext } from "@/providers/DeviceProvider";
-
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import CategoryFilter from "@/components/CategoryFilter";
 import LiveStreamCategoryGroup from "@/components/LiveStreamCategoryGroup";
 
+import useGetLiveStreamCategories from "@/hooks/api/useGetLiveStreamCategories";
+
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
-
-import { fetchLiveStreamCategories, fetchLiveStreams } from "@/providers/api";
 
 import { Category, LiveStream } from "@/types";
 
@@ -28,44 +25,16 @@ export interface LiveTvProps {
 
 const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
-  const { deviceId } = useContext(DeviceContext);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [liveStreams, setLiveStreams] = useState<{
-    [key: string]: LiveStream[];
-  }>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const flatListRef = useRef<FlatList>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      const categoriesData = await fetchLiveStreamCategories(deviceId);
-      const availableCategories = categoriesData.slice(0, 30);
-      setCategories(availableCategories);
-
-      // const liveStreamData = await fetchLiveStreams(
-      //   deviceId,
-      //   availableCategories
-      // );
-      // setLiveStreams(liveStreamData);
-
-      if (categoriesData.length > 0) {
-        setSelectedCategory(categoriesData[0].category_id);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [deviceId]);
+  const { data: categories, isLoading } = useGetLiveStreamCategories();
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <CustomView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.white} />
@@ -73,7 +42,7 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
     );
   }
 
-  if (categories.length === 0) {
+  if (categories?.length === 0) {
     return (
       <CustomView style={styles.container}>
         <CustomText>No categories found.</CustomText>
@@ -89,18 +58,20 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
         paddingBottom: tabBarHeight + 50,
       }}
     >
-      <CategoryFilter
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelect={handleCategoryPress}
-      />
+      {categories && (
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelect={handleCategoryPress}
+        />
+      )}
 
-      {selectedCategory && (
+      {/* {selectedCategory && (
         <LiveStreamCategoryGroup
           navigation={navigation}
           categoryId={selectedCategory}
         />
-      )}
+      )} */}
     </CustomView>
   );
 };

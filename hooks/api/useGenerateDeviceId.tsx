@@ -1,10 +1,10 @@
+import { useContext } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import axios from "axios";
 
-import { useAsyncStorage } from "@/hooks/useAsyncStorage";
+import { DeviceContext } from "@/providers/DeviceProvider";
 
 import { BASE_URL } from "@/constants/api";
-import { STORAGE_KEYS } from "@/constants";
 
 type GenerateDeviceIdPayload = {
   type: string;
@@ -16,7 +16,7 @@ type GenerateDeviceIdResponse = {
 };
 
 const useGenerateDeviceId = () => {
-  const storage = useAsyncStorage();
+  const { setDeviceId } = useContext(DeviceContext);
   const generateDeviceId = async ({ type, os }: GenerateDeviceIdPayload): Promise<GenerateDeviceIdResponse | undefined> => {
     try {
       const response = await axios({
@@ -41,7 +41,7 @@ const useGenerateDeviceId = () => {
     mutationFn: generateDeviceId,
     onSuccess: async (data) => {
       if(data) {
-        storage.setItem(STORAGE_KEYS.deviceId, data?.device);
+        setDeviceId(data?.device);
       }
     },
     onError: (error) => {

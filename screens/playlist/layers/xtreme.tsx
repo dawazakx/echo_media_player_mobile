@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Alert, StyleSheet, View, Pressable } from "react-native";
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useAsyncStorage } from "@/hooks/useAsyncStorage";
+
+import { DeviceContext } from "@/providers/DeviceProvider";
 
 import Button from "@/components/Button";
 import CustomInput from "@/components/Input";
@@ -14,7 +15,6 @@ import useCreatePlaylist from "@/hooks/api/useCreatePlaylist";
 import { Colors } from "@/constants/Colors";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
-import { STORAGE_KEYS } from "@/constants";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -26,9 +26,7 @@ export interface XtremePlaylistProps {
 }
 
 export default function XtremeForm({ navigation }: XtremePlaylistProps) {
-  const storage = useAsyncStorage();
-  const deviceId = storage.getItem(STORAGE_KEYS.deviceId);
-  
+  const { deviceId } = useContext(DeviceContext);
   const [username, setUsername] = useState("Dawazak");
   const [nickname, setNickname] = useState("Dawazak");
   const [password, setPassword] = useState("wcunmgpamy");
@@ -43,7 +41,7 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
     mutate: connectXtreme, 
     isPending: isLoading, 
     isSuccess: createPlaylistSuccess, 
-    error: createPlaylistError
+    error: createPlaylistError,
   } = useCreatePlaylist();
 
   const validateForm = () => {
@@ -56,25 +54,30 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
     }
 
     try {
-      await connectXtreme({
+      connectXtreme({
         username,
         password,
         url,
         nickname,
-        device_id: await deviceId || "",
+        device_id: deviceId || "",
       });
-
-      if(createPlaylistError) {
-        Alert.alert("Error", createPlaylistError.message);
-      }
-
-      if(createPlaylistSuccess) {
-        navigation.navigate(PLAYER_INDEX_ROUTE);
-      }
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
   };
+
+  useEffect(() => {
+    if (createPlaylistError) {
+      Alert.alert("Error", createPlaylistError.message);
+    }
+  }, [createPlaylistError]);
+
+  useEffect(() => {
+    if (createPlaylistSuccess) {
+      navigation.navigate(PLAYER_INDEX_ROUTE);
+    }
+  }, [createPlaylistSuccess]);
+
   return (
     <CustomView style={styles.container}>
       <View style={styles.header}>

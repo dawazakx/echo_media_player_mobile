@@ -1,54 +1,38 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, Dispatch, SetStateAction } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Device from "expo-device";
 
-import { BASE_URL } from "../constants/api";
+import { ReactChildrenProps } from "@/types";
 
-const initialContetxt: {
-  deviceId: string | null;
-  setDeviceId: (deviceId: string | null) => void;
-} = {
+import { STORAGE_KEYS } from "@/constants";
+
+type InitialContextProps = {
+  deviceId: null | string;
+  setDeviceId: Dispatch<SetStateAction<null | string>>;
+}
+
+const initialContext: InitialContextProps = {
   deviceId: null,
   setDeviceId: () => {},
 };
 
-export const DeviceContext = createContext(initialContetxt);
+export const DeviceContext = createContext(initialContext);
 
-export const DeviceProvider = ({ children }) => {
-  const [deviceId, setDeviceId] = useState(() => {
-    const deviceId = AsyncStorage.getItem("@app:deviceId");
-    return typeof deviceId === "string" ? deviceId : null;
-  });
-
-  const getDeviceId = async () => {
-    try {
-      const request = await fetch(`${BASE_URL}generate-device-id`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          deviceId: Device.isDevice ? Device.isDevice : null,
-          type: "mobile",
-          // os: Device.osName?.toLowerCase(),
-          os: "android",
-        }),
-      });
-
-      const response = await request.json();
-      await AsyncStorage.setItem(
-        "@app:deviceId",
-        JSON.stringify(response?.device)
-      );
-      setDeviceId(response?.device);
-    } catch (error) {
-      console.log(error?.message);
-    }
-  };
+export const DeviceProvider = ({ children }: ReactChildrenProps) => {
+  const [deviceId, setDeviceId] = useState<null | string>(null);
 
   useEffect(() => {
-    if (!deviceId) {
-      getDeviceId();
+    AsyncStorage
+      .getItem(STORAGE_KEYS.deviceId)
+      .then((value) => {
+        if (value) {
+          setDeviceId(value);
+        }
+      })
+  }, []);
+
+  useEffect(() => {
+    if(deviceId !== initialContext.deviceId) {
+      AsyncStorage.setItem(STORAGE_KEYS.deviceId, deviceId || "");
     }
   }, [deviceId]);
 

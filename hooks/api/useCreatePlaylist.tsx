@@ -1,9 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
+import { useMutation } from "@tanstack/react-query";
 
-import { useAsyncStorage } from "@/hooks/useAsyncStorage";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
 
 import { BASE_URL } from "@/constants/api";
-import { STORAGE_KEYS } from "@/constants";
 
 type createPlaylistPayload = {
   username: string;
@@ -24,7 +24,7 @@ type createPlaylistResponse = {
 }
 
 const useCreatePlaylist = () => {
-  const storage = useAsyncStorage();
+  const { setUserPlaylists, setActivePlaylist } = useContext(PlaylistContext);
 
   async function connectXtreme( data: createPlaylistPayload): Promise<createPlaylistResponse> {
     const response = await fetch(`${BASE_URL}/connect-xstream`, {
@@ -46,7 +46,8 @@ const useCreatePlaylist = () => {
   return useMutation({
     mutationFn: connectXtreme,
     onSuccess: (data) => {
-      storage.setItem(STORAGE_KEYS.activePlaylist, JSON.stringify(data?.isConnected));
+      setUserPlaylists([data?.isConnected]);
+      setActivePlaylist(data?.isConnected);
       return true;
     },
     onError: (error) => {

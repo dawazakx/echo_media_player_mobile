@@ -6,26 +6,33 @@ import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 
+import { DeviceContext } from "@/providers/DeviceProvider";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+
 import useGenerateDeviceId from "@/hooks/api/useGenerateDeviceId";
-import { useAsyncStorage } from "@/hooks/useAsyncStorage";
 
 import { Colors } from "@/constants/Colors";
 import { RootStackParamList } from "@/constants/types";
 import { SIGNIN_ROUTE, ADD_PLAYLIST_ROUTE, PLAYER_INDEX_ROUTE } from "@/constants/Routes";
-import { STORAGE_KEYS } from "@/constants";
 
 export interface HomeProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
 }
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
-  const storage = useAsyncStorage();
-  const deviceId = storage.getItem(STORAGE_KEYS.deviceId);
+  const { deviceId } = useContext(DeviceContext);
+  const { activePlaylist } = useContext(PlaylistContext);
 
   const { mutate: generateDeviceId } = useGenerateDeviceId();
 
+  const checkActivePlaylist = () => {
+    if(activePlaylist?._id) {
+      navigation.navigate(PLAYER_INDEX_ROUTE);
+    }
+  }
+
   const onGenerateDeviceId = async () => {
-    if(await !deviceId) {
+    if(!deviceId) {
       generateDeviceId({
         type: "mobile",
         os: "android",
@@ -34,6 +41,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   }
 
   useEffect(() => {
+    checkActivePlaylist();
     onGenerateDeviceId();
   }, []);
 
