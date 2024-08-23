@@ -48,6 +48,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { PlaylistContext } from "@/providers/PlaylistProvider";
+import useGetMovieCategories from "@/hooks/api/useGetMovieCategories";
+import useGetMovieContent from "@/hooks/api/useGetMovieContent";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -78,19 +80,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const categoriesQuery = useQuery({
-    queryKey: ["categories", deviceId],
-    queryFn: () => fetchCategories(deviceId),
-  });
-
-  const availableCategories = categoriesQuery.data!;
-
-  const moviesQuery = useQuery({
-    queryKey: ["movies", availableCategories],
-    queryFn: () => fetchAllMovies(deviceId, availableCategories),
-    enabled: !!availableCategories,
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
+  const { data: categories, isLoading } = useGetMovieCategories();
 
   const topRatedMoviesQuery = useQuery({
     queryKey: ["topRatedMovies"],
@@ -99,18 +89,18 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
   });
 
   useEffect(() => {
-    if (availableCategories && availableCategories.length > 0) {
-      setSelectedCategory(availableCategories[0].category_id);
+    if (categories && categories.length > 0) {
+      setSelectedCategory(categories[0].category_id);
     }
-  }, [availableCategories]);
+  }, [categories]);
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const categoryIndex = availableCategories?.findIndex(
+    const categoryIndex = categories?.findIndex(
       (category) => category.category_id === categoryId
     );
     if (flatListRef.current) {
-      const targetPosition = 262 * categoryIndex + 428;
+      const targetPosition = 262 * categoryIndex! + 428;
       flatListRef.current.scrollToOffset({
         offset: targetPosition,
         animated: true,
@@ -230,7 +220,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     );
   };
 
-  if (categoriesQuery.data && topRatedMoviesQuery.data)
+  if (topRatedMoviesQuery.data)
     return (
       <View
         style={{
@@ -241,7 +231,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
       >
         <View>
           <CategoryFilter
-            categories={availableCategories}
+            categories={categories!}
             selectedCategory={selectedCategory}
             onSelect={handleCategoryPress}
           />
@@ -297,7 +287,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
                   <View>
                     <MovieCategoryGroup
                       navigation={navigation}
-                      categories={availableCategories}
+                      categories={categories!}
                       flatListRef={flatListRef}
                       onMovieLongPress={handleMovieLongPress}
                     />
@@ -413,11 +403,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
       </View>
     );
 
-  if (
-    categoriesQuery.isError ||
-    moviesQuery.isError ||
-    topRatedMoviesQuery.isError
-  )
+  if (topRatedMoviesQuery.isError)
     return (
       <CustomView
         style={{
@@ -427,10 +413,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         }}
       >
         <CustomText type="extraSmall">
-          An error occurred. Message:{" "}
-          {categoriesQuery.error?.message ||
-            moviesQuery.error?.message ||
-            topRatedMoviesQuery.error?.message}
+          An error occurred. Message: {topRatedMoviesQuery.error?.message}
         </CustomText>
       </CustomView>
     );

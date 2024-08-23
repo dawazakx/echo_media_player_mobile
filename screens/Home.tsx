@@ -13,7 +13,11 @@ import useGenerateDeviceId from "@/hooks/api/useGenerateDeviceId";
 
 import { Colors } from "@/constants/Colors";
 import { RootStackParamList } from "@/constants/types";
-import { SIGNIN_ROUTE, ADD_PLAYLIST_ROUTE, PLAYER_INDEX_ROUTE } from "@/constants/Routes";
+import {
+  SIGNIN_ROUTE,
+  ADD_PLAYLIST_ROUTE,
+  PLAYER_INDEX_ROUTE,
+} from "@/constants/Routes";
 
 export interface HomeProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -26,20 +30,21 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { mutate: generateDeviceId } = useGenerateDeviceId();
 
   const checkActivePlaylist = async () => {
-    console.log(activePlaylist)
-    if(await activePlaylist?._id) {
+    console.log(activePlaylist);
+    if (await activePlaylist?._id) {
       navigation.navigate(PLAYER_INDEX_ROUTE);
     }
-  }
+  };
 
   const onGenerateDeviceId = async () => {
-    if(!deviceId) {
+    console.log(deviceId);
+    if (!deviceId) {
       generateDeviceId({
         type: "mobile",
         os: "android",
       });
     }
-  }
+  };
 
   useEffect(() => {
     checkActivePlaylist();

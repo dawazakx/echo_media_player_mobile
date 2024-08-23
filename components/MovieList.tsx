@@ -13,13 +13,13 @@ import { Image } from "expo-image";
 
 import { type Movie } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMovieImage, fetchMoviesByCategory } from "@/providers/api";
-import { DeviceContext } from "@/providers/DeviceProvider";
+
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "@/constants/types";
 import { image500 } from "@/constants/api";
+import useGetMovieContent from "@/hooks/api/useGetMovieContent";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const blurhash =
@@ -34,13 +34,11 @@ const MovieList = ({
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
   onMovieLongPress: (movie: Movie) => void;
 }) => {
-  const { deviceId } = useContext(DeviceContext);
+  const { data: movies, isError } = useGetMovieContent();
 
-  const moviesQuery = useQuery({
-    queryKey: ["movies", categoryId],
-    queryFn: () => fetchMoviesByCategory(deviceId!, categoryId),
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
+  const categorymovies = movies?.filter(
+    (movie) => movie.category_id === categoryId
+  );
 
   const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
     return (
@@ -73,10 +71,10 @@ const MovieList = ({
     );
   }, []);
 
-  if (moviesQuery.data)
+  if (categorymovies)
     return (
       <FlatList
-        data={moviesQuery.data.slice(0, 15)}
+        data={categorymovies.slice(0, 15)}
         horizontal
         keyExtractor={(movie) => movie.stream_id.toString()}
         renderItem={renderMovieItem}
@@ -93,7 +91,7 @@ const MovieList = ({
       />
     );
 
-  if (moviesQuery.isError) {
+  if (isError) {
     return (
       <View>
         <Text>Error</Text>
