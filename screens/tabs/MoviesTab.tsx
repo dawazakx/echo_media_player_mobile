@@ -28,11 +28,7 @@ import CategoryFilter from "@/components/CategoryFilter";
 import MovieCategoryGroup from "@/components/MovieCategoryGroup";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
-import {
-  fetchAllMovies,
-  fetchCategories,
-  fetchTopRatedMovies,
-} from "@/providers/api";
+import { fetchTopRatedMovies } from "@/providers/api";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
@@ -41,15 +37,11 @@ import Animated, {
   Extrapolation,
   interpolate,
   SharedValue,
-  useAnimatedRef,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
-import { PlaylistContext } from "@/providers/PlaylistProvider";
 import useGetMovieCategories from "@/hooks/api/useGetMovieCategories";
-import useGetMovieContent from "@/hooks/api/useGetMovieContent";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -60,7 +52,7 @@ const { width, height } = Dimensions.get("window");
 const ITEM_SIZE = Platform.OS === "ios" ? width * 0.62 : width * 0.64;
 const EMPTY_ITEM_SIZE = (width - ITEM_SIZE) / 2;
 
-interface Poster {
+export interface Poster {
   id: number;
   title: string;
   poster_path: string;
@@ -99,15 +91,18 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     const categoryIndex = categories?.findIndex(
       (category) => category.category_id === categoryId
     );
-    if (flatListRef.current) {
-      const targetPosition = 262 * categoryIndex! + 428;
-      flatListRef.current.scrollToOffset({
-        offset: targetPosition,
-        animated: true,
-      });
+    if (flatListRef.current && categoryIndex !== -1) {
+      setTimeout(() => {
+        if (flatListRef.current) {
+          const targetPosition = 262 * categoryIndex! + 428;
+          flatListRef.current.scrollToOffset({
+            offset: targetPosition,
+            animated: true,
+          });
+        }
+      }, 100);
     }
   };
-
   const handleMovieLongPress = (movie: Movie) => {
     setSelectedMovie(movie);
     bottomSheetRef.current?.expand();
@@ -162,22 +157,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         },
       ],
     }));
-    const animatedHeaderStyle = useAnimatedStyle(() => ({
-      transform: [
-        {
-          translateY: interpolate(
-            scrollX.value,
-            [
-              (index - 2) * ITEM_SIZE,
-              (index - 1) * ITEM_SIZE,
-              index * ITEM_SIZE,
-            ],
-            [-10, 25, -10],
-            Extrapolation.CLAMP
-          ),
-        },
-      ],
-    }));
+    //
 
     return (
       <View style={{ width: ITEM_SIZE }}>
@@ -273,9 +253,16 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
                             scrollX={scrollX}
                           />
                         )}
+                        initialScrollIndex={1}
+                        getItemLayout={(data, index) => {
+                          return {
+                            length: ITEM_SIZE,
+                            offset: ITEM_SIZE * index,
+                            index,
+                          };
+                        }}
                         keyExtractor={(item) => item.id?.toString() || item.key}
                         contentContainerStyle={{
-                          // paddingHorizontal: EMPTY_ITEM_SIZE,
                           paddingTop: 10,
                           paddingBottom: 20,
                         }}
@@ -436,7 +423,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.secBackground,
   },
-  carouselContainer: {},
 });
 
 export default MoviesTab;

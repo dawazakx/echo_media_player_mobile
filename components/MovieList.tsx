@@ -1,8 +1,6 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { memo, useCallback } from "react";
 import {
-  FlatList,
   Pressable,
-  // Image,
   View,
   StyleSheet,
   Text,
@@ -12,106 +10,106 @@ import {
 import { Image } from "expo-image";
 
 import { type Movie } from "@/types";
-import { useQuery } from "@tanstack/react-query";
 
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "@/constants/types";
-import { image500 } from "@/constants/api";
 import useGetMovieContent from "@/hooks/api/useGetMovieContent";
+import { FlashList } from "@shopify/flash-list";
 
-const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-const MovieList = ({
-  categoryId,
-  navigation,
-  onMovieLongPress,
-}: {
-  categoryId: string;
-  navigation: BottomTabScreenProps<TabParamList, "Movies">;
-  onMovieLongPress: (movie: Movie) => void;
-}) => {
-  const { data: movies, isError } = useGetMovieContent();
+const MovieList = memo(
+  ({
+    categoryId,
+    navigation,
+    onMovieLongPress,
+  }: {
+    categoryId: string;
+    navigation: BottomTabScreenProps<TabParamList, "Movies">;
+    onMovieLongPress: (movie: Movie) => void;
+  }) => {
+    const { data: movies, isError } = useGetMovieContent();
 
-  const categorymovies = movies?.filter(
-    (movie) => movie.category_id === categoryId
-  );
+    const categorymovies = movies?.filter(
+      (movie) => movie.category_id === categoryId
+    );
 
-  const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
-    return (
-      <Pressable
-        style={styles.movieItem}
-        onLongPress={() => onMovieLongPress(item)}
-        onPress={() => navigation.navigate("MovieDetails", { movie: item })}
-        delayLongPress={250}
-      >
-        <Image
-          // source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-          source={`${item.stream_icon}`}
-          placeholder={{ blurhash }}
-          style={styles.movieImage}
-          // resizeMode="contain"
-        />
-        <CustomText
-          type="extraSmall"
-          style={{ textAlign: "center", color: "#9ca3af" }}
+    const renderMovieItem = useCallback(({ item }: { item: Movie }) => {
+      return (
+        <Pressable
+          style={({ pressed }) => ({
+            ...styles.movieItem,
+            opacity: pressed ? 0.5 : 1,
+          })}
+          onLongPress={() => onMovieLongPress(item)}
+          onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+          delayLongPress={250}
         >
-          {item.name}
-        </CustomText>
-
-        <View style={styles.ratingTag}>
-          <CustomText type="extraSmall">
-            {Number(item.rating).toFixed(1)}
+          <Image
+            source={`${item.stream_icon}`}
+            placeholder={{ blurhash }}
+            style={styles.movieImage}
+            accessibilityLabel={item.name}
+            alt={item.name}
+          />
+          <CustomText
+            type="extraSmall"
+            style={{ textAlign: "center", color: "#9ca3af" }}
+          >
+            {item.name}
           </CustomText>
+
+          <View style={styles.ratingTag}>
+            <CustomText type="extraSmall">
+              {Number(item.rating).toFixed(1)}
+            </CustomText>
+          </View>
+        </Pressable>
+      );
+    }, []);
+
+    if (categorymovies)
+      return (
+        <FlashList
+          data={categorymovies.slice(0, 15)}
+          horizontal
+          keyExtractor={(movie) => movie.stream_id.toString()}
+          renderItem={renderMovieItem}
+          showsHorizontalScrollIndicator={false}
+          estimatedItemSize={120}
+          estimatedListSize={{ height: 120, width: 360 }}
+          ListEmptyComponent={
+            <CustomText style={styles.emptyStateText}>
+              No movies available
+            </CustomText>
+          }
+        />
+      );
+
+    if (isError) {
+      return (
+        <View>
+          <Text>Error</Text>
         </View>
-      </Pressable>
-    );
-  }, []);
+      );
+    }
 
-  if (categorymovies)
-    return (
-      <FlatList
-        data={categorymovies.slice(0, 15)}
-        horizontal
-        keyExtractor={(movie) => movie.stream_id.toString()}
-        renderItem={renderMovieItem}
-        showsHorizontalScrollIndicator={false}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-        windowSize={3}
-        updateCellsBatchingPeriod={50}
-        ListEmptyComponent={
-          <CustomText style={styles.emptyStateText}>
-            No movies available
-          </CustomText>
-        }
-      />
-    );
-
-  if (isError) {
     return (
       <View>
-        <Text>Error</Text>
+        <ActivityIndicator size="large" color={Colors.white} />
       </View>
     );
   }
-
-  return (
-    <View>
-      <ActivityIndicator size="large" color={Colors.white} />
-    </View>
-  );
-};
+);
 
 const styles = StyleSheet.create({
   movieItem: {
     width: 120,
     height: 180,
-    marginRight: 4,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
   },
 
   movieImage: {
@@ -126,8 +124,8 @@ const styles = StyleSheet.create({
     top: 6,
     left: 6,
     backgroundColor: "rgb(190 18 60)",
-    borderRadius: 5,
-    padding: 3,
+    borderRadius: 4,
+    padding: 2,
   },
 
   emptyStateText: {

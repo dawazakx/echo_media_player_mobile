@@ -1,8 +1,6 @@
 import React, { useCallback, useContext } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
-import CustomButton from "@/components/Button";
-
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { PlaylistContext } from "@/providers/PlaylistProvider";
@@ -25,7 +23,7 @@ const CategoryFilter = ({
   selectedCategory,
   onSelect,
 }: CategoryFilterProps) => {
-  const { currentPlaylist } = useContext(PlaylistContext);
+  const { activePlaylist } = useContext(PlaylistContext);
 
   const renderCategoryItem = useCallback(
     ({ item }: { item: CategoryI }) => {
@@ -78,7 +76,7 @@ const CategoryFilter = ({
       >
         <MaterialIcons name="playlist-play" size={22} color="white" />
         <CustomText type="defaultSemiBold">
-          {currentPlaylist?.nickname}
+          {activePlaylist?.nickname}
         </CustomText>
       </Pressable>
 
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#3f3f46",
-    padding: 9,
+    padding: 11,
     justifyContent: "center",
     alignItems: "center",
   },
