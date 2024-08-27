@@ -36,6 +36,8 @@ import WebView from "react-native-webview";
 import { StatusBar } from "expo-status-bar";
 import { useQuery } from "@tanstack/react-query";
 import EpisodesList from "@/components/EpisodesList";
+import useGetSeriesDetails from "@/hooks/api/useGetSeriesDetails";
+import { FlashList } from "@shopify/flash-list";
 
 type TvShowDetailsProps = {
   route: RouteProp<TvShowsStackParamList, "TvSeriesDetails">;
@@ -47,46 +49,16 @@ type TvShowDetailsProps = {
 var { width, height } = Dimensions.get("window");
 const IMG_HEIGHT = 262;
 
-const formatPopularity = (popularity: number) => {
-  const percentage = (popularity / 1000) * 170;
-  return `${Math.round(percentage)} %`;
-};
-const formatRuntime = (runtime: number) => {
-  const hours = Math.floor(runtime / 60);
-  const minutes = runtime % 60;
-
-  if (hours === 0) {
-    return `${minutes}min`;
-  } else if (minutes === 0) {
-    return `${hours}h`;
-  } else {
-    return `${hours}h ${minutes}mins`;
-  }
-};
-
 const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
   route,
   navigation,
 }) => {
-  const { tvshows } = route.params;
+  const { tvshow } = route.params;
   const { deviceId } = useContext(DeviceContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [activeSegment, setActiveSegment] = useState("overview");
-
-  const fetchSeriesDetails = async () => {
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}`,
-      {
-        headers: {
-          accept: "application/json",
-          Authorization: TMDB_API_KEY,
-        },
-      }
-    );
-    return response.data;
-  };
 
   const fetchSeasonDetails = async (seasonNumber: number) => {
     const response = await axios.get(
@@ -101,22 +73,9 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
     return response.data;
   };
 
-  const fetchSeriesCast = async () => {
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}/credits`,
-      {
-        headers: {
-          accept: "application/json",
-          Authorization: TMDB_API_KEY,
-        },
-      }
-    );
-    return response.data;
-  };
-
   const fetchSeriesVideos = async () => {
     const response = await axios.get(
-      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}/videos`,
+      `https://api.themoviedb.org/3/tv/${tvshow.tmdb}/videos`,
       {
         headers: {
           accept: "application/json",
@@ -127,35 +86,37 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
     return response.data;
   };
 
-  const { data: seriesDetails, isLoading: isLoadingDetails } = useQuery({
-    queryKey: ["seriesDetails"],
-    queryFn: fetchSeriesDetails,
-  });
+  const { data: seriesDetails, isLoading: isLoadingDetails } =
+    useGetSeriesDetails(tvshow.series_id);
 
-  const { data: seasonDetails, isLoading: isLoadingSeason } = useQuery({
-    queryKey: ["seasonDetails", selectedSeason],
-    queryFn: () => fetchSeasonDetails(selectedSeason),
-    enabled: !!seriesDetails, // Only run this query if seriesDetails is available
-  });
-  const { data: seriesCast, isLoading: isLoadingCast } = useQuery({
-    queryKey: ["seriesCast"],
-    queryFn: fetchSeriesCast,
-  });
-  const { data: seriesVideos, isLoading: isLoadingVideos } = useQuery({
-    queryKey: ["seriesVideos"],
-    queryFn: fetchSeriesVideos,
-  });
+  const numberOfSeasons = seriesDetails?.seasons.length;
 
-  const castData =
-    seriesCast?.cast
-      ?.filter((member: any) => member.known_for_department === "Acting")
-      ?.slice(0, 12) || [];
+  // Helper function to filter seasons with episodes
+  const filterSeasonsWithEpisodes = (episodes) => {
+    return Object.keys(episodes).filter(
+      (season) => episodes[season].length > 0
+    );
+  };
+  console.log(seriesDetails?.episodes);
+  // Filter seasons to include only those with episodes
+  let seasonsWithEpisodes = [];
 
-  const youtubeTrailers = seriesVideos
-    ? seriesVideos?.results
-        ?.filter((video) => video.site === "YouTube")
-        .slice(0, 3)
-    : [];
+  if (seriesDetails?.episodes) {
+    seasonsWithEpisodes = filterSeasonsWithEpisodes(seriesDetails?.episodes);
+  } else {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: Colors.secBackground,
+        }}
+      >
+        <ActivityIndicator size="large" color={Colors.white} />
+      </View>
+    );
+  }
 
   const handleWatchNow = async () => {
     if (!deviceId) {
@@ -205,7 +166,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
     );
   };
 
-  if (isLoadingDetails || isLoadingCast || isLoadingVideos) {
+  if (isLoadingDetails) {
     return (
       <View
         style={{
@@ -268,7 +229,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
               <Image
                 source={{
                   uri:
-                    `https://image.tmdb.org/t/p/original/${seriesDetails.backdrop_path}` ||
+                    `${seriesDetails?.info?.backdrop_path[0]}` ||
                     "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
                 }}
                 style={{
@@ -315,7 +276,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
             <Image
               source={{
                 uri:
-                  image500(seriesDetails.poster_path) ||
+                  `${seriesDetails?.info?.cover}` ||
                   "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
               }}
               style={{
@@ -327,11 +288,11 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
             />
             <View style={{ flex: 1 }}>
               <CustomText type="title" style={{ textAlign: "center" }}>
-                {seriesDetails?.name}
+                {seriesDetails?.info.name}
               </CustomText>
 
               {/* Release Year, Runtime */}
-              {seriesDetails?.id ? (
+              {seriesDetails?.info ? (
                 <View
                   style={{
                     padding: 8,
@@ -351,7 +312,8 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                   >
                     <Ionicons name="stopwatch" size={16} color="white" />
                     <CustomText type="extraSmall">
-                      {seriesDetails?.number_of_seasons} seasons
+                      {numberOfSeasons}{" "}
+                      {numberOfSeasons! > 1 ? "seasons" : "season"}
                     </CustomText>
                   </View>
                   <View
@@ -364,7 +326,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                   >
                     <Ionicons name="calendar" size={16} color="white" />
                     <CustomText type="extraSmall">
-                      {(seriesDetails?.first_air_date).slice(0, 4)}
+                      {seriesDetails?.info.releaseDate}
                     </CustomText>
                   </View>
                   <View
@@ -377,7 +339,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                   >
                     <Ionicons name="star" size={16} color="gold" />
                     <CustomText type="extraSmall">
-                      {seriesDetails?.popularity}
+                      {seriesDetails?.info.rating_5based}
                     </CustomText>
                   </View>
                 </View>
@@ -471,7 +433,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                       color: "rgb(163 163 163)",
                     }}
                   >
-                    {seriesDetails?.overview}
+                    {seriesDetails?.info.plot}
                   </CustomText>
                 </View>
                 <View
@@ -483,81 +445,58 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                       flexDirection: "row",
                     }}
                   >
-                    {seriesDetails?.genres?.map((genre, index) => {
-                      let showDot = index + 1 != seriesDetails.genres.length;
-
-                      return (
-                        <CustomText
-                          key={index}
-                          type="extraSmall"
-                          style={{
-                            fontWeight: "600",
-                            textAlign: "auto",
-                            marginHorizontal: 16,
-                            color: "rgb(163 163 163)",
-                          }}
-                        >
-                          {genre?.name} {showDot ? "• " : null}
-                        </CustomText>
-                      );
-                    })}
+                    <CustomText
+                      type="extraSmall"
+                      style={{
+                        fontWeight: "600",
+                        textAlign: "auto",
+                        marginHorizontal: 16,
+                        color: "rgb(163 163 163)",
+                      }}
+                    >
+                      {seriesDetails?.info.genre}
+                    </CustomText>
                   </CustomText>
                 </View>
                 <View
-                  style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}
+                  style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}
                 >
                   <CustomText>Cast</CustomText>
-                  <CustomText
-                    style={{
-                      flexDirection: "row",
-                    }}
-                  >
-                    {castData.length > 0 ? (
-                      castData.map((member: any) => (
-                        <CustomText
-                          key={member.id}
-                          type="extraSmall"
-                          style={{
-                            fontWeight: "600",
-                            lineHeight: 20,
-                            textAlign: "auto",
-                            marginHorizontal: 16,
-                            color: "rgb(163 163 163)",
-                          }}
-                        >
-                          {member.name},{" "}
-                        </CustomText>
-                      ))
-                    ) : (
-                      <Text>No cast information available</Text>
-                    )}
-                  </CustomText>
+                  {seriesDetails?.info?.cast ? (
+                    <CustomText
+                      type="extraSmall"
+                      style={{
+                        fontWeight: "600",
+                        lineHeight: 20,
+                        textAlign: "auto",
+                        // marginHorizontal: 16,
+                        color: "rgb(163 163 163)",
+                      }}
+                    >
+                      {seriesDetails?.info?.cast}
+                    </CustomText>
+                  ) : (
+                    <CustomText type="title">No Cast data available</CustomText>
+                  )}
                 </View>
                 <View
                   style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}
                 >
                   <CustomText>Trailers and Videos</CustomText>
 
-                  {youtubeTrailers?.length > 0 ? (
-                    <FlatList
-                      data={youtubeTrailers}
-                      horizontal
-                      keyExtractor={(item) => item.key}
-                      renderItem={({ item }) => (
-                        <WebView
-                          style={{
-                            width: width - 74,
-                            height: 180,
-                            marginVertical: 10,
-                            marginRight: 15,
-                          }}
-                          javaScriptEnabled={true}
-                          domStorageEnabled={true}
-                          source={{
-                            uri: `https://www.youtube.com/embed/${item.key}`,
-                          }}
-                        />
-                      )}
+                  {seriesDetails?.info.youtube_trailer ? (
+                    <WebView
+                      style={{
+                        width: width - 74,
+                        height: 180,
+                        marginVertical: 10,
+                        marginRight: 15,
+                      }}
+                      javaScriptEnabled={true}
+                      domStorageEnabled={true}
+                      source={{
+                        uri: `https://www.youtube.com/embed/${seriesDetails?.info.youtube_trailer}`,
+                      }}
                     />
                   ) : (
                     <CustomText type="title">No trailers available</CustomText>
@@ -601,34 +540,34 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                 >
                   <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                      <ScrollView
-                        style={{ marginVertical: 20 }}
-                        contentContainerStyle={{ alignItems: "center" }}
-                      >
-                        {seriesDetails?.seasons?.map((season: number) => (
-                          <TouchableOpacity
-                            key={season.id}
-                            onPress={() => {
-                              setSelectedSeason(season.season_number);
-                              setModalVisible(false);
-                            }}
-                            style={{
-                              backgroundColor: "transparent",
-                              padding: 15,
-                              width: "100%",
-                              marginVertical: 5,
-                              alignItems: "center",
-                            }}
-                          >
-                            <CustomText
-                              type="defaultSemiBold"
-                              style={{ textAlign: "center" }}
+                      {seasonsWithEpisodes.length > 0 && (
+                        <FlatList
+                          data={seasonsWithEpisodes}
+                          keyExtractor={(item) => `season-${item}`}
+                          renderItem={({ item }) => (
+                            <Pressable
+                              style={{
+                                backgroundColor: "transparent",
+                                padding: 15,
+                                width: "100%",
+                                marginVertical: 5,
+                                alignItems: "center",
+                              }}
+                              onPress={() => {
+                                setSelectedSeason(parseInt(item));
+                                setModalVisible(false);
+                              }}
                             >
-                              Season {season.season_number}
-                            </CustomText>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
+                              <CustomText
+                                type="defaultSemiBold"
+                                style={{ textAlign: "center" }}
+                              >
+                                Season {item}
+                              </CustomText>
+                            </Pressable>
+                          )}
+                        />
+                      )}
                       <TouchableOpacity
                         style={styles.closeButton}
                         onPress={() => setModalVisible(false)}
@@ -638,9 +577,11 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
                     </View>
                   </View>
                 </Modal>
-                {/* Render episodes here */}
+                {/* Render episodes  */}
 
-                <EpisodesList episodes={seasonDetails?.episodes} />
+                <EpisodesList
+                  episodes={seriesDetails.episodes[selectedSeason]}
+                />
               </View>
             )}
           </View>

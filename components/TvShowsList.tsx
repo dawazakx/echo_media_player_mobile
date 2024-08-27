@@ -46,7 +46,7 @@ const TvShowsList = memo(
           })}
           onLongPress={() => onMovieLongPress(item)}
           onPress={() =>
-            navigation.navigate("TvSeriesDetails", { tvshows: item })
+            navigation.navigate("TvSeriesDetails", { tvshow: item })
           }
           delayLongPress={250}
         >

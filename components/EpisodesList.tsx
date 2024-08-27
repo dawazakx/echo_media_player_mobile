@@ -11,6 +11,7 @@ import {
 import { Ionicons, Octicons } from "@expo/vector-icons";
 import { CustomText } from "@/components/Text";
 import { Colors } from "@/constants/Colors";
+import { Episode } from "@/types";
 
 const EpisodesList = ({ episodes }) => {
   const [loading, setLoading] = useState(true);
@@ -39,15 +40,14 @@ const EpisodesList = ({ episodes }) => {
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-      {episodes.map((item) => (
+      {episodes.map((item: Episode) => (
         <View key={item.id.toString()} style={styles.episodeContainer}>
           <View style={styles.episodeHeader}>
             <View style={styles.episodeImageContainer}>
               <Image
                 source={{
-                  uri: item.still_path
-                    ? `https://image.tmdb.org/t/p/w500${item.still_path}`
-                    : "https://via.placeholder.com/150",
+                  uri:
+                    item.info.movie_image || "https://via.placeholder.com/150",
                 }}
                 style={styles.episodeImage}
               />
@@ -66,13 +66,8 @@ const EpisodesList = ({ episodes }) => {
             >
               <View style={{ gap: 5 }}>
                 <CustomText style={{ fontSize: 15, textAlign: "left" }}>{`${
-                  item.episode_number || "N/A"
-                }. ${
-                  `${item.name.substring(0, 34)}` || "Untitled"
+                  item.episode_num || "N/A"
                 }`}</CustomText>
-                {item.runtime && (
-                  <CustomText type="extraSmall">{item.runtime}m</CustomText>
-                )}
               </View>
               <TouchableOpacity>
                 <Octicons name="download" size={24} color={Colors.white} />
@@ -85,7 +80,7 @@ const EpisodesList = ({ episodes }) => {
             numberOfLines={3}
             ellipsizeMode="tail"
           >
-            {item.overview || "No overview available."}
+            {item.title || "No overview available."}
           </CustomText>
         </View>
       ))}

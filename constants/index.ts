@@ -6,6 +6,7 @@ export const QUERY_KEYS = {
   movieContent: "movieContent",
   tvShowsCategories: "tvShowsCategories",
   tvShowsContent: "tvShowsContent",
+  seriesDetails: "seriesDetails",
 };
 
 export const STORAGE_KEYS = {
