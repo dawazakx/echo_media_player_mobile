@@ -112,20 +112,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginVertical: 10,
   },
-
-  ratingTag: {
-    position: "absolute",
-    top: 6,
-    left: 6,
-    backgroundColor: "rgb(190 18 60)",
-    borderRadius: 5,
-    padding: 3,
-  },
-
-  emptyStateText: {
-    marginLeft: 10,
-    color: Colors.tint,
-  },
 });
 
 export default MovieCategoryGroup;

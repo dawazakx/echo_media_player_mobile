@@ -12,9 +12,7 @@ import {
   Image,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import {
@@ -26,33 +24,27 @@ import { DeviceContext } from "@/providers/DeviceProvider";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import CategoryFilter from "@/components/CategoryFilter";
+import MovieCategoryGroup from "@/components/MovieCategoryGroup";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
-import {
-  fetchAllMovies,
-  fetchTopRatedShows,
-  fetchTvCategories,
-} from "@/providers/api";
+import { fetchTopRatedMovies } from "@/providers/api";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { Movie, Show } from "@/types";
+import { Movie } from "@/types";
 import Animated, {
   Extrapolation,
   interpolate,
   SharedValue,
-  useAnimatedRef,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
-import { PlaylistContext } from "@/providers/PlaylistProvider";
-import TvShowsCategoryGroup from "@/components/TvShowsCategoryGroup";
+import useGetMovieCategories from "@/hooks/api/useGetMovieCategories";
 
-export interface TvShowsProps {
-  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
-  route: RouteProp<TabParamList, "TvShows">;
+export interface MoviesProps {
+  navigation: BottomTabScreenProps<TabParamList, "Movies">;
+  route: RouteProp<TabParamList, "Movies">;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -71,55 +63,45 @@ interface RenderItemProps {
   scrollX: SharedValue<number>;
 }
 
-const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
+const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
-  const { deviceId } = useContext(DeviceContext);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [selectedMovie, setSelectedMovie] = useState<Show | null>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const categoriesQuery = useQuery({
-    queryKey: ["categories", deviceId],
-    queryFn: () => fetchTvCategories(deviceId),
-  });
+  const { data: categories, isLoading } = useGetMovieCategories();
 
-  const availableCategories = categoriesQuery.data!;
-
-  const moviesQuery = useQuery({
-    queryKey: ["movies", availableCategories],
-    queryFn: () => fetchAllMovies(deviceId, availableCategories),
-    enabled: !!availableCategories,
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
-
-  const topRatedShowsQuery = useQuery({
-    queryKey: ["topRatedShows"],
-    queryFn: fetchTopRatedShows,
+  const topRatedMoviesQuery = useQuery({
+    queryKey: ["topRatedMovies"],
+    queryFn: fetchTopRatedMovies,
     staleTime: 20 * 60 * 1000, // 20 minutes
   });
 
   useEffect(() => {
-    if (availableCategories && availableCategories.length > 0) {
-      setSelectedCategory(availableCategories[0].category_id);
+    if (categories && categories.length > 0) {
+      setSelectedCategory(categories[0].category_id);
     }
-  }, [availableCategories]);
+  }, [categories]);
 
   const handleCategoryPress = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const categoryIndex = availableCategories?.findIndex(
+    const categoryIndex = categories?.findIndex(
       (category) => category.category_id === categoryId
     );
-    if (flatListRef.current) {
-      const targetPosition = 262 * categoryIndex + 428;
-      flatListRef.current.scrollToOffset({
-        offset: targetPosition,
-        animated: true,
-      });
+    if (flatListRef.current && categoryIndex !== -1) {
+      setTimeout(() => {
+        if (flatListRef.current) {
+          const targetPosition = 262 * categoryIndex! + 428;
+          flatListRef.current.scrollToOffset({
+            offset: targetPosition,
+            animated: true,
+          });
+        }
+      }, 100);
     }
   };
-
-  const handleMovieLongPress = (movie: Show) => {
+  const handleMovieLongPress = (movie: Movie) => {
     setSelectedMovie(movie);
     bottomSheetRef.current?.expand();
   };
@@ -144,9 +126,9 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
     },
   });
 
-  const topRatedShowsData = [
+  const topRatedMoviesData = [
     { key: "empty-left" }, // Empty item at the beginning
-    ...(topRatedShowsQuery.data || []).map((movie: Poster) => ({
+    ...(topRatedMoviesQuery.data || []).map((movie: Poster) => ({
       ...movie,
       key: movie.id.toString(),
     })),
@@ -173,22 +155,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
         },
       ],
     }));
-    const animatedHeaderStyle = useAnimatedStyle(() => ({
-      transform: [
-        {
-          translateY: interpolate(
-            scrollX.value,
-            [
-              (index - 2) * ITEM_SIZE,
-              (index - 1) * ITEM_SIZE,
-              index * ITEM_SIZE,
-            ],
-            [-10, 25, -10],
-            Extrapolation.CLAMP
-          ),
-        },
-      ],
-    }));
+    //
 
     return (
       <View style={{ width: ITEM_SIZE }}>
@@ -231,7 +198,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
     );
   };
 
-  if (categoriesQuery.data && topRatedShowsQuery.data)
+  if (topRatedMoviesQuery.data)
     return (
       <View
         style={{
@@ -242,7 +209,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
       >
         <View>
           <CategoryFilter
-            categories={availableCategories}
+            categories={categories!}
             selectedCategory={selectedCategory}
             onSelect={handleCategoryPress}
           />
@@ -256,7 +223,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
               <View style={{ width: "100%" }}>
                 {index === 0 && (
                   <View>
-                    <View style={{ marginTop: 10 }}>
+                    <View>
                       <CustomText
                         style={{
                           padding: 10,
@@ -264,11 +231,11 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        Top Rated TV Shows
+                        Popular Movies
                       </CustomText>
                       <Animated.FlatList
                         showsHorizontalScrollIndicator={false}
-                        data={topRatedShowsData}
+                        data={topRatedMoviesData}
                         horizontal
                         snapToInterval={ITEM_SIZE}
                         snapToAlignment="start"
@@ -284,9 +251,16 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
                             scrollX={scrollX}
                           />
                         )}
+                        initialScrollIndex={1}
+                        getItemLayout={(data, index) => {
+                          return {
+                            length: ITEM_SIZE,
+                            offset: ITEM_SIZE * index,
+                            index,
+                          };
+                        }}
                         keyExtractor={(item) => item.id?.toString() || item.key}
                         contentContainerStyle={{
-                          // paddingHorizontal: EMPTY_ITEM_SIZE,
                           paddingTop: 10,
                           paddingBottom: 20,
                         }}
@@ -296,9 +270,9 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
                 )}
                 {index === 1 && (
                   <View>
-                    <TvShowsCategoryGroup
+                    <MovieCategoryGroup
                       navigation={navigation}
-                      categories={availableCategories}
+                      categories={categories!}
                       flatListRef={flatListRef}
                       onMovieLongPress={handleMovieLongPress}
                     />
@@ -414,11 +388,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
       </View>
     );
 
-  if (
-    categoriesQuery.isError ||
-    moviesQuery.isError ||
-    topRatedShowsQuery.isError
-  )
+  if (topRatedMoviesQuery.isError)
     return (
       <CustomView
         style={{
@@ -428,10 +398,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
         }}
       >
         <CustomText type="extraSmall">
-          An error occurred. Message:{" "}
-          {categoriesQuery.error?.message ||
-            moviesQuery.error?.message ||
-            topRatedShowsQuery.error?.message}
+          An error occurred. Message: {topRatedMoviesQuery.error?.message}
         </CustomText>
       </CustomView>
     );
@@ -454,7 +421,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.secBackground,
   },
-  carouselContainer: {},
 });
 
-export default TvShowsTab;
+export default MoviesTab;

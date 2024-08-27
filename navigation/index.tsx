@@ -8,12 +8,12 @@ import Tabs from "@/Navigators/TabNavigator";
 
 import HomeScreen from "@/screens/Home";
 import SearchScreen from "@/screens/SearchScreen";
-import MovieDetails from "@/screens/MovieDetails";
 import VideoPlayer from "@/screens/VideoPlayer";
 import LiveStreamDetails from "@/screens/LiveStreamDetails";
-import TvSeriesDetails from "@/screens/TvSeriesDetails";
+import TvSeriesDetails from "@/screens/tabs/tvshows/TvSeriesDetails";
 
 import { RootStackParamList } from "@/constants/types";
+import MovieDetails from "@/screens/tabs/movies/MovieDetails";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

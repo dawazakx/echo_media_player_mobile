@@ -1,8 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Colors } from "@/constants/Colors";
-import MoviesTab from "@/screens/tabs/MoviesTab";
 import LiveTvTab from "@/screens/tabs/LiveTvTab";
-import TvShowsTab from "@/screens/tabs/TvShowsTab";
+import TvShowsTab from "@/screens/tabs/tvshows/TvShowsTab";
 import SportsTab from "@/screens/tabs/SportsTab";
 import React from "react";
 import Header from "../components/Header";
@@ -17,7 +16,6 @@ import {
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import MovieDetails from "@/screens/MovieDetails";
 import Profile from "@/screens/tabs/settings/Profile";
 import About from "@/screens/tabs/settings/About";
 import Terms from "@/screens/tabs/settings/Terms";
@@ -29,6 +27,7 @@ import PlaylistDetails from "@/screens/tabs/settings/managePlaylist/PlaylistDeta
 
 import { useNavigationState } from "@react-navigation/native";
 import AllTvShows from "@/screens/tabs/tvshows/AllTvShows";
+import MoviesTab from "@/screens/tabs/movies/MoviesTab";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();

@@ -12,7 +12,6 @@ import {
   Image,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
@@ -25,14 +24,13 @@ import { DeviceContext } from "@/providers/DeviceProvider";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import CategoryFilter from "@/components/CategoryFilter";
-import MovieCategoryGroup from "@/components/MovieCategoryGroup";
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
-import { fetchTopRatedMovies } from "@/providers/api";
+import { fetchTopRatedShows } from "@/providers/api";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { Movie } from "@/types";
+import { Show } from "@/types";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -41,20 +39,21 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import useGetMovieCategories from "@/hooks/api/useGetMovieCategories";
+import TvShowsCategoryGroup from "@/components/TvShowsCategoryGroup";
+import useGetTvShowsCategories from "@/hooks/api/useGetTvShowsCategories";
 
-export interface MoviesProps {
-  navigation: BottomTabScreenProps<TabParamList, "Movies">;
-  route: RouteProp<TabParamList, "Movies">;
+export interface TvShowsProps {
+  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+  route: RouteProp<TabParamList, "TvShows">;
 }
 
 const { width, height } = Dimensions.get("window");
 const ITEM_SIZE = Platform.OS === "ios" ? width * 0.62 : width * 0.64;
 const EMPTY_ITEM_SIZE = (width - ITEM_SIZE) / 2;
 
-export interface Poster {
+interface Poster {
   id: number;
-  title: string;
+  name: string;
   poster_path: string;
 }
 
@@ -64,19 +63,18 @@ interface RenderItemProps {
   scrollX: SharedValue<number>;
 }
 
-const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
+const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
-  const { deviceId } = useContext(DeviceContext);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Show | null>(null);
 
-  const { data: categories, isLoading } = useGetMovieCategories();
+  const { data: categories, isLoading } = useGetTvShowsCategories();
 
-  const topRatedMoviesQuery = useQuery({
-    queryKey: ["topRatedMovies"],
-    queryFn: fetchTopRatedMovies,
+  const topRatedShowsQuery = useQuery({
+    queryKey: ["topRatedShows"],
+    queryFn: fetchTopRatedShows,
     staleTime: 20 * 60 * 1000, // 20 minutes
   });
 
@@ -103,7 +101,8 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
       }, 100);
     }
   };
-  const handleMovieLongPress = (movie: Movie) => {
+
+  const handleMovieLongPress = (movie: Show) => {
     setSelectedMovie(movie);
     bottomSheetRef.current?.expand();
   };
@@ -128,9 +127,9 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
     },
   });
 
-  const topRatedMoviesData = [
+  const topRatedShowsData = [
     { key: "empty-left" }, // Empty item at the beginning
-    ...(topRatedMoviesQuery.data || []).map((movie: Poster) => ({
+    ...(topRatedShowsQuery.data || []).map((movie: Poster) => ({
       ...movie,
       key: movie.id.toString(),
     })),
@@ -157,7 +156,6 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         },
       ],
     }));
-    //
 
     return (
       <View style={{ width: ITEM_SIZE }}>
@@ -193,14 +191,14 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
             style={{ color: Colors.white }}
             numberOfLines={1}
           >
-            {item.title}
+            {item.name}
           </CustomText>
         </Animated.View>
       </View>
     );
   };
 
-  if (topRatedMoviesQuery.data)
+  if (topRatedShowsQuery.data)
     return (
       <View
         style={{
@@ -225,7 +223,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
               <View style={{ width: "100%" }}>
                 {index === 0 && (
                   <View>
-                    <View>
+                    <View style={{ marginTop: 10 }}>
                       <CustomText
                         style={{
                           padding: 10,
@@ -233,11 +231,11 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        Popular Movies
+                        Top Rated TV Shows
                       </CustomText>
                       <Animated.FlatList
                         showsHorizontalScrollIndicator={false}
-                        data={topRatedMoviesData}
+                        data={topRatedShowsData}
                         horizontal
                         snapToInterval={ITEM_SIZE}
                         snapToAlignment="start"
@@ -272,7 +270,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
                 )}
                 {index === 1 && (
                   <View>
-                    <MovieCategoryGroup
+                    <TvShowsCategoryGroup
                       navigation={navigation}
                       categories={categories!}
                       flatListRef={flatListRef}
@@ -390,7 +388,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
       </View>
     );
 
-  if (topRatedMoviesQuery.isError)
+  if (topRatedShowsQuery.isError)
     return (
       <CustomView
         style={{
@@ -400,7 +398,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
         }}
       >
         <CustomText type="extraSmall">
-          An error occurred. Message: {topRatedMoviesQuery.error?.message}
+          An error occurred. Message: {topRatedShowsQuery.error?.message}
         </CustomText>
       </CustomView>
     );
@@ -423,6 +421,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.secBackground,
   },
+  carouselContainer: {},
 });
 
-export default MoviesTab;
+export default TvShowsTab;

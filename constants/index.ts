@@ -4,6 +4,8 @@ export const QUERY_KEYS = {
   liveStreamContent: "liveStreamContent",
   movieCategories: "movieCategories",
   movieContent: "movieContent",
+  tvShowsCategories: "tvShowsCategories",
+  tvShowsContent: "tvShowsContent",
 };
 
 export const STORAGE_KEYS = {

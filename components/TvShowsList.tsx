@@ -1,8 +1,6 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { memo, useCallback } from "react";
 import {
-  FlatList,
   Pressable,
-  // Image,
   View,
   StyleSheet,
   Text,
@@ -11,115 +9,109 @@ import {
 
 import { Image } from "expo-image";
 
-import { Show, type Movie } from "@/types";
-import { useQuery } from "@tanstack/react-query";
-import {
-  fetchMovieImage,
-  fetchMoviesByCategory,
-  fetchTvShowsByCategory,
-} from "@/providers/api";
-import { DeviceContext } from "@/providers/DeviceProvider";
+import { Show } from "@/types";
+
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { TabParamList } from "@/constants/types";
-import { image500 } from "@/constants/api";
+import useGetTvShowsContent from "@/hooks/api/useGetTvShowsContent";
+import { FlashList } from "@shopify/flash-list";
 
-const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-const TvShowsList = ({
-  categoryId,
-  navigation,
-  onMovieLongPress,
-}: {
-  categoryId: string;
-  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
-  onMovieLongPress: (movie: Show) => void;
-}) => {
-  const { deviceId } = useContext(DeviceContext);
+const TvShowsList = memo(
+  ({
+    categoryId,
+    navigation,
+    onMovieLongPress,
+  }: {
+    categoryId: string;
+    navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+    onMovieLongPress: (movie: Show) => void;
+  }) => {
+    const { data: tvshows, isError } = useGetTvShowsContent();
 
-  const TvShowsQuery = useQuery({
-    queryKey: ["tvshows", categoryId],
-    queryFn: () => fetchTvShowsByCategory(deviceId!, categoryId),
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
+    const categorytvshows = tvshows?.filter(
+      (tvshows) => tvshows.category_id === categoryId
+    );
 
-  const renderTvShowItem = useCallback(({ item }: { item: Show }) => {
-    return (
-      <Pressable
-        style={styles.movieItem}
-        onLongPress={() => onMovieLongPress(item)}
-        onPress={() =>
-          navigation.navigate("TvSeriesDetails", { tvshows: item })
-        }
-        delayLongPress={250}
-      >
-        <Image
-          // source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-          source={`${item.cover}`}
-          placeholder={{ blurhash }}
-          style={styles.movieImage}
-          // resizeMode="contain"
-        />
-        <CustomText
-          type="extraSmall"
-          style={{ textAlign: "center", color: "#9ca3af" }}
+    const renderTvShowItem = useCallback(({ item }: { item: Show }) => {
+      return (
+        <Pressable
+          style={({ pressed }) => ({
+            ...styles.movieItem,
+            opacity: pressed ? 0.5 : 1,
+          })}
+          onLongPress={() => onMovieLongPress(item)}
+          onPress={() =>
+            navigation.navigate("TvSeriesDetails", { tvshows: item })
+          }
+          delayLongPress={250}
         >
-          {item.name}
-        </CustomText>
-
-        <View style={styles.ratingTag}>
-          <CustomText type="extraSmall">
-            {Number(item.rating).toFixed(1)}
+          <Image
+            source={`${item.cover}`}
+            placeholder={{ blurhash }}
+            style={styles.movieImage}
+            accessibilityLabel={item.name}
+            alt={item.name}
+          />
+          <CustomText
+            type="extraSmall"
+            style={{ textAlign: "center", color: "#9ca3af" }}
+          >
+            {item.name}
           </CustomText>
+
+          <View style={styles.ratingTag}>
+            <CustomText type="extraSmall">
+              {Number(item.rating).toFixed(1)}
+            </CustomText>
+          </View>
+        </Pressable>
+      );
+    }, []);
+
+    if (categorytvshows)
+      return (
+        <FlashList
+          data={categorytvshows.slice(0, 15)}
+          horizontal
+          keyExtractor={(tvshow) => tvshow.series_id.toString()}
+          renderItem={renderTvShowItem}
+          showsHorizontalScrollIndicator={false}
+          estimatedItemSize={120}
+          estimatedListSize={{ height: 120, width: 360 }}
+          ListEmptyComponent={
+            <CustomText style={styles.emptyStateText}>
+              No Tv Shows available
+            </CustomText>
+          }
+        />
+      );
+
+    if (isError) {
+      return (
+        <View>
+          <Text>Error</Text>
         </View>
-      </Pressable>
-    );
-  }, []);
+      );
+    }
 
-  if (TvShowsQuery.data)
-    return (
-      <FlatList
-        data={TvShowsQuery.data.slice(0, 15)}
-        horizontal
-        keyExtractor={(tvshow) => tvshow.series_id.toString()}
-        renderItem={renderTvShowItem}
-        showsHorizontalScrollIndicator={false}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-        windowSize={3}
-        updateCellsBatchingPeriod={50}
-        ListEmptyComponent={
-          <CustomText style={styles.emptyStateText}>
-            No Tv Shows available
-          </CustomText>
-        }
-      />
-    );
-
-  if (TvShowsQuery.isError) {
     return (
       <View>
-        <Text>Error</Text>
+        <ActivityIndicator size="large" color={Colors.white} />
       </View>
     );
   }
-
-  return (
-    <View>
-      <ActivityIndicator size="large" color={Colors.white} />
-    </View>
-  );
-};
+);
 
 const styles = StyleSheet.create({
   movieItem: {
     width: 120,
     height: 180,
-    marginRight: 4,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
   },
 
   movieImage: {
