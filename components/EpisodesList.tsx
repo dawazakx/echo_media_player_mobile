@@ -42,57 +42,50 @@ const EpisodesList = ({ episodes }) => {
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-      {Array.isArray(episodes) && episodes.length > 0 ? (
-        episodes.map((item: Episode) => (
-          <View key={item.id.toString()} style={styles.episodeContainer}>
-            <View style={styles.episodeHeader}>
-              <View style={styles.episodeImageContainer}>
-                <Image
-                  source={{
-                    uri:
-                      item.info.movie_image ||
-                      "https://via.placeholder.com/150",
-                  }}
-                  style={styles.episodeImage}
-                />
-                <TouchableOpacity style={styles.playIconContainer}>
-                  <Ionicons name="play-circle" size={30} color="white" />
-                </TouchableOpacity>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  flex: 1,
-                  gap: 10,
+      {episodes.map((item: Episode) => (
+        <View key={item.id.toString()} style={styles.episodeContainer}>
+          <View style={styles.episodeHeader}>
+            <View style={styles.episodeImageContainer}>
+              <Image
+                source={{
+                  uri:
+                    item.info.movie_image || "https://via.placeholder.com/150",
                 }}
-              >
-                <View style={{ gap: 5 }}>
-                  <CustomText style={{ fontSize: 15, textAlign: "left" }}>{`${
-                    item.episode_num || "N/A"
-                  }`}</CustomText>
-                </View>
-                <TouchableOpacity>
-                  <Octicons name="download" size={24} color={Colors.white} />
-                </TouchableOpacity>
-              </View>
+                style={styles.episodeImage}
+              />
+              <TouchableOpacity style={styles.playIconContainer}>
+                <Ionicons name="play-circle" size={30} color="white" />
+              </TouchableOpacity>
             </View>
-            <CustomText
-              type="extraSmall"
-              style={{ color: "#a3a3a3" }}
-              numberOfLines={3}
-              ellipsizeMode="tail"
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                flex: 1,
+                gap: 10,
+              }}
             >
-              {item.title || "No overview available."}
-            </CustomText>
+              <View style={{ gap: 5 }}>
+                <CustomText style={{ fontSize: 15, textAlign: "left" }}>{`${
+                  item.episode_num || "N/A"
+                }`}</CustomText>
+              </View>
+              <TouchableOpacity>
+                <Octicons name="download" size={24} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
           </View>
-        ))
-      ) : (
-        <View style={styles.container}>
-          <CustomText>No episodes available for this season</CustomText>
+          <CustomText
+            type="extraSmall"
+            style={{ color: "#a3a3a3" }}
+            numberOfLines={3}
+            ellipsizeMode="tail"
+          >
+            {item.title || "No overview available."}
+          </CustomText>
         </View>
-      )}
+      ))}
     </ScrollView>
   );
 };
