@@ -3,14 +3,16 @@ import {
   View,
   Image,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+
 import { Ionicons, Octicons } from "@expo/vector-icons";
+
 import { CustomText } from "@/components/Text";
 import { Colors } from "@/constants/Colors";
+
 import { Episode } from "@/types";
 
 const EpisodesList = ({ episodes }) => {
@@ -40,50 +42,57 @@ const EpisodesList = ({ episodes }) => {
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-      {episodes.map((item: Episode) => (
-        <View key={item.id.toString()} style={styles.episodeContainer}>
-          <View style={styles.episodeHeader}>
-            <View style={styles.episodeImageContainer}>
-              <Image
-                source={{
-                  uri:
-                    item.info.movie_image || "https://via.placeholder.com/150",
-                }}
-                style={styles.episodeImage}
-              />
-              <TouchableOpacity style={styles.playIconContainer}>
-                <Ionicons name="play-circle" size={30} color="white" />
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                flex: 1,
-                gap: 10,
-              }}
-            >
-              <View style={{ gap: 5 }}>
-                <CustomText style={{ fontSize: 15, textAlign: "left" }}>{`${
-                  item.episode_num || "N/A"
-                }`}</CustomText>
+      {Array.isArray(episodes) && episodes.length > 0 ? (
+        episodes.map((item: Episode) => (
+          <View key={item.id.toString()} style={styles.episodeContainer}>
+            <View style={styles.episodeHeader}>
+              <View style={styles.episodeImageContainer}>
+                <Image
+                  source={{
+                    uri:
+                      item.info.movie_image ||
+                      "https://via.placeholder.com/150",
+                  }}
+                  style={styles.episodeImage}
+                />
+                <TouchableOpacity style={styles.playIconContainer}>
+                  <Ionicons name="play-circle" size={30} color="white" />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity>
-                <Octicons name="download" size={24} color={Colors.white} />
-              </TouchableOpacity>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  flex: 1,
+                  gap: 10,
+                }}
+              >
+                <View style={{ gap: 5 }}>
+                  <CustomText style={{ fontSize: 15, textAlign: "left" }}>{`${
+                    item.episode_num || "N/A"
+                  }`}</CustomText>
+                </View>
+                <TouchableOpacity>
+                  <Octicons name="download" size={24} color={Colors.white} />
+                </TouchableOpacity>
+              </View>
             </View>
+            <CustomText
+              type="extraSmall"
+              style={{ color: "#a3a3a3" }}
+              numberOfLines={3}
+              ellipsizeMode="tail"
+            >
+              {item.title || "No overview available."}
+            </CustomText>
           </View>
-          <CustomText
-            type="extraSmall"
-            style={{ color: "#a3a3a3" }}
-            numberOfLines={3}
-            ellipsizeMode="tail"
-          >
-            {item.title || "No overview available."}
-          </CustomText>
+        ))
+      ) : (
+        <View style={styles.container}>
+          <CustomText>No episodes available for this season</CustomText>
         </View>
-      ))}
+      )}
     </ScrollView>
   );
 };
@@ -100,9 +109,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   episodeContainer: {
-    marginVertical: 10,
+    marginVertical: 8,
     backgroundColor: "#262626",
-    borderRadius: 6,
+    borderRadius: 10,
     padding: 10,
   },
   episodeImageContainer: {

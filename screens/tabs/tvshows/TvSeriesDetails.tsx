@@ -38,6 +38,10 @@ import { useQuery } from "@tanstack/react-query";
 import EpisodesList from "@/components/EpisodesList";
 import useGetSeriesDetails from "@/hooks/api/useGetSeriesDetails";
 import { FlashList } from "@shopify/flash-list";
+import { HeaderImage } from "@/components/details/HeaderImage";
+import { Banner } from "@/components/details/Banner";
+import { OverviewSegment } from "@/components/details/OverviewSegment";
+import { EpisodeSegment } from "@/components/details/EpisodeSegment";
 
 type TvShowDetailsProps = {
   route: RouteProp<TvShowsStackParamList, "TvSeriesDetails">;
@@ -97,7 +101,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
       (season) => episodes[season].length > 0
     );
   };
-  console.log(seriesDetails?.episodes);
+  // console.log(seriesDetails?.episodes);
   // Filter seasons to include only those with episodes
   let seasonsWithEpisodes = [];
 
@@ -203,58 +207,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
       <ParallaxScrollView
         headerBackgroundColor="rgb(23 23 23)"
         headerImage={
-          <View style={{ marginTop: 0 }}>
-            <View
-              style={{
-                position: "absolute",
-                top: 40,
-                left: 12,
-                zIndex: 10,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: "transparent",
-                  padding: 8,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Ionicons name="arrow-back" size={30} color="white" />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View>
-              <Image
-                source={{
-                  uri:
-                    `${seriesDetails?.info?.backdrop_path[0]}` ||
-                    "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
-                }}
-                style={{
-                  width,
-                  height: IMG_HEIGHT,
-                }}
-                resizeMode="cover"
-              />
-              <LinearGradient
-                colors={[
-                  "transparent",
-                  "rgba(23,23,23,0.6)",
-                  "rgba(23,23,23,1)",
-                ]}
-                style={{
-                  width: "100%",
-                  height: height * 0.4,
-                  position: "absolute",
-                  bottom: 0,
-                }}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-              />
-            </View>
-          </View>
+          <HeaderImage seriesDetails={seriesDetails} navigation={navigation} />
         }
       >
         <View
@@ -264,156 +217,11 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
             backgroundColor: "rgb(23 23 23)",
           }}
         >
-          <View
-            style={{
-              padding: 15,
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <Image
-              source={{
-                uri:
-                  `${seriesDetails?.info?.cover}` ||
-                  "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
-              }}
-              style={{
-                width: width * 0.3,
-                height: height * 0.18,
-                borderRadius: 15,
-              }}
-              resizeMode="contain"
-            />
-            <View style={{ flex: 1 }}>
-              <CustomText type="title" style={{ textAlign: "center" }}>
-                {seriesDetails?.info.name}
-              </CustomText>
-
-              {/* Release Year, Runtime */}
-              {seriesDetails?.info ? (
-                <View
-                  style={{
-                    padding: 8,
-                    gap: 10,
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Ionicons name="stopwatch" size={16} color="white" />
-                    <CustomText type="extraSmall">
-                      {numberOfSeasons}{" "}
-                      {numberOfSeasons! > 1 ? "seasons" : "season"}
-                    </CustomText>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Ionicons name="calendar" size={16} color="white" />
-                    <CustomText type="extraSmall">
-                      {seriesDetails?.info.releaseDate}
-                    </CustomText>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 8,
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Ionicons name="star" size={16} color="gold" />
-                    <CustomText type="extraSmall">
-                      {seriesDetails?.info.rating_5based}
-                    </CustomText>
-                  </View>
-                </View>
-              ) : null}
-              <CustomButton
-                iconLeft={
-                  <Ionicons
-                    name="play-sharp"
-                    size={24}
-                    color={Colors.background}
-                  />
-                }
-                title="Play"
-                onPress={handleWatchNow}
-                style={{
-                  paddingVertical: 7,
-                  paddingHorizontal: 10,
-                  marginTop: 10,
-                  alignSelf: "center",
-                }}
-                textStyle={{ fontSize: 14, fontWeight: "bold" }}
-                width="50%"
-                borderRadius={10}
-                textColor={Colors.background}
-              />
-            </View>
-          </View>
-          <View
-            style={{
-              height: 38,
-              marginVertical: 15,
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <CustomButton
-              iconLeft={
-                <Octicons name="download" size={24} color={Colors.white} />
-              }
-              title="Download"
-              onPress={handleWatchNow}
-              style={{
-                paddingVertical: 7,
-                paddingHorizontal: 10,
-                backgroundColor: "transparent",
-                borderColor: "white",
-                borderWidth: 1,
-              }}
-              textStyle={{ fontSize: 14, fontWeight: "bold" }}
-              width="45%"
-              borderRadius={10}
-              textColor={Colors.white}
-            />
-            <CustomButton
-              iconLeft={
-                <MaterialIcons name="bookmark" size={24} color={Colors.white} />
-              }
-              title="Watch Later"
-              onPress={handleWatchNow}
-              style={{
-                paddingVertical: 7,
-                paddingHorizontal: 10,
-                backgroundColor: "transparent",
-                borderColor: "white",
-                borderWidth: 1,
-              }}
-              textStyle={{ fontSize: 14, fontWeight: "bold" }}
-              width="45%"
-              borderRadius={10}
-              textColor={Colors.white}
-            />
-          </View>
+          <Banner
+            seriesDetails={seriesDetails}
+            handleWatchNow={handleWatchNow}
+            numberOfSeasons={numberOfSeasons!}
+          />
 
           <View style={styles.container}>
             <SegmentSwitcher
@@ -421,168 +229,16 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
               setActiveSegment={setActiveSegment}
             />
             {activeSegment === "overview" ? (
-              <View style={styles.detailsContainer}>
-                <View
-                  style={{ marginHorizontal: 16, marginVertical: 5, gap: 5 }}
-                >
-                  <CustomText type="subtitle">Synopsis</CustomText>
-                  <CustomText
-                    type="extraSmall"
-                    style={{
-                      letterSpacing: 0.4,
-                      color: "rgb(163 163 163)",
-                    }}
-                  >
-                    {seriesDetails?.info.plot}
-                  </CustomText>
-                </View>
-                <View
-                  style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}
-                >
-                  <CustomText>Genres</CustomText>
-                  <CustomText
-                    style={{
-                      flexDirection: "row",
-                    }}
-                  >
-                    <CustomText
-                      type="extraSmall"
-                      style={{
-                        fontWeight: "600",
-                        textAlign: "auto",
-                        marginHorizontal: 16,
-                        color: "rgb(163 163 163)",
-                      }}
-                    >
-                      {seriesDetails?.info.genre}
-                    </CustomText>
-                  </CustomText>
-                </View>
-                <View
-                  style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}
-                >
-                  <CustomText>Cast</CustomText>
-                  {seriesDetails?.info?.cast ? (
-                    <CustomText
-                      type="extraSmall"
-                      style={{
-                        fontWeight: "600",
-                        lineHeight: 20,
-                        textAlign: "auto",
-                        // marginHorizontal: 16,
-                        color: "rgb(163 163 163)",
-                      }}
-                    >
-                      {seriesDetails?.info?.cast}
-                    </CustomText>
-                  ) : (
-                    <CustomText type="title">No Cast data available</CustomText>
-                  )}
-                </View>
-                <View
-                  style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}
-                >
-                  <CustomText>Trailers and Videos</CustomText>
-
-                  {seriesDetails?.info.youtube_trailer ? (
-                    <WebView
-                      style={{
-                        width: width - 74,
-                        height: 180,
-                        marginVertical: 10,
-                        marginRight: 15,
-                      }}
-                      javaScriptEnabled={true}
-                      domStorageEnabled={true}
-                      source={{
-                        uri: `https://www.youtube.com/embed/${seriesDetails?.info.youtube_trailer}`,
-                      }}
-                    />
-                  ) : (
-                    <CustomText type="title">No trailers available</CustomText>
-                  )}
-                </View>
-              </View>
+              <OverviewSegment seriesDetails={seriesDetails} />
             ) : (
-              <View style={{ padding: 5, gap: 10 }}>
-                {/* Episodes section */}
-                <CustomText type="subtitle">Episodes</CustomText>
-
-                <CustomButton
-                  iconRight={
-                    <AntDesign
-                      name="caretdown"
-                      size={18}
-                      color={Colors.white}
-                    />
-                  }
-                  title={`Season ${selectedSeason}`}
-                  onPress={() => setModalVisible(true)}
-                  style={{
-                    paddingVertical: 7,
-                    paddingHorizontal: 10,
-                    backgroundColor: "transparent",
-                    borderColor: "white",
-                    borderWidth: 1,
-                  }}
-                  textStyle={{ fontSize: 18, fontWeight: "bold" }}
-                  width="40%"
-                  borderRadius={5}
-                  textColor={Colors.white}
-                />
-
-                {/* Modal */}
-                <Modal
-                  transparent={true}
-                  visible={modalVisible}
-                  animationType="slide"
-                  onRequestClose={() => setModalVisible(false)}
-                >
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                      {seasonsWithEpisodes.length > 0 && (
-                        <FlatList
-                          data={seasonsWithEpisodes}
-                          keyExtractor={(item) => `season-${item}`}
-                          renderItem={({ item }) => (
-                            <Pressable
-                              style={{
-                                backgroundColor: "transparent",
-                                padding: 15,
-                                width: "100%",
-                                marginVertical: 5,
-                                alignItems: "center",
-                              }}
-                              onPress={() => {
-                                setSelectedSeason(parseInt(item));
-                                setModalVisible(false);
-                              }}
-                            >
-                              <CustomText
-                                type="defaultSemiBold"
-                                style={{ textAlign: "center" }}
-                              >
-                                Season {item}
-                              </CustomText>
-                            </Pressable>
-                          )}
-                        />
-                      )}
-                      <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => setModalVisible(false)}
-                      >
-                        <Ionicons name="close" size={40} color="white" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-                {/* Render episodes  */}
-
-                <EpisodesList
-                  episodes={seriesDetails.episodes[selectedSeason]}
-                />
-              </View>
+              <EpisodeSegment
+                seasonsWithEpisodes={seasonsWithEpisodes}
+                episodes={seriesDetails.episodes[selectedSeason]}
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                selectedSeason={selectedSeason}
+                setSelectedSeason={setSelectedSeason}
+              />
             )}
           </View>
         </View>
