@@ -1,47 +1,26 @@
-// MovieDetailsScreen.tsx
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
-  ScrollView,
   ActivityIndicator,
-  Pressable,
-  FlatList,
-  Modal,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
-import { MoviesStackParamList, TvShowsStackParamList } from "@/constants/types";
+import { TvShowsStackParamList } from "@/constants/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Colors } from "@/constants/Colors";
-import {
-  AntDesign,
-  Entypo,
-  Ionicons,
-  MaterialIcons,
-  Octicons,
-} from "@expo/vector-icons";
-import { TMDB_API_KEY, image500 } from "@/constants/api";
-import axios from "axios";
-import { CustomText } from "@/components/Text";
-import { LinearGradient } from "expo-linear-gradient";
-import CustomButton from "@/components/Button";
-import { fetchStreamUrl } from "@/providers/api";
-import { DeviceContext } from "@/providers/DeviceProvider";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import WebView from "react-native-webview";
+
 import { StatusBar } from "expo-status-bar";
-import { useQuery } from "@tanstack/react-query";
-import EpisodesList from "@/components/EpisodesList";
-import useGetSeriesDetails from "@/hooks/api/useGetSeriesDetails";
-import { FlashList } from "@shopify/flash-list";
+
+import { Colors } from "@/constants/Colors";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { HeaderImage } from "@/components/details/HeaderImage";
 import { Banner } from "@/components/details/Banner";
 import { OverviewSegment } from "@/components/details/OverviewSegment";
 import { EpisodeSegment } from "@/components/details/EpisodeSegment";
+import { fetchStreamUrl } from "@/providers/api";
+import { DeviceContext } from "@/providers/DeviceProvider";
+import useGetSeriesDetails from "@/hooks/api/useGetSeriesDetails";
 
 type TvShowDetailsProps = {
   route: RouteProp<TvShowsStackParamList, "TvSeriesDetails">;
@@ -50,8 +29,6 @@ type TvShowDetailsProps = {
     "TvSeriesDetails"
   >;
 };
-var { width, height } = Dimensions.get("window");
-const IMG_HEIGHT = 262;
 
 const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
   route,
@@ -61,34 +38,8 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
   const { deviceId } = useContext(DeviceContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState(1);
-  const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  // const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [activeSegment, setActiveSegment] = useState("overview");
-
-  const fetchSeasonDetails = async (seasonNumber: number) => {
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/tv/${tvshows.tmdb}/season/${seasonNumber}`,
-      {
-        headers: {
-          accept: "application/json",
-          Authorization: TMDB_API_KEY,
-        },
-      }
-    );
-    return response.data;
-  };
-
-  const fetchSeriesVideos = async () => {
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/tv/${tvshow.tmdb}/videos`,
-      {
-        headers: {
-          accept: "application/json",
-          Authorization: TMDB_API_KEY,
-        },
-      }
-    );
-    return response.data;
-  };
 
   const { data: seriesDetails, isLoading: isLoadingDetails } =
     useGetSeriesDetails(tvshow.series_id);
@@ -101,7 +52,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
       (season) => episodes[season].length > 0
     );
   };
-  // console.log(seriesDetails?.episodes);
+  console.log(seriesDetails?.episodes);
   // Filter seasons to include only those with episodes
   let seasonsWithEpisodes = [];
 

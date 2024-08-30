@@ -1,5 +1,4 @@
-// MovieDetailsScreen.tsx
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -7,26 +6,26 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  ScrollView,
   ActivityIndicator,
-  Pressable,
   FlatList,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
-import { MoviesStackParamList } from "@/constants/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Colors } from "@/constants/Colors";
-import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { TMDB_API_KEY, image500 } from "@/constants/api";
-import axios from "axios";
-import { CustomText } from "@/components/Text";
+
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomButton from "@/components/Button";
-import { fetchStreamUrl } from "@/providers/api";
-import { DeviceContext } from "@/providers/DeviceProvider";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import WebView from "react-native-webview";
 import { StatusBar } from "expo-status-bar";
+
+import { Colors } from "@/constants/Colors";
+import { image500 } from "@/constants/api";
+import { CustomText } from "@/components/Text";
+import CustomButton from "@/components/Button";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import useGetMovieDetails from "@/hooks/api/useGetMovieDetails";
+import useGetStreamUrl from "@/hooks/api/useStreamUrl";
+import { DeviceContext } from "@/providers/DeviceProvider";
+import { MoviesStackParamList } from "@/constants/types";
 
 type MovieDetailsProps = {
   route: RouteProp<MoviesStackParamList, "MovieDetails">;
@@ -55,70 +54,13 @@ const formatRuntime = (runtime: number) => {
 const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
   const { movie } = route.params;
   const { deviceId } = useContext(DeviceContext);
-  const [movieDetails, setMovieDetails] = useState<any>(null);
-  const [movieCast, setMovieCast] = useState<any>(null);
-  const [movieVideos, setMovieVideos] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchMovieDetails = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movie.tmdb}`,
-          {
-            headers: {
-              accept: "application/json",
-              Authorization: TMDB_API_KEY,
-            },
-          }
-        );
-        setMovieDetails(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
+  const { data, isLoading, error } = useGetMovieDetails(movie);
+  const { data: streamUrl } = useGetStreamUrl({ movie });
 
-    const fetchMovieCast = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movie.tmdb}/credits`,
-          {
-            headers: {
-              accept: "application/json",
-              Authorization: TMDB_API_KEY,
-            },
-          }
-        );
-        setMovieCast(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const fetchMovieVideos = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movie.tmdb}/videos`,
-          {
-            headers: {
-              accept: "application/json",
-              Authorization: TMDB_API_KEY,
-            },
-          }
-        );
-        setMovieVideos(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchMovieDetails();
-    fetchMovieCast();
-    fetchMovieVideos();
-  }, [movie]);
+  const movieCast = data?.movieCast;
+  const movieInfo = data?.movieInfo;
+  const movieVideos = data?.movieVideos;
 
   const castData =
     movieCast?.cast
@@ -130,31 +72,17 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
         ?.filter((video) => video.site === "YouTube")
         .slice(0, 3)
     : [];
-
-  const handleWatchNow = async () => {
-    if (!deviceId) {
-      console.error("Device ID is required to fetch the stream URL");
-      return;
-    }
-
-    try {
-      const streamUrl = await fetchStreamUrl(deviceId, movie);
-      if (streamUrl) {
-        setStreamUrl(streamUrl);
-        // Navigate to the video player screen or handle the stream URL as needed
-        navigation.navigate("VideoPlayer", {
-          streamUrl: streamUrl,
-          title: movieDetails?.title,
-        });
-      } else {
-        console.error("Failed to fetch the stream URL");
-      }
-    } catch (error) {
-      console.error("Error fetching stream URL:", error);
+  const handleWatchNow = () => {
+    if (streamUrl) {
+      // Navigate to the video player
+      navigation.navigate("VideoPlayer", {
+        streamUrl: streamUrl,
+        title: movieInfo?.title,
+      });
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View
         style={{
@@ -169,7 +97,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
     );
   }
 
-  if (!movieDetails) {
+  if (!movieInfo) {
     return (
       <View
         style={{
@@ -217,7 +145,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
               <Image
                 source={{
                   uri:
-                    image500(movieDetails.backdrop_path) ||
+                    image500(movieInfo.backdrop_path) ||
                     "https://th.bing.com/th/id/R.4dc29c271625202308a26ed96d1d962d?rik=qKnKhs7roVDpXA&pid=ImgRaw&r=0",
                 }}
                 style={{
@@ -272,11 +200,11 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
             />
             <View style={{ flex: 1 }}>
               <CustomText type="title" style={{ textAlign: "center" }}>
-                {movieDetails?.title}
+                {movieInfo?.title}
               </CustomText>
 
               {/* Release Year, Runtime */}
-              {movieDetails?.id ? (
+              {movieInfo?.id ? (
                 <View
                   style={{
                     padding: 8,
@@ -296,7 +224,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
                   >
                     <Ionicons name="stopwatch" size={16} color="white" />
                     <CustomText type="extraSmall">
-                      {formatRuntime(movieDetails?.runtime)}
+                      {formatRuntime(movieInfo?.runtime)}
                     </CustomText>
                   </View>
                   <View
@@ -309,7 +237,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
                   >
                     <Ionicons name="calendar" size={16} color="white" />
                     <CustomText type="extraSmall">
-                      {movieDetails?.release_date}
+                      {movieInfo?.release_date}
                     </CustomText>
                   </View>
                   <View
@@ -408,7 +336,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
                   color: "rgb(163 163 163)",
                 }}
               >
-                {movieDetails?.overview}
+                {movieInfo?.overview}
               </CustomText>
             </View>
             <View style={{ marginHorizontal: 16, marginVertical: 10, gap: 5 }}>
@@ -418,8 +346,8 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
                   flexDirection: "row",
                 }}
               >
-                {movieDetails?.genres?.map((genre, index) => {
-                  let showDot = index + 1 != movieDetails.genres.length;
+                {movieInfo?.genres?.map((genre, index) => {
+                  let showDot = index + 1 != movieInfo.genres.length;
 
                   return (
                     <CustomText

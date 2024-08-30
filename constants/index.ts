@@ -4,9 +4,11 @@ export const QUERY_KEYS = {
   liveStreamContent: "liveStreamContent",
   movieCategories: "movieCategories",
   movieContent: "movieContent",
+  movieDetails: "movieDetails",
   tvShowsCategories: "tvShowsCategories",
   tvShowsContent: "tvShowsContent",
   seriesDetails: "seriesDetails",
+  streamUrl: "streamUrl",
 };
 
 export const STORAGE_KEYS = {
