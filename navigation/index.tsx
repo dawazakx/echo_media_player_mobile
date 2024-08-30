@@ -9,7 +9,7 @@ import Tabs from "@/Navigators/TabNavigator";
 import HomeScreen from "@/screens/Home";
 import SearchScreen from "@/screens/SearchScreen";
 import VideoPlayer from "@/screens/VideoPlayer";
-import LiveStreamDetails from "@/screens/LiveStreamDetails";
+import LiveStreamDetails from "@/screens/tabs/livetv/LiveStreamDetails";
 import TvSeriesDetails from "@/screens/tabs/tvshows/TvSeriesDetails";
 
 import { RootStackParamList } from "@/constants/types";

@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Colors } from "@/constants/Colors";
-import LiveTvTab from "@/screens/tabs/LiveTvTab";
+import LiveTvTab from "@/screens/tabs/livetv/LiveTvTab";
 import TvShowsTab from "@/screens/tabs/tvshows/TvShowsTab";
 import SportsTab from "@/screens/tabs/SportsTab";
 import React from "react";

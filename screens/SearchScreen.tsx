@@ -1,5 +1,3 @@
-//
-
 import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -8,18 +6,21 @@ import {
   Image,
   Pressable,
   StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { MaterialIcons } from "@expo/vector-icons";
-import CustomButton from "@/components/Button";
+
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
-import { searchLiveTV, searchMovies } from "@/providers/api";
+import useGetSearchResult from "@/hooks/api/useGetSearchResult";
 import { DeviceContext } from "@/providers/DeviceProvider";
-import { Movie } from "@/types";
+import { LiveStream, Movie } from "@/types";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 
@@ -28,47 +29,69 @@ const { width, height } = Dimensions.get("window");
 const SearchScreen = ({ navigation }) => {
   const { deviceId } = useContext(DeviceContext);
   const [query, setQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [liveTVResults, setLiveTVResults] = useState([]);
-  const [movieResults, setMovieResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [activeSegment, setActiveSegment] = useState("movies");
+
   const [searchInitiated, setSearchInitiated] = useState(false);
 
+  const trimmedQuery = query.trim();
+  // const { data, error, isLoading } = useGetSearchResult(trimmedQuery);
+  const { data, error, isLoading } = useGetSearchResult(
+    trimmedQuery,
+    searchInitiated
+  );
+
+  const liveTVResults = data?.liveTvResult;
+  const movieResults = data?.movieResult;
   const handleSearch = async () => {
+    if (!trimmedQuery) return;
     setSearchInitiated(true);
-    setLoading(true);
-    setIsSearching(true);
-
-    const [liveTVData, movieData] = await Promise.all([
-      searchLiveTV(deviceId, query),
-      searchMovies(deviceId, query),
-    ]);
-
-    setLiveTVResults(liveTVData);
-    setMovieResults(movieData);
-    setLoading(false);
-    setIsSearching(false);
+  };
+  const handleQueryChange = (newQuery) => {
+    setQuery(newQuery);
+    setSearchInitiated(false); // Reset searchInitiated whenever the query changes
   };
 
-  const renderLiveTvItem = ({ item }: { item: Movie }) => (
+  const SegmentSwitcher = ({ activeSegment, setActiveSegment }) => {
+    return (
+      <View style={styles.segmentSwitcher}>
+        <TouchableOpacity
+          onPress={() => setActiveSegment("movies")}
+          style={[
+            styles.segmentButton,
+            activeSegment === "movies" && styles.activeSegmentButton,
+          ]}
+        >
+          <Text style={styles.segmentButtonText}>Movies</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setActiveSegment("livetv")}
+          style={[
+            styles.segmentButton,
+            activeSegment === "LiveTv" && styles.activeSegmentButton,
+          ]}
+        >
+          <Text style={styles.segmentButtonText}>Live TV</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  const renderLiveTvItem = ({ item }: { item: LiveStream }) => (
     <Pressable
-      style={styles.liveTvItem}
-      onPress={() => navigation.navigate("MovieDetails", { movie: item })}
+      style={styles.resultItem}
+      onPress={() => navigation.navigate("LiveStreamDetails", { stream: item })}
     >
       <Image
         source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-        style={styles.liveTvImage}
-        resizeMode="cover"
+        style={styles.resultImage}
+        resizeMode="contain"
       />
-      <View style={styles.liveTvTextContainer}>
-        <CustomText type="extraSmall" style={styles.liveTvText}>
-          {item.name}
-        </CustomText>
-      </View>
+      <CustomText type="extraSmall" style={styles.resultText}>
+        {item.name}
+      </CustomText>
     </Pressable>
   );
 
-  const renderItem = ({ item }: { item: Movie }) => (
+  const renderMovieItem = ({ item }: { item: Movie }) => (
     <Pressable
       style={styles.resultItem}
       onPress={() => navigation.navigate("MovieDetails", { movie: item })}
@@ -100,43 +123,46 @@ const SearchScreen = ({ navigation }) => {
           placeholder="Search a Channel, Programme, or V.O.D..."
           placeholderTextColor={Colors.white}
           value={query}
-          onChangeText={setQuery}
+          onChangeText={handleQueryChange}
           onSubmitEditing={handleSearch}
         />
       </CustomView>
 
-      {loading ? (
+      {searchInitiated && isLoading ? (
         <ActivityIndicator size="large" color={Colors.white} />
       ) : (
         searchInitiated && (
-          <CustomView style={styles.resultsContainer}>
+          <>
             <CustomText type="subtitle" style={{ paddingBottom: 10 }}>
-              Showing results for: '{query}'
+              Showing results for: {query}
             </CustomText>
-            <CustomText style={styles.sectionTitle}>
-              Live TV ({liveTVResults.length})
-            </CustomText>
-            <FlatList
-              horizontal
-              data={liveTVResults}
-              renderItem={renderLiveTvItem}
-              keyExtractor={(item) => item.stream_id.toString()}
-              ListEmptyComponent={<CustomText>No results found</CustomText>}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.liveTvList}
+            <SegmentSwitcher
+              activeSegment={activeSegment}
+              setActiveSegment={setActiveSegment}
             />
-            <CustomText style={styles.sectionTitle}>
-              Movies ({movieResults.length})
-            </CustomText>
-            <FlatList
-              data={movieResults}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.stream_id.toString()}
-              ListEmptyComponent={<CustomText>No results found</CustomText>}
-              numColumns={2}
-              columnWrapperStyle={styles.columnWrapper}
-            />
-          </CustomView>
+            {activeSegment === "movies" ? (
+              <FlatList
+                data={movieResults}
+                renderItem={renderMovieItem}
+                keyExtractor={(item) => item.stream_id.toString()}
+                ListEmptyComponent={<CustomText>No results found</CustomText>}
+                showsHorizontalScrollIndicator={false}
+                numColumns={3}
+                j
+                columnWrapperStyle={styles.columnWrapper}
+              />
+            ) : (
+              <FlatList
+                data={liveTVResults}
+                renderItem={renderLiveTvItem}
+                keyExtractor={(item) => item.stream_id.toString()}
+                ListEmptyComponent={<CustomText>No results found</CustomText>}
+                showsHorizontalScrollIndicator={false}
+                numColumns={3}
+                contentContainerStyle={styles.liveTvList}
+              />
+            )}
+          </>
         )
       )}
     </CustomView>
@@ -146,7 +172,7 @@ const SearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.secBackground,
     padding: 10,
   },
   searchContainer: {
@@ -172,7 +198,7 @@ const styles = StyleSheet.create({
   resultsContainer: {
     // flex: 1,
     borderRadius: 10,
-    // padding: 15,
+    padding: 15,
     marginHorizontal: 5,
   },
   sectionTitle: {
@@ -180,49 +206,46 @@ const styles = StyleSheet.create({
     color: Colors.white,
     marginVertical: 10,
   },
-  liveTvItem: {
-    marginRight: 10,
-    alignItems: "center",
-    width: width * 0.63,
-  },
-  liveTvImage: {
-    width: "100%",
-    height: height * 0.2,
-    borderRadius: 12,
-  },
-  liveTvTextContainer: {
-    position: "absolute",
-    bottom: 5,
-    left: 5,
-    right: 5,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    borderRadius: 8,
-    padding: 5,
-  },
-  liveTvText: {
-    marginTop: 5,
-    color: Colors.white,
-  },
+
   resultItem: {
     flex: 1,
     margin: 10,
     alignItems: "center",
   },
   resultImage: {
-    width: width * 0.39,
-    height: height * 0.28,
+    width: width * 0.3,
+    height: height * 0.2,
     borderRadius: 12,
     overflow: "visible",
   },
   resultText: {
     marginTop: 5,
     color: Colors.white,
+    fontSize: 10,
   },
   columnWrapper: {
     justifyContent: "space-between",
+    gap: 3,
   },
   liveTvList: {
     paddingBottom: 20,
+  },
+  segmentSwitcher: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  segmentButton: {
+    padding: 10,
+    marginHorizontal: 5,
+  },
+  activeSegmentButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.white,
+  },
+  segmentButtonText: {
+    color: Colors.white,
+    fontSize: 16,
   },
 });
 

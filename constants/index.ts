@@ -9,6 +9,7 @@ export const QUERY_KEYS = {
   tvShowsContent: "tvShowsContent",
   seriesDetails: "seriesDetails",
   streamUrl: "streamUrl",
+  searchResult: "searchResult",
 };
 
 export const STORAGE_KEYS = {
