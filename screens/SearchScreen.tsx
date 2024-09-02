@@ -87,12 +87,12 @@ const SearchScreen = ({ navigation }) => {
   };
   const renderLiveTvItem = ({ item }: { item: LiveStream }) => (
     <Pressable
-      style={styles.resultItem}
+      style={styles.liveTvResultItem}
       onPress={() => navigation.navigate("LiveStreamDetails", { stream: item })}
     >
       <Image
         source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
-        style={styles.resultImage}
+        style={styles.liveTvResultImage}
         resizeMode="contain"
       />
       <CustomText type="extraSmall" style={styles.resultText}>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderRadius: 8,
     padding: 8,
-    height: 50,
+    height: 40,
     width: "80%",
     color: Colors.white,
   },
@@ -263,21 +263,37 @@ const styles = StyleSheet.create({
   },
   resultImage: {
     width: width * 0.3,
-    height: height * 0.2,
+    height: height * 0.19,
     borderRadius: 12,
     overflow: "visible",
+  },
+  liveTvResultItem: {
+    flex: 1,
+    margin: 10,
+    alignItems: "center",
+  },
+  liveTvResultImage: {
+    width: width * 0.28,
+    height: height * 0.13,
+    padding: 10,
+    borderRadius: 12,
+    overflow: "hidden",
+    borderWidth: 1,
+    backgroundColor: "#52525b72",
+    borderColor: "#52525b",
   },
   resultText: {
     marginTop: 5,
     color: Colors.white,
     fontSize: 10,
+    textAlign: "center",
   },
   columnWrapper: {
     justifyContent: "space-between",
     gap: 3,
   },
   liveTvList: {
-    paddingBottom: 20,
+    gap: 3,
   },
   segmentSwitcher: {
     flexDirection: "row",
