@@ -52,7 +52,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
       (season) => episodes[season].length > 0
     );
   };
-  console.log(seriesDetails?.episodes);
+  // console.log(seriesDetails?.episodes);
   // Filter seasons to include only those with episodes
   let seasonsWithEpisodes = [];
 

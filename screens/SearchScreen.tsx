@@ -20,7 +20,7 @@ import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
 import useGetSearchResult from "@/hooks/api/useGetSearchResult";
 import { DeviceContext } from "@/providers/DeviceProvider";
-import { LiveStream, Movie } from "@/types";
+import { LiveStream, Movie, Show } from "@/types";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 
@@ -42,6 +42,7 @@ const SearchScreen = ({ navigation }) => {
 
   const liveTVResults = data?.liveTvResult;
   const movieResults = data?.movieResult;
+  const tvShowsResults = data?.tvShowsResult;
   const handleSearch = async () => {
     if (!trimmedQuery) return;
     setSearchInitiated(true);
@@ -64,10 +65,19 @@ const SearchScreen = ({ navigation }) => {
           <Text style={styles.segmentButtonText}>Movies</Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => setActiveSegment("tvshows")}
+          style={[
+            styles.segmentButton,
+            activeSegment === "tvshows" && styles.activeSegmentButton,
+          ]}
+        >
+          <Text style={styles.segmentButtonText}>Tv Shows</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => setActiveSegment("livetv")}
           style={[
             styles.segmentButton,
-            activeSegment === "LiveTv" && styles.activeSegmentButton,
+            activeSegment === "livetv" && styles.activeSegmentButton,
           ]}
         >
           <Text style={styles.segmentButtonText}>Live TV</Text>
@@ -106,6 +116,21 @@ const SearchScreen = ({ navigation }) => {
       </CustomText>
     </Pressable>
   );
+  const renderTvShowItem = ({ item }: { item: Show }) => (
+    <Pressable
+      style={styles.resultItem}
+      onPress={() => navigation.navigate("TvSeriesDetails", { tvshow: item })}
+    >
+      <Image
+        source={{ uri: item.cover || PLACEHOLDER_IMAGE }}
+        style={styles.resultImage}
+        resizeMode="cover"
+      />
+      <CustomText type="extraSmall" style={styles.resultText}>
+        {item.name}
+      </CustomText>
+    </Pressable>
+  );
 
   const insets = useSafeAreaInsets();
 
@@ -133,7 +158,10 @@ const SearchScreen = ({ navigation }) => {
       ) : (
         searchInitiated && (
           <>
-            <CustomText type="subtitle" style={{ paddingBottom: 10 }}>
+            <CustomText
+              type="subtitle"
+              style={{ paddingBottom: 10, textAlign: "center" }}
+            >
               Showing results for: {query}
             </CustomText>
             <SegmentSwitcher
@@ -145,23 +173,44 @@ const SearchScreen = ({ navigation }) => {
                 data={movieResults}
                 renderItem={renderMovieItem}
                 keyExtractor={(item) => item.stream_id.toString()}
-                ListEmptyComponent={<CustomText>No results found</CustomText>}
+                ListEmptyComponent={
+                  <CustomText style={{ textAlign: "center" }}>
+                    No results found
+                  </CustomText>
+                }
                 showsHorizontalScrollIndicator={false}
                 numColumns={3}
-                j
                 columnWrapperStyle={styles.columnWrapper}
               />
-            ) : (
+            ) : activeSegment === "tvshows" ? (
+              <FlatList
+                data={tvShowsResults}
+                renderItem={renderTvShowItem}
+                keyExtractor={(item) => item.series_id.toString()}
+                ListEmptyComponent={
+                  <CustomText style={{ textAlign: "center" }}>
+                    No results found
+                  </CustomText>
+                }
+                showsHorizontalScrollIndicator={false}
+                numColumns={3}
+                columnWrapperStyle={styles.columnWrapper}
+              />
+            ) : activeSegment === "livetv" ? (
               <FlatList
                 data={liveTVResults}
                 renderItem={renderLiveTvItem}
                 keyExtractor={(item) => item.stream_id.toString()}
-                ListEmptyComponent={<CustomText>No results found</CustomText>}
+                ListEmptyComponent={
+                  <CustomText style={{ textAlign: "center" }}>
+                    No results found
+                  </CustomText>
+                }
                 showsHorizontalScrollIndicator={false}
                 numColumns={3}
                 contentContainerStyle={styles.liveTvList}
               />
-            )}
+            ) : null}
           </>
         )
       )}
@@ -177,7 +226,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    gap: 10,
+    gap: 15,
     alignItems: "center",
     marginVertical: 20,
     backgroundColor: "transparent",
@@ -192,7 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     height: 50,
-    width: "85%",
+    width: "80%",
     color: Colors.white,
   },
   resultsContainer: {
