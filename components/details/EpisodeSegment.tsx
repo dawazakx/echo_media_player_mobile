@@ -1,9 +1,12 @@
 import { Episode } from "@/types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Modal,
   Pressable,
+  ScrollView,
+  StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -11,7 +14,7 @@ import { CustomText } from "../Text";
 import CustomButton from "../Button";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import EpisodesList from "../EpisodesList";
+import EpisodeCard from "../EpisodeCard";
 
 export const EpisodeSegment = ({
   episodes,
@@ -20,6 +23,7 @@ export const EpisodeSegment = ({
   setModalVisible,
   modalVisible,
   seasonsWithEpisodes,
+  navigation,
 }: {
   episodes: any;
   selectedSeason: number;
@@ -27,7 +31,32 @@ export const EpisodeSegment = ({
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   modalVisible: boolean;
   seasonsWithEpisodes: string[];
+  navigation: any;
 }) => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (episodes) {
+      setLoading(false);
+      console.log(episodes);
+    }
+  }, [episodes]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.white} />
+      </View>
+    );
+  }
+
+  if (!episodes || episodes.length === 0) {
+    return (
+      <View style={styles.container}>
+        <CustomText>No episodes available for this season</CustomText>
+      </View>
+    );
+  }
   return (
     <View style={{ padding: 5, gap: 10 }}>
       <CustomText type="subtitle">Episodes</CustomText>
@@ -113,7 +142,27 @@ export const EpisodeSegment = ({
         </View>
       </Modal>
       {/* Render episodes  */}
-      <EpisodesList episodes={episodes} />
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        {episodes.map((episode: Episode) => (
+          <EpisodeCard
+            key={episode.id.toString()}
+            episode={episode}
+            navigation={navigation}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 };
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
