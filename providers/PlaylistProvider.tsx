@@ -2,21 +2,15 @@ import React, { createContext, useState, useEffect, Dispatch, SetStateAction } f
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { ReactChildrenProps } from "@/types";
+import { type Playlist } from "@/types/playlist";
 
 import { STORAGE_KEYS } from "@/constants";
 
-type PlaylistProps = {
-  _id?: string;
-  device_id: string;
-  nickname: string;
-  url: string;
-}
-
 type PlaylistContextProps = {
-  activePlaylist: PlaylistProps | null;
-  userPlaylists: PlaylistProps[];
-  setActivePlaylist: Dispatch<SetStateAction<PlaylistProps | null>>;
-  setUserPlaylists: Dispatch<SetStateAction<PlaylistProps[]>>;
+  activePlaylist: Playlist | null;
+  userPlaylists: Playlist[];
+  setActivePlaylist: Dispatch<SetStateAction<Playlist | null>>;
+  setUserPlaylists: Dispatch<SetStateAction<Playlist[]>>;
 }
 
 const initialContext: PlaylistContextProps = {
@@ -29,8 +23,8 @@ const initialContext: PlaylistContextProps = {
 export const PlaylistContext = createContext(initialContext);
 
 export const PlaylistProvider = ({ children }: ReactChildrenProps) => {
-  const [activePlaylist, setActivePlaylist] = useState<PlaylistProps | null>(null);
-  const [userPlaylists, setUserPlaylists] = useState<PlaylistProps[]>([]);
+  const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null);
+  const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
   useEffect(() => {
     AsyncStorage

@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { DeviceProvider } from "@/providers/DeviceProvider";
 import { PlaylistProvider } from "./providers/PlaylistProvider";
+import { SeriesProvider } from "./providers/SeriesProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import AppNavigator from "./navigation";
@@ -15,10 +16,12 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DeviceProvider>
         <PlaylistProvider>
-          <QueryClientProvider client={queryClient}>
-            <StatusBar style="auto" />
-            <AppNavigator />
-          </QueryClientProvider>
+          <SeriesProvider>
+            <QueryClientProvider client={queryClient}>
+              <StatusBar style="auto" />
+              <AppNavigator />
+            </QueryClientProvider>
+          </SeriesProvider>
         </PlaylistProvider>
       </DeviceProvider>
     </GestureHandlerRootView>

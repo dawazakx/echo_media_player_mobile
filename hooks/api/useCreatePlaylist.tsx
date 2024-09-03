@@ -5,6 +5,8 @@ import { PlaylistContext } from "@/providers/PlaylistProvider";
 
 import { BASE_URL } from "@/constants/api";
 
+import { type Playlist } from "@/types/playlist";
+
 type createPlaylistPayload = {
   username: string;
   nickname: string;
@@ -15,16 +17,11 @@ type createPlaylistPayload = {
 
 type createPlaylistResponse = {
   message: string;
-  isConnected: {
-    device_id: string;
-    url: string;
-    nickname: string;
-    xtreamUserInfo: {}
-  };
+  isConnected: Playlist;
 }
 
 const useCreatePlaylist = () => {
-  const { setUserPlaylists, setActivePlaylist } = useContext(PlaylistContext);
+  const { setUserPlaylists, setActivePlaylist, userPlaylists } = useContext(PlaylistContext);
 
   async function connectXtreme( data: createPlaylistPayload): Promise<createPlaylistResponse> {
     const response = await fetch(`${BASE_URL}/connect-xstream`, {
@@ -43,10 +40,21 @@ const useCreatePlaylist = () => {
     return response.json();
   }
 
+  const setPlaylists = async (playlist: Playlist) => {
+    // check if playlist exists
+    const checkPlaylistExist = userPlaylists.find((p) => {
+      return p.url === playlist.url && p.xtreamUserInfo.username === playlist.xtreamUserInfo.username;
+    });
+
+    if(!checkPlaylistExist) {
+      setUserPlaylists((prevPlaylists) => [...prevPlaylists, playlist]);
+    }
+  };
+
   return useMutation({
     mutationFn: connectXtreme,
     onSuccess: (data) => {
-      setUserPlaylists([data?.isConnected]);
+      setPlaylists(data?.isConnected);
       setActivePlaylist(data?.isConnected);
       return true;
     },

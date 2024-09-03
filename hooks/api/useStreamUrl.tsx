@@ -4,10 +4,14 @@ import axios from "axios";
 
 import { PlaylistContext } from "@/providers/PlaylistProvider";
 
-import type { Episode, Movie } from "@/types";
+import type { Episode, Movie, LiveStream } from "@/types";
 
 import { BASE_URL } from "@/constants/api";
 import { QUERY_KEYS } from "@/constants";
+
+type UseGetStreamUrlStreamOptions = {
+  stream: LiveStream;
+};
 
 type UseGetStreamUrlOptions = {
   movie: Movie;
@@ -17,9 +21,7 @@ type UseGetStreamUrlEpisodeOptions = {
   episode: Episode;
 };
 
-type UseGetStreamUrlOptionsUnion =
-  | UseGetStreamUrlOptions
-  | UseGetStreamUrlEpisodeOptions;
+type UseGetStreamUrlOptionsUnion = UseGetStreamUrlStreamOptions | UseGetStreamUrlOptions | UseGetStreamUrlEpisodeOptions;
 
 const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
   const { activePlaylist } = useContext(PlaylistContext);
@@ -34,6 +36,9 @@ const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
     } else if ("episode" in options) {
       id = options.episode.id;
       containerExtension = options.episode.container_extension;
+    } else if("stream" in options) {
+      id = options.stream.stream_id;
+      containerExtension = "mkv";
     } else {
       throw new Error("Invalid options object");
     }
@@ -51,6 +56,7 @@ const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
 
     return response.data.streamURL;
   };
+  
   return useQuery({
     queryKey: [QUERY_KEYS.streamUrl],
     queryFn: getStreamUrl,

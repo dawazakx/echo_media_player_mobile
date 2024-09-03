@@ -1,8 +1,3 @@
-import { SegmentedControl } from "@/components/SegmentedControl";
-import { CustomText } from "@/components/Text";
-import { Colors } from "@/constants/Colors";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
   View,
@@ -14,8 +9,21 @@ import {
   Pressable,
 } from "react-native";
 
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+
+import { SegmentedControl } from "@/components/SegmentedControl";
+import { CustomText } from "@/components/Text";
+import { VideoPlayer } from "@/components/VideoPlayer";
+
+import useGetStreamUrl from "@/hooks/api/useStreamUrl";
+
+import { Colors } from "@/constants/Colors";
+
 const LiveStreamDetails = ({ navigation, route }) => {
   const { stream } = route.params;
+  const { data: streamUrl } = useGetStreamUrl({ stream });
+
   // Dummy data for schedule flatlist
   const scheduleData = [
     { id: "1", day: "Monday", shows: ["Show 1", "Show 2", "Show 3"] },
@@ -59,7 +67,10 @@ const LiveStreamDetails = ({ navigation, route }) => {
         </View>
       </View>
       {/* Video Player Component */}
-      <View style={styles.videoPlayerContainer}>{/* <VideoPlayer /> */}</View>
+      <View style={styles.videoPlayerContainer}>
+        <VideoPlayer streamUrl={streamUrl} />
+      </View>
+      
 
       {/* Stream Info */}
       <View style={styles.streamInfoContainer}>
