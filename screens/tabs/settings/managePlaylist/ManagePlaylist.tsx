@@ -103,7 +103,11 @@ const ManagePlaylist = ({ navigation }) => {
               <CustomText type="extraSmall">{playlist?.url}</CustomText>
             </View>
             <MaterialIcons
-              name={playlist.nickname === activePlaylist?.nickname ? "radio-button-checked" : "radio-button-unchecked"}
+              name={
+                playlist.nickname === activePlaylist?.nickname
+                  ? "radio-button-checked"
+                  : "radio-button-unchecked"
+              }
               size={24}
               color={Colors.tint}
             />
@@ -135,6 +139,27 @@ const ManagePlaylist = ({ navigation }) => {
             marginTop: 10,
           }}
         >
+          <Pressable
+            style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+            onPress={() => {
+              navigation.navigate("PlaylistDetails", {
+                playlistId: activePlaylist?._id,
+              });
+            }}
+          >
+            <Feather name="info" size={22} color={Colors.background} />
+            <CustomText type="subtitle" style={{ color: Colors.background }}>
+              Details
+            </CustomText>
+          </Pressable>
+          <View
+            style={{
+              width: "88%",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderBottomColor: Colors.secBackground,
+              alignSelf: "flex-end",
+            }}
+          />
           <Pressable
             style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
           >
@@ -193,7 +218,7 @@ const ManagePlaylist = ({ navigation }) => {
           <Fontisto name="plus-a" size={24} color={Colors.background} />
         }
         textColor={Colors.background}
-        onPress={() => navigation.navigate("AddPlaylist")}
+        onPress={() => navigation.navigate("add-playlist")}
       />
 
       <Modal

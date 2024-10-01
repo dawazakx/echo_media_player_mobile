@@ -5,10 +5,12 @@ import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
+import { MaterialIcons } from "@expo/vector-icons";
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React from "react";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 export interface m3uPlaylistProps {
   navigation: CompositeNavigationProp<
@@ -23,42 +25,46 @@ export default function M3uForm({ navigation }: m3uPlaylistProps) {
 
   return (
     <CustomView style={styles.container}>
-      <CustomText type="subtitle">Connect with M3u Url</CustomText>
+      <View style={styles.header}>
+        <Pressable
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={32} color={Colors.white} />
+        </Pressable>
+
+        <CustomText type="subtitle">Connect with M3u Url</CustomText>
+      </View>
 
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Nickname"
         // value={nickname}
         onChangeText={(text) => setNickname(text)}
       />
 
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="M3U Link"
         // value={url}
         onChangeText={(text) => setUrl(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="EPG Link (Optional)"
         // value={url}
         onChangeText={(text) => setUrl(text)}
       />
 
-      <CustomView style={styles.navigation}>
-        <Button
-          title="Back"
-          borderRadius={25}
-          width="48%"
-          textColor={Colors.background}
-          onPress={() => navigation.goBack()}
-        />
-
-        <Button
-          title="Next"
-          borderRadius={25}
-          width="48%"
-          textColor={Colors.background}
-          onPress={() => navigation.navigate(PLAYER_INDEX_ROUTE)}
-        />
-      </CustomView>
+      <Button
+        title="Next"
+        borderRadius={10}
+        width="85%"
+        style={{ alignSelf: "center" }}
+        textColor={Colors.background}
+        onPress={() => navigation.navigate(PLAYER_INDEX_ROUTE)}
+      />
     </CustomView>
   );
 }
@@ -66,9 +72,17 @@ export default function M3uForm({ navigation }: m3uPlaylistProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
-    paddingTop: 50,
+    padding: 10,
     gap: 30,
+    backgroundColor: Colors.secBackground,
+  },
+  header: {
+    marginTop: 50,
+    marginBottom: 20,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 35,
   },
 
   text: {
@@ -77,10 +91,5 @@ const styles = StyleSheet.create({
     color: "white",
     padding: 20,
     textAlign: "center",
-  },
-
-  navigation: {
-    flexDirection: "row",
-    justifyContent: "space-between",
   },
 });

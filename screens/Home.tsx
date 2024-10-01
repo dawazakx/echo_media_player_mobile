@@ -18,6 +18,7 @@ import {
   ADD_PLAYLIST_ROUTE,
   PLAYER_INDEX_ROUTE,
 } from "@/constants/Routes";
+import { Feather } from "@expo/vector-icons";
 
 export interface HomeProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -25,7 +26,7 @@ export interface HomeProps {
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { deviceId } = useContext(DeviceContext);
-  const { activePlaylist } = useContext(PlaylistContext);
+  const { activePlaylist, userPlaylists } = useContext(PlaylistContext);
 
   const { mutate: generateDeviceId } = useGenerateDeviceId();
 
@@ -37,7 +38,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   };
 
   const onGenerateDeviceId = async () => {
-    console.log(deviceId);
+    // console.log(deviceId);
     if (!deviceId) {
       generateDeviceId({
         type: "mobile",
@@ -47,16 +48,18 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    checkActivePlaylist();
+    // checkActivePlaylist();
     onGenerateDeviceId();
   }, []);
 
   return (
-    <CustomView style={{ flex: 1, padding: 10 }}>
+    <CustomView
+      style={{ flex: 1, justifyContent: "space-between", padding: 10 }}
+    >
       <View
         style={{
           height: 250,
-          paddingVertical: 50,
+          paddingVertical: 150,
           alignItems: "center",
         }}
       >
@@ -66,37 +69,39 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
           resizeMode="contain"
         />
       </View>
-      <CustomText
-        type="title"
-        style={{ color: Colors.tint, textAlign: "center", paddingBottom: 15 }}
-      >
-        Premium Features
-      </CustomText>
-      <CustomView>
-        <CustomText type="subtitle" style={{ textAlign: "center", padding: 5 }}>
-          Recording
-        </CustomText>
-        <CustomText type="subtitle" style={{ textAlign: "center", padding: 5 }}>
-          Catch up
-        </CustomText>
-        <CustomText type="subtitle" style={{ textAlign: "center", padding: 5 }}>
-          V.O.D recording
-        </CustomText>
-        <CustomText type="subtitle" style={{ textAlign: "center", padding: 5 }}>
-          Multiple playlists
-        </CustomText>
-        <CustomText type="subtitle" style={{ textAlign: "center", padding: 5 }}>
-          Synchronise playlists & favorites
-        </CustomText>
-      </CustomView>
-      <CustomView style={{ alignItems: "center", paddingTop: 80, gap: 12 }}>
+
+      <CustomView style={{ alignItems: "center", paddingTop: 70, gap: 12 }}>
         <CustomButton
-          title="Continue"
+          title="Purchase or Activate"
           width="70%"
-          borderRadius={25}
+          borderRadius={10}
+          style={{ backgroundColor: Colors.tint }}
           textColor={Colors.background}
+          iconLeft={<Feather name="star" size={18} color={Colors.background} />}
           onPress={() => navigation.navigate(ADD_PLAYLIST_ROUTE)}
         />
+        <CustomButton
+          title="Continue with basic"
+          width="70%"
+          borderRadius={10}
+          textColor={Colors.background}
+          iconLeft={
+            <Feather name="clock" size={18} color={Colors.background} />
+          }
+          onPress={() => {
+            if (userPlaylists.length > 0) {
+              navigation.navigate("Select");
+            } else {
+              navigation.navigate(ADD_PLAYLIST_ROUTE);
+            }
+          }}
+        />
+      </CustomView>
+
+      <CustomView style={{ alignItems: "center", paddingTop: 90 }}>
+        <CustomText type="extraSmall" style={{ color: "gray" }}>
+          Device ID: {deviceId}
+        </CustomText>
       </CustomView>
     </CustomView>
   );

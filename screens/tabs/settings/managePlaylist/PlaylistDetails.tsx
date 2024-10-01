@@ -26,6 +26,7 @@ const PlaylistDetails = ({ navigation, route }) => {
           marginHorizontal: 12,
           marginTop: 15,
           marginBottom: 35,
+          padding: 15,
           flexDirection: "row",
           justifyContent: "center",
           backgroundColor: "transparent",
@@ -43,7 +44,9 @@ const PlaylistDetails = ({ navigation, route }) => {
         <CustomText type="subtitle">Playlist Manager</CustomText>
       </CustomView>
 
-      <CustomView style={{ gap: 25, backgroundColor: "transparent" }}>
+      <CustomView
+        style={{ gap: 25, backgroundColor: "transparent", padding: 10 }}
+      >
         <CustomText type="subtitle" style={{ textAlign: "center" }}>
           Playlist Details for ID: {playlistId}
         </CustomText>

@@ -38,11 +38,19 @@ const AddPlaylistScreen: React.FC<AddPlaylistProps> = ({ navigation }) => {
   );
 
   return (
-    <CustomView style={{ flex: 1, padding: 10, gap: 15 }}>
+    <CustomView
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        padding: 10,
+        gap: 5,
+        backgroundColor: Colors.secBackground,
+      }}
+    >
       <View
         style={{
           height: 250,
-          paddingVertical: 50,
+          paddingTop: 35,
           alignItems: "center",
         }}
       >
@@ -52,40 +60,39 @@ const AddPlaylistScreen: React.FC<AddPlaylistProps> = ({ navigation }) => {
           resizeMode="contain"
         />
       </View>
-      <MaterialIcons
-        name="playlist-play"
-        size={70}
-        color={Colors.tint}
-        style={{ alignSelf: "center" }}
-      />
-      <CustomView>
+
+      <View>
         <CustomText style={{ textAlign: "center", padding: 10 }}>
-          Sparrow Player is strictly a MEDIA PLAYER It does not provide any type
-          of media content To use sparrow player, add your playlist using the
-          button below
+          Echo Media Player is strictly a MEDIA PLAYER It does not provide any
+          type of media content To use Echo Media Player, add your playlist
+          using the button below
         </CustomText>
-      </CustomView>
-      <CustomView style={{ alignItems: "center", paddingTop: 60 }}>
+      </View>
+      <View style={{ alignItems: "center", paddingTop: 50 }}>
         <CustomButton
           title="Add playlist"
-          width="70%"
-          borderRadius={25}
+          width="55%"
+          borderRadius={10}
           style={{ backgroundColor: Colors.tint }}
           iconLeft={
-            <Fontisto name="plus-a" size={24} color={Colors.background} />
+            <MaterialIcons
+              name="playlist-add"
+              size={24}
+              color={Colors.background}
+            />
           }
           textColor={Colors.background}
           // onPress={() => navigation.navigate(SELECT_PLAYLIST_ROUTE)}
           onPress={handleOpenPress}
         />
-      </CustomView>
+      </View>
 
       <BottomSheet
         index={-1}
         snapPoints={["31%"]}
         ref={bottomSheetRef}
         enablePanDownToClose={true}
-        backgroundStyle={{ backgroundColor: Colors.background }}
+        backgroundStyle={{ backgroundColor: Colors.secBackground }}
         handleIndicatorStyle={{ backgroundColor: Colors.white }}
         backdropComponent={renderBackdrop}
       >

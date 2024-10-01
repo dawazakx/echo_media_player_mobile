@@ -36,11 +36,11 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
   // const [password, setPassword] = useState("");
   // const [url, setUrl] = useState("");
   // const [isLoading, setIsLoading] = useState(false);
-  
-  const { 
-    mutate: connectXtreme, 
-    isPending: isLoading, 
-    isSuccess: createPlaylistSuccess, 
+
+  const {
+    mutate: connectXtreme,
+    isPending: isLoading,
+    isSuccess: createPlaylistSuccess,
     error: createPlaylistError,
   } = useCreatePlaylist();
 
@@ -84,32 +84,34 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
         <Pressable
           onPress={() => {
             navigation.goBack();
-          }}>
+          }}
+        >
           <MaterialIcons name="arrow-back" size={32} color={Colors.white} />
         </Pressable>
 
-        <CustomText type="subtitle">
-          Connect with Xtreme code
-        </CustomText>
+        <CustomText type="subtitle">Connect with Xtream Code</CustomText>
       </View>
-      
 
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Username"
         value={username}
         onChangeText={(text) => setUsername(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Password"
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Portal"
         value={url}
         onChangeText={(text) => setUrl(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Nickname"
         value={nickname}
         onChangeText={(text) => setNickname(text)}
@@ -117,8 +119,9 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
 
       <Button
         title="Next"
-        borderRadius={25}
-        width="100%"
+        borderRadius={10}
+        width="85%"
+        style={{ alignSelf: "center" }}
         textColor={Colors.background}
         onPress={handleSubmit}
         disabled={isLoading}
@@ -131,8 +134,9 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
+    padding: 10,
     gap: 30,
+    backgroundColor: Colors.secBackground,
   },
 
   header: {
@@ -141,6 +145,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 35,
   },
 });

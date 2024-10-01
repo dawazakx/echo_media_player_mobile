@@ -60,10 +60,10 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   const labelStyle = useAnimatedStyle(() => {
     return {
-      left: 10,
+      left: labelPosition.value ? 3 : 10,
       top: labelPosition.value ? -22 : 17,
       fontSize: labelPosition.value ? 14 : 16,
-      color: labelPosition.value ? "#888" : "white",
+      color: labelPosition.value ? "#cbd5e1" : "white",
     };
   });
 
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     borderRadius: 5,
-    height: 60,
+    height: 55,
     justifyContent: "center",
   },
   label: {
