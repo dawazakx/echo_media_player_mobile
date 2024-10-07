@@ -27,7 +27,7 @@ const Header = ({ navigation }) => {
       <Pressable style={styles.iconContainer} onPress={() => {}}>
         {/* <Feather name="menu" size={24} color="white" /> */}
         <Image
-          source={require("../assets/whiteLogo.png")}
+          source={require("../assets/logob.png")}
           contentFit="contain"
           style={{
             width: 35,

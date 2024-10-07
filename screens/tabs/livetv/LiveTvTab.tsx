@@ -23,7 +23,9 @@ export interface LiveTvProps {
 
 const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
   const flatListRef = useRef<FlatList>(null);
 
   const { data: categories, isLoading } = useGetLiveStreamCategories();
@@ -67,6 +69,7 @@ const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
           categories={categories}
           selectedCategory={selectedCategoryId}
           onSelect={handleCategoryPress}
+          filterRoute="livetv"
         />
       )}
 

@@ -53,8 +53,13 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   }, []);
 
   return (
-    <CustomView
-      style={{ flex: 1, justifyContent: "space-between", padding: 10 }}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.secBackground,
+        justifyContent: "space-between",
+        padding: 10,
+      }}
     >
       <View
         style={{
@@ -65,12 +70,12 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
       >
         <Image
           style={{ width: 150, height: 120 }}
-          source={require("../assets/logo.png")}
+          source={require("../assets/Echoplayer-04.png")}
           resizeMode="contain"
         />
       </View>
 
-      <CustomView style={{ alignItems: "center", paddingTop: 70, gap: 12 }}>
+      <View style={{ alignItems: "center", paddingTop: 70, gap: 12 }}>
         <CustomButton
           title="Purchase or Activate"
           width="70%"
@@ -96,14 +101,14 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
             }
           }}
         />
-      </CustomView>
+      </View>
 
-      <CustomView style={{ alignItems: "center", paddingTop: 90 }}>
+      <View style={{ alignItems: "center", paddingTop: 90 }}>
         <CustomText type="extraSmall" style={{ color: "gray" }}>
           Device ID: {deviceId}
         </CustomText>
-      </CustomView>
-    </CustomView>
+      </View>
+    </View>
   );
 };
 

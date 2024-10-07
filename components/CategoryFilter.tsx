@@ -1,10 +1,19 @@
-import React, { useCallback, useContext } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useContext, useState } from "react";
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { Colors } from "@/constants/Colors";
 import { CustomText } from "./Text";
 import { PlaylistContext } from "@/providers/PlaylistProvider";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { MoviesStackParamList, RootStackParamList } from "@/constants/types";
 
 interface CategoryI {
   category_id: string;
@@ -16,14 +25,20 @@ interface CategoryFilterProps {
   categories: CategoryI[];
   selectedCategory: string | null;
   onSelect: (category_id: string) => void;
+  filterRoute: string;
 }
 
 const CategoryFilter = ({
   categories,
   selectedCategory,
   onSelect,
+  filterRoute,
 }: CategoryFilterProps) => {
   const { activePlaylist } = useContext(PlaylistContext);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const navigation = useNavigation<
+    NavigationProp<MoviesStackParamList> | NavigationProp<RootStackParamList>
+  >();
 
   const renderCategoryItem = useCallback(
     ({ item }: { item: CategoryI }) => {
@@ -50,6 +65,25 @@ const CategoryFilter = ({
     [selectedCategory, onSelect]
   );
 
+  const renderModalItem = useCallback(
+    ({ item }: { item: CategoryI }) => {
+      return (
+        <Pressable
+          style={styles.modalItem}
+          onPress={() => {
+            setDrawerVisible(false);
+            navigation.navigate(filterRoute, {
+              category: item,
+            }); // Navigate to "AllVOD" screen
+          }}
+        >
+          <Text style={styles.modalCategoryText}>{item.category_name}</Text>
+        </Pressable>
+      );
+    },
+    [navigation]
+  );
+
   return (
     <View
       style={{
@@ -57,8 +91,8 @@ const CategoryFilter = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingLeft: 5,
-        gap: 10,
+        paddingHorizontal: 10,
+        gap: 8,
       }}
     >
       <Pressable
@@ -100,6 +134,57 @@ const CategoryFilter = ({
           gap: 10,
         }}
       />
+
+      <View
+        style={{
+          width: 1,
+          backgroundColor: "#3f3f46",
+          marginVertical: 10,
+          height: "55%",
+        }}
+      />
+
+      {/* Drawer Toggle Icon */}
+      <Pressable onPress={() => setDrawerVisible(true)}>
+        <Feather name="filter" size={20} color="white" />
+      </Pressable>
+
+      {/* Custom Drawer */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={drawerVisible}
+        onRequestClose={() => setDrawerVisible(false)}
+      >
+        <View style={styles.drawerContainer}>
+          <View style={styles.drawerContent}>
+            {/* Close Drawer Button */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingTop: 20,
+                paddingHorizontal: 10,
+              }}
+            >
+              <CustomText type="title">Categories</CustomText>
+
+              <Pressable onPress={() => setDrawerVisible(false)}>
+                <Feather name="x" size={24} color="white" />
+              </Pressable>
+            </View>
+
+            {/* Category List in Drawer */}
+            <FlatList
+              data={categories}
+              keyExtractor={(item) => item.category_id}
+              renderItem={renderModalItem} // Use renderModalItem for modal
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.drawerFlatListContent}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -129,6 +214,39 @@ const styles = StyleSheet.create({
     color: Colors.background,
     fontSize: 14,
     lineHeight: 14,
+  },
+  drawerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 5,
+    backgroundColor: "rgba(0,0,0,0.7)",
+  },
+
+  drawerContent: {
+    backgroundColor: "rgba(0,0,0,0.7)",
+    // padding: 20,
+    gap: 10,
+    // borderTopLeftRadius: 20,
+    // borderTopRightRadius: 20,
+    maxHeight: "90%",
+  },
+
+  drawerFlatListContent: {
+    paddingTop: 10,
+    paddingHorizontal: 12,
+  },
+
+  modalItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    backgroundColor: Colors.secBackground,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+
+  modalCategoryText: {
+    color: Colors.white,
+    fontSize: 14,
   },
 });
 

@@ -212,6 +212,7 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
             categories={categories!}
             selectedCategory={selectedCategory}
             onSelect={handleCategoryPress}
+            filterRoute="AllMovies"
           />
         </View>
 

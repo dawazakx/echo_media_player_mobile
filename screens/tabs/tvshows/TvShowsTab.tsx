@@ -212,6 +212,7 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
             categories={categories!}
             selectedCategory={selectedCategory}
             onSelect={handleCategoryPress}
+            filterRoute="AllTvShows"
           />
         </View>
 
