@@ -13,10 +13,12 @@ import { Feather, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import { Colors } from "@/constants/Colors";
+import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 
 const ManagePlaylist = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { activePlaylist, userPlaylists } = useContext(PlaylistContext);
+  const { activePlaylist, setActivePlaylist, userPlaylists } =
+    useContext(PlaylistContext);
   const snapPoints = ["30%"];
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -102,15 +104,26 @@ const ManagePlaylist = ({ navigation }) => {
               </CustomText>
               <CustomText type="extraSmall">{playlist?.url}</CustomText>
             </View>
-            <MaterialIcons
-              name={
-                playlist.nickname === activePlaylist?.nickname
-                  ? "radio-button-checked"
-                  : "radio-button-unchecked"
-              }
-              size={24}
-              color={Colors.tint}
-            />
+            <Pressable
+              onPress={() => {
+                setActivePlaylist(playlist);
+                navigation.navigate(PLAYER_INDEX_ROUTE);
+              }}
+            >
+              {activePlaylist?._id === playlist._id ? (
+                <MaterialIcons
+                  name="radio-button-checked"
+                  size={24}
+                  color={Colors.tint}
+                />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={24}
+                  color={Colors.tint}
+                />
+              )}
+            </Pressable>
           </Pressable>
         ))}
       </CustomView>

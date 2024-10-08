@@ -1,15 +1,17 @@
+import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
 import { ADD_PLAYLIST_ROUTE, PLAYER_INDEX_ROUTE } from "@/constants/Routes";
 import { PlaylistContext } from "@/providers/PlaylistProvider";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Feather, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import React, { useContext } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 const PlaylistSelect = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { activePlaylist, userPlaylists } = useContext(PlaylistContext);
+  const { activePlaylist, setActivePlaylist, userPlaylists } =
+    useContext(PlaylistContext);
 
   return (
     <CustomView
@@ -38,7 +40,7 @@ const PlaylistSelect = ({ navigation }) => {
           <MaterialIcons name="arrow-back" size={32} color={Colors.white} />
         </Pressable>
 
-        <CustomText type="subtitle">Select a Playlist</CustomText>
+        <CustomText type="subtitle">Select Playlist</CustomText>
       </CustomView>
 
       <CustomView
@@ -47,35 +49,58 @@ const PlaylistSelect = ({ navigation }) => {
           gap: 15,
           padding: 15,
           marginHorizontal: 12,
-          alignSelf: "center",
-          alignItems: "center",
           backgroundColor: "transparent",
         }}
       >
-        {userPlaylists.map((playlist) => (
-          <Pressable
-            style={{
-              gap: 2,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 15,
-              backgroundColor: "#374151",
-              borderRadius: 10,
-              width: "50%",
-            }}
-            onPress={() => navigation.navigate(PLAYER_INDEX_ROUTE)}
-            key={playlist?._id}
-          >
-            <View>
-              <CustomText type="defaultSemiBold">
-                {playlist?.nickname}
-              </CustomText>
-              {/* <CustomText type="extraSmall">{playlist?.url}</CustomText> */}
-            </View>
-          </Pressable>
-        ))}
+        <FlatList
+          data={userPlaylists}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <Pressable
+              style={{
+                gap: 2,
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: 10,
+                backgroundColor: "#374151",
+                borderRadius: 10,
+                width: "40%",
+                margin: 10,
+              }}
+              onPress={() => {
+                setActivePlaylist(item);
+                navigation.navigate(PLAYER_INDEX_ROUTE);
+              }}
+              key={item?._id}
+            >
+              <Feather name="user" size={44} color="white" />
+              <View>
+                <CustomText type="defaultSemiBold">{item?.nickname}</CustomText>
+                {/* <CustomText type="extraSmall">{item?.url}</CustomText> */}
+              </View>
+            </Pressable>
+          )}
+          keyExtractor={(item) => item?._id.toString()}
+        />
       </CustomView>
+      <CustomButton
+        title="Add playlist"
+        width="40%"
+        borderRadius={10}
+        style={{
+          backgroundColor: Colors.tint,
+          position: "absolute",
+          bottom: 20,
+          right: 12,
+          zIndex: -1,
+        }}
+        iconLeft={
+          <Fontisto name="plus-a" size={24} color={Colors.background} />
+        }
+        textColor={Colors.background}
+        onPress={() => navigation.navigate("Playlist")}
+      />
     </CustomView>
   );
 };

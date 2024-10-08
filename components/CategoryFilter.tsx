@@ -72,9 +72,13 @@ const CategoryFilter = ({
           style={styles.modalItem}
           onPress={() => {
             setDrawerVisible(false);
-            navigation.navigate(filterRoute, {
-              category: item,
-            }); // Navigate to "AllVOD" screen
+            if (filterRoute === "livetv") {
+              onSelect(item.category_id);
+            } else {
+              navigation.navigate(filterRoute, {
+                category: item,
+              });
+            }
           }}
         >
           <Text style={styles.modalCategoryText}>{item.category_name}</Text>
