@@ -99,23 +99,9 @@ const CategoryFilter = ({
         gap: 8,
       }}
     >
-      <Pressable
-        style={{
-          backgroundColor: "transparent",
-          paddingVertical: 7,
-          paddingHorizontal: 9,
-          flexDirection: "row",
-          alignContent: "center",
-          borderRadius: 15,
-          borderWidth: 1,
-          borderColor: "#3f3f46",
-          gap: 2,
-        }}
-      >
-        <MaterialIcons name="playlist-play" size={22} color="white" />
-        <CustomText type="defaultSemiBold">
-          {activePlaylist?.nickname}
-        </CustomText>
+      {/* Drawer Toggle Icon */}
+      <Pressable onPress={() => setDrawerVisible(true)}>
+        <Feather name="menu" size={20} color="white" />
       </Pressable>
 
       <View
@@ -138,20 +124,6 @@ const CategoryFilter = ({
           gap: 10,
         }}
       />
-
-      <View
-        style={{
-          width: 1,
-          backgroundColor: "#3f3f46",
-          marginVertical: 10,
-          height: "55%",
-        }}
-      />
-
-      {/* Drawer Toggle Icon */}
-      <Pressable onPress={() => setDrawerVisible(true)}>
-        <Feather name="filter" size={20} color="white" />
-      </Pressable>
 
       {/* Custom Drawer */}
       <Modal
@@ -182,7 +154,7 @@ const CategoryFilter = ({
             <FlatList
               data={categories}
               keyExtractor={(item) => item.category_id}
-              renderItem={renderModalItem} // Use renderModalItem for modal
+              renderItem={renderModalItem}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.drawerFlatListContent}
             />
@@ -229,7 +201,7 @@ const styles = StyleSheet.create({
   drawerContent: {
     backgroundColor: "rgba(0,0,0,0.7)",
     // padding: 20,
-    gap: 10,
+    gap: 2,
     // borderTopLeftRadius: 20,
     // borderTopRightRadius: 20,
     maxHeight: "90%",
@@ -243,13 +215,13 @@ const styles = StyleSheet.create({
   modalItem: {
     paddingVertical: 8,
     paddingHorizontal: 10,
-    backgroundColor: Colors.secBackground,
+    backgroundColor: Colors.tint,
     borderRadius: 8,
     marginVertical: 8,
   },
 
   modalCategoryText: {
-    color: Colors.white,
+    color: Colors.secBackground,
     fontSize: 14,
   },
 });

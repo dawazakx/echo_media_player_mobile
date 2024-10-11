@@ -28,6 +28,8 @@ import PlaylistDetails from "@/screens/tabs/settings/managePlaylist/PlaylistDeta
 import { useNavigationState } from "@react-navigation/native";
 import AllTvShows from "@/screens/tabs/tvshows/AllTvShows";
 import MoviesTab from "@/screens/tabs/movies/MoviesTab";
+import { Image } from "expo-image";
+import { View } from "react-native";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<MoviesStackParamList>();
@@ -171,13 +173,19 @@ export default function Tabs() {
         options={{
           title: "Settings",
           tabBarStyle: { display: "none" },
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons
-              name="settings"
-              color={color}
-              size={28}
-              style={{ marginBottom: -3 }}
-            />
+          tabBarIcon: () => (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Image
+                source={require("../assets/logo.png")}
+                style={{ width: 28, height: 28 }}
+              />
+            </View>
           ),
         }}
       />
