@@ -21,7 +21,10 @@ type UseGetStreamUrlEpisodeOptions = {
   episode: Episode;
 };
 
-type UseGetStreamUrlOptionsUnion = UseGetStreamUrlStreamOptions | UseGetStreamUrlOptions | UseGetStreamUrlEpisodeOptions;
+type UseGetStreamUrlOptionsUnion =
+  | UseGetStreamUrlStreamOptions
+  | UseGetStreamUrlOptions
+  | UseGetStreamUrlEpisodeOptions;
 
 const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
   const { activePlaylist } = useContext(PlaylistContext);
@@ -36,7 +39,7 @@ const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
     } else if ("episode" in options) {
       id = options.episode.id;
       containerExtension = options.episode.container_extension;
-    } else if("stream" in options) {
+    } else if ("stream" in options) {
       id = options.stream.stream_id;
       containerExtension = "mkv";
     } else {
@@ -53,12 +56,17 @@ const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
         },
       }
     );
-
+    console.log("stream-id", id);
     return response.data.streamURL;
   };
-  
+
+  const queryKey =
+    "episode" in options
+      ? [QUERY_KEYS.streamUrl, options.episode.id]
+      : [QUERY_KEYS.streamUrl];
+
   return useQuery({
-    queryKey: [QUERY_KEYS.streamUrl],
+    queryKey,
     queryFn: getStreamUrl,
   });
 };

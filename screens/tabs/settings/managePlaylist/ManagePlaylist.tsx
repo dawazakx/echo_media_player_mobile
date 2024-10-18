@@ -107,7 +107,7 @@ const ManagePlaylist = ({ navigation }) => {
             <Pressable
               onPress={() => {
                 setActivePlaylist(playlist);
-                navigation.navigate(PLAYER_INDEX_ROUTE);
+                navigation.popToTop(PLAYER_INDEX_ROUTE);
               }}
             >
               {activePlaylist?._id === playlist._id ? (

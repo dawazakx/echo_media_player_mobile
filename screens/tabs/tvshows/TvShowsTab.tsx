@@ -41,6 +41,7 @@ import Animated, {
 } from "react-native-reanimated";
 import TvShowsCategoryGroup from "@/components/TvShowsCategoryGroup";
 import useGetTvShowsCategories from "@/hooks/api/useGetTvShowsCategories";
+import useInvalidateOnPlaylistChange from "@/hooks/api/useInvalidateOnPlaylistChange";
 
 export interface TvShowsProps {
   navigation: BottomTabScreenProps<TabParamList, "TvShows">;
@@ -64,6 +65,7 @@ interface RenderItemProps {
 }
 
 const TvShowsTab: React.FC<TvShowsProps> = ({ navigation, route }) => {
+  useInvalidateOnPlaylistChange();
   const tabBarHeight = useBottomTabBarHeight();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);

@@ -73,28 +73,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
     );
   }
 
-  const handleWatchNow = async () => {
-    if (!deviceId) {
-      console.error("Device ID is required to fetch the stream URL");
-      return;
-    }
-
-    try {
-      const streamUrl = await fetchStreamUrl(deviceId, tvshow);
-      if (streamUrl) {
-        setStreamUrl(streamUrl);
-        // Navigate to the video player screen or handle the stream URL as needed
-        navigation.navigate("VideoPlayer", {
-          streamUrl: streamUrl,
-          title: seriesDetails?.title,
-        });
-      } else {
-        console.error("Failed to fetch the stream URL");
-      }
-    } catch (error) {
-      console.error("Error fetching stream URL:", error);
-    }
-  };
+  const handleWatchNow = async () => {};
 
   const SegmentSwitcher = ({ activeSegment, setActiveSegment }) => {
     return (
@@ -183,6 +162,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
               <OverviewSegment seriesDetails={seriesDetails} />
             ) : (
               <EpisodeSegment
+                navigation={navigation}
                 seasonsWithEpisodes={seasonsWithEpisodes}
                 episodes={seriesDetails.episodes[selectedSeason]}
                 modalVisible={modalVisible}

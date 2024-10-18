@@ -41,6 +41,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import useGetMovieCategories from "@/hooks/api/useGetMovieCategories";
+import useInvalidateOnPlaylistChange from "@/hooks/api/useInvalidateOnPlaylistChange";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -64,6 +65,7 @@ interface RenderItemProps {
 }
 
 const MoviesTab: React.FC<MoviesProps> = ({ navigation, route }) => {
+  useInvalidateOnPlaylistChange();
   const tabBarHeight = useBottomTabBarHeight();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);

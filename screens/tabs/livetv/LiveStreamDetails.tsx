@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -19,58 +20,66 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import useGetStreamUrl from "@/hooks/api/useStreamUrl";
 
 import { Colors } from "@/constants/Colors";
+import useEpgData from "@/hooks/api/useEpgData";
+import { Buffer } from "buffer";
 
 const LiveStreamDetails = ({ navigation, route }) => {
   const { stream } = route.params;
   const { data: streamUrl } = useGetStreamUrl({ stream });
+  const { data: epgData, isLoading: isEpgLoading } = useEpgData({
+    channelId: stream.stream_id,
+  });
+  const [epgListings, setEpgListings] = useState([]);
 
-  // Dummy data for schedule flatlist
-  const scheduleData = [
-    { id: "1", day: "Monday", shows: ["Show 1", "Show 2", "Show 3"] },
-    { id: "2", day: "Tuesday", shows: ["Show 4", "Show 5", "Show 6"] },
-    { id: "3", day: "Wednesday", shows: ["Show 7", "Show 8", "Show 9"] },
-    // { id: "4", day: "Thursday", shows: ["Show 10", "Show 11", "Show 12"] },
-    // { id: "5", day: "Friday", shows: ["Show 13", "Show 14", "Show 15"] },
-  ];
-  const [selectedOption, setSelectedOption] = useState("Monday");
-  const days = ["Monday", "Tuesday", "Wednesday"];
+  const handleGoBack = () => navigation.goBack();
 
-  // Function to render each day in the schedule flatlist
-  const renderScheduleItem = ({ item }) => (
-    <TouchableOpacity style={styles.scheduleItem}>
-      <Text style={styles.dayText}>{item.day}</Text>
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    if (epgData && epgData.epg_listings) {
+      const decodedListings = epgData.epg_listings.map((item) => ({
+        ...item,
+        title: Buffer.from(item.title, "base64").toString("utf-8"),
+        description: Buffer.from(item.description, "base64").toString("utf-8"),
+      }));
+      setEpgListings(decodedListings);
+    }
+  }, [epgData]);
+
+  // Function to format the date and time
+  const formatDateTime = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+
+    return date.toLocaleDateString("en-US", options);
+  };
+
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.programContainer}>
+        <Text style={styles.programTitle}>{item.title}</Text>
+        <Text style={styles.programDescription}>{item.description}</Text>
+        <Text style={styles.programTime}>
+          {formatDateTime(item.start)} - {formatDateTime(item.end)}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      <View
-        style={{
-          position: "absolute",
-          top: 40,
-          left: 12,
-          zIndex: 10,
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "transparent",
-            padding: 8,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={30} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
+
       {/* Video Player Component */}
       <View style={styles.videoPlayerContainer}>
         <VideoPlayer streamUrl={streamUrl} />
       </View>
-      
 
       {/* Stream Info */}
       <View style={styles.streamInfoContainer}>
@@ -98,113 +107,24 @@ const LiveStreamDetails = ({ navigation, route }) => {
       </View>
 
       {/* Schedule */}
-      <View style={styles.scheduleContainer}>
-        {/* <FlatList
-          data={scheduleData}
-          keyExtractor={(item) => item.id}
-          renderItem={renderScheduleItem}
-          horizontal
-        /> */}
-        <SegmentedControl
-          options={days}
-          selectedOption={selectedOption}
-          onOptionPress={setSelectedOption}
-        />
-        {/* Placeholder for show details based on selected day */}
-        <Pressable
-          style={{
-            gap: 2,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 10,
-            backgroundColor: "#666",
-            borderRadius: 10,
-            width: "100%",
-          }}
-          onPress={() => {}}
-        >
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <View>
-              <CustomText type="defaultSemiBold">06:00 AM </CustomText>
-            </View>
-            <View>
-              <CustomText type="defaultSemiBold">show 1</CustomText>
-            </View>
-          </View>
-          <MaterialIcons name="connected-tv" size={24} color={Colors.white} />
-        </Pressable>
-        <Pressable
-          style={{
-            gap: 2,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 10,
-            backgroundColor: "#666",
-            borderRadius: 10,
-            width: "100%",
-          }}
-          onPress={() => {}}
-        >
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <View>
-              <CustomText type="defaultSemiBold">06:00 AM </CustomText>
-            </View>
-            <View>
-              <CustomText type="defaultSemiBold">show 1</CustomText>
-            </View>
-          </View>
-          <MaterialIcons name="connected-tv" size={24} color={Colors.white} />
-        </Pressable>
-        <Pressable
-          style={{
-            gap: 2,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 10,
-            backgroundColor: "#666",
-            borderRadius: 10,
-            width: "100%",
-          }}
-          onPress={() => {}}
-        >
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <View>
-              <CustomText type="defaultSemiBold">06:00 AM </CustomText>
-            </View>
-            <View>
-              <CustomText type="defaultSemiBold">show 1</CustomText>
-            </View>
-          </View>
-          <MaterialIcons name="connected-tv" size={24} color={Colors.white} />
-        </Pressable>
-        <Pressable
-          style={{
-            gap: 2,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 10,
-            backgroundColor: "#666",
-            borderRadius: 10,
-            width: "100%",
-          }}
-          onPress={() => {}}
-        >
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <View>
-              <CustomText type="defaultSemiBold">06:00 AM </CustomText>
-            </View>
-            <View>
-              <CustomText type="defaultSemiBold">show 1</CustomText>
-            </View>
-          </View>
-          <MaterialIcons name="connected-tv" size={24} color={Colors.white} />
-        </Pressable>
-        {/* Implement logic to display shows based on selected day */}
-      </View>
+      {epgData?.epg_listings?.length ? (
+        <View style={styles.listContainer}>
+          {isEpgLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <FlatList
+              data={epgListings}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={styles.listContainer}
+            />
+          )}
+        </View>
+      ) : (
+        <View style={styles.listContainer}>
+          <CustomText>No schedule available</CustomText>
+        </View>
+      )}
     </View>
   );
 };
@@ -253,20 +173,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
   },
-  scheduleContainer: {
-    padding: 10,
-    gap: 20,
+  listContainer: {
+    padding: 16,
+    backgroundColor: Colors.secBackground,
   },
-  scheduleItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 15,
-    backgroundColor: "#f0f0f0",
-    marginRight: 10,
+  programContainer: {
+    backgroundColor: Colors.secBackground,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
-  dayText: {
-    fontSize: 16,
+  programTitle: {
+    fontSize: 18,
     fontWeight: "bold",
+    color: Colors.white,
+    marginBottom: 6,
+  },
+  programDescription: {
+    fontSize: 14,
+    color: Colors.white,
+    marginBottom: 6,
+  },
+  programTime: {
+    fontSize: 12,
+    color: "#888",
   },
 });
 

@@ -21,12 +21,14 @@ import { Colors } from "@/constants/Colors";
 import useGetSearchResult from "@/hooks/api/useGetSearchResult";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import { LiveStream, Movie, Show } from "@/types";
+import useInvalidateOnPlaylistChange from "@/hooks/api/useInvalidateOnPlaylistChange";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 
 const { width, height } = Dimensions.get("window");
 
 const SearchScreen = ({ navigation }) => {
+  useInvalidateOnPlaylistChange();
   const { deviceId } = useContext(DeviceContext);
   const [query, setQuery] = useState("");
   const [activeSegment, setActiveSegment] = useState("movies");

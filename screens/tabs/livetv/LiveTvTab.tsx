@@ -15,6 +15,7 @@ import useGetLiveStreamCategories from "@/hooks/api/useGetLiveStreamCategories";
 
 import { Colors } from "@/constants/Colors";
 import { TabParamList } from "@/constants/types";
+import useInvalidateOnPlaylistChange from "@/hooks/api/useInvalidateOnPlaylistChange";
 
 export interface LiveTvProps {
   navigation: BottomTabScreenProps<TabParamList, "LiveTV">;
@@ -22,7 +23,9 @@ export interface LiveTvProps {
 }
 
 const LiveTvTab: React.FC<LiveTvProps> = ({ navigation, route }) => {
+  useInvalidateOnPlaylistChange();
   const tabBarHeight = useBottomTabBarHeight();
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null
   );

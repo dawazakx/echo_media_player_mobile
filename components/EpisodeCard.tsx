@@ -15,6 +15,7 @@ const EpisodeCard = ({ episode, navigation }: EpisodeCardProps) => {
 
   const handlePress = async () => {
     if (StreamUrl) {
+      console.log(StreamUrl);
       navigation.navigate("VideoPlayer", {
         streamUrl: StreamUrl,
         title: episode.title,

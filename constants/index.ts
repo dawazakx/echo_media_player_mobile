@@ -10,6 +10,7 @@ export const QUERY_KEYS = {
   seriesDetails: "seriesDetails",
   streamUrl: "streamUrl",
   searchResult: "searchResult",
+  liveStreamEpg: "liveStreamEpg",
 };
 
 export const STORAGE_KEYS = {
