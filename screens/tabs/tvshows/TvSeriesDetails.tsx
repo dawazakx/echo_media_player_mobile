@@ -1,10 +1,10 @@
 import React, { useContext, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Text,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { TvShowsStackParamList } from "@/constants/types";
@@ -18,9 +18,11 @@ import { HeaderImage } from "@/components/details/HeaderImage";
 import { Banner } from "@/components/details/Banner";
 import { OverviewSegment } from "@/components/details/OverviewSegment";
 import { EpisodeSegment } from "@/components/details/EpisodeSegment";
-import { fetchStreamUrl } from "@/providers/api";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import useGetSeriesDetails from "@/hooks/api/useGetSeriesDetails";
+import useGetTvShowStreamUrl from "@/hooks/api/useGetTvShowStreamUrl";
+import { CustomText } from "@/components/Text";
+import { Episode } from "@/types";
 
 type TvShowDetailsProps = {
   route: RouteProp<TvShowsStackParamList, "TvSeriesDetails">;
@@ -38,7 +40,6 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
   const { deviceId } = useContext(DeviceContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState(1);
-  // const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [activeSegment, setActiveSegment] = useState("overview");
 
   const { data: seriesDetails, isLoading: isLoadingDetails } =
@@ -52,28 +53,28 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
       (season) => episodes[season].length > 0
     );
   };
-  // console.log(seriesDetails?.episodes);
-  // Filter seasons to include only those with episodes
-  let seasonsWithEpisodes = [];
+
+  let seasonsWithEpisodes: string[] = [];
 
   if (seriesDetails?.episodes) {
     seasonsWithEpisodes = filterSeasonsWithEpisodes(seriesDetails?.episodes);
-  } else {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: Colors.secBackground,
-        }}
-      >
-        <ActivityIndicator size="large" color={Colors.white} />
-      </View>
-    );
   }
 
-  const handleWatchNow = async () => {};
+  const firstSeason = seasonsWithEpisodes[0];
+  const firstEpisode = seriesDetails?.episodes?.[firstSeason]?.[0];
+
+  const { data: streamUrl } = useGetTvShowStreamUrl(
+    firstEpisode ? firstEpisode : ({} as Episode)
+  );
+
+  const handleWatchNow = () => {
+    if (streamUrl && firstEpisode) {
+      navigation.navigate("VideoPlayer", {
+        streamUrl,
+        title: firstEpisode.title,
+      });
+    }
+  };
 
   const SegmentSwitcher = ({ activeSegment, setActiveSegment }) => {
     return (
@@ -102,35 +103,23 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
 
   if (isLoadingDetails) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: Colors.secBackground,
-        }}
-      >
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.white} />
+        <CustomText style={styles.loadingText}>Loading content...</CustomText>
       </View>
     );
   }
 
   if (!seriesDetails) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: Colors.secBackground,
-        }}
-      >
-        <Text style={{ color: Colors.background }}>
-          Failed to load movie details
-        </Text>
+      <View style={styles.errorContainer}>
+        <CustomText style={styles.errorText}>
+          Failed to load series details
+        </CustomText>
       </View>
     );
   }
+
   return (
     <>
       <StatusBar style="light" />
@@ -140,13 +129,7 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
           <HeaderImage seriesDetails={seriesDetails} navigation={navigation} />
         }
       >
-        <View
-          style={{
-            // marginTop: -(height * 0.095),
-            paddingVertical: 10,
-            backgroundColor: "rgb(23 23 23)",
-          }}
-        >
+        <View style={styles.contentContainer}>
           <Banner
             seriesDetails={seriesDetails}
             handleWatchNow={handleWatchNow}
@@ -237,6 +220,29 @@ const styles = StyleSheet.create({
   },
   seasonText: {
     fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.secBackground,
+  },
+  loadingText: {
+    color: Colors.white,
+    marginTop: 10,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.secBackground,
+  },
+  errorText: {
+    color: Colors.white,
+  },
+  contentContainer: {
+    paddingVertical: 10,
+    backgroundColor: "rgb(23 23 23)",
   },
 });
 

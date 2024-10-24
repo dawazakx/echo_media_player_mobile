@@ -2,7 +2,7 @@ import React from "react";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { CustomText } from "./Text";
-import useGetStreamUrl from "@/hooks/api/useStreamUrl";
+import useGetTvShowStreamUrl from "@/hooks/api/useGetTvShowStreamUrl";
 import { Episode } from "@/types";
 
 interface EpisodeCardProps {
@@ -11,25 +11,24 @@ interface EpisodeCardProps {
 }
 
 const EpisodeCard = ({ episode, navigation }: EpisodeCardProps) => {
-  const { data: StreamUrl } = useGetStreamUrl({ episode });
+  const { data: streamUrl } = useGetTvShowStreamUrl(episode);
 
   const handlePress = async () => {
-    if (StreamUrl) {
-      console.log(StreamUrl);
+    if (streamUrl) {
       navigation.navigate("VideoPlayer", {
-        streamUrl: StreamUrl,
+        streamUrl,
         title: episode.title,
       });
     }
   };
+
   return (
     <View key={episode.id.toString()} style={styles.episodeContainer}>
       <View style={styles.episodeContent}>
         <View style={styles.episodeImageContainer}>
           <Image
             source={{
-              uri:
-                episode.info.movie_image || "https://via.placeholder.com/150",
+              uri: episode.info.movie_image || "https://via.placeholder.com/150",
             }}
             style={styles.episodeImage}
             resizeMode="contain"
@@ -71,7 +70,6 @@ const styles = StyleSheet.create({
     left: "50%",
     transform: [{ translateX: -15 }, { translateY: -15 }],
   },
-
   episodeContent: {
     flexDirection: "row",
     justifyContent: "flex-start",
@@ -80,4 +78,5 @@ const styles = StyleSheet.create({
     padding: 5,
   },
 });
+
 export default EpisodeCard;

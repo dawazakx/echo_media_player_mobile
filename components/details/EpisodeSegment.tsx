@@ -38,7 +38,7 @@ export const EpisodeSegment = ({
   useEffect(() => {
     if (episodes) {
       setLoading(false);
-      console.log(episodes);
+      // console.log(episodes);
     }
   }, [episodes]);
 

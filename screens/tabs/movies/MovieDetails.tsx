@@ -26,6 +26,7 @@ import useGetMovieDetails from "@/hooks/api/useGetMovieDetails";
 import useGetStreamUrl from "@/hooks/api/useStreamUrl";
 import { DeviceContext } from "@/providers/DeviceProvider";
 import { MoviesStackParamList } from "@/constants/types";
+import useGetMovieStreamUrl from "@/hooks/api/useGetMovieStreamUrl";
 
 type MovieDetailsProps = {
   route: RouteProp<MoviesStackParamList, "MovieDetails">;
@@ -56,7 +57,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ route, navigation }) => {
   const { deviceId } = useContext(DeviceContext);
 
   const { data, isLoading, error } = useGetMovieDetails(movie);
-  const { data: streamUrl } = useGetStreamUrl({ movie });
+  const { data: streamUrl } = useGetMovieStreamUrl( movie );
 
   const movieCast = data?.movieCast;
   const movieInfo = data?.movieInfo;

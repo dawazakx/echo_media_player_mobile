@@ -62,7 +62,7 @@ export const OverviewSegment: React.FC<OverviewSegmentProps> = ({
             {seriesDetails?.info?.cast}
           </CustomText>
         ) : (
-          <CustomText type="title">No Cast data available</CustomText>
+          <CustomText type="subtitle">No Cast data available</CustomText>
         )}
       </View>
       <View style={{ marginHorizontal: 16, marginVertical: 16, gap: 5 }}>
@@ -83,7 +83,7 @@ export const OverviewSegment: React.FC<OverviewSegmentProps> = ({
             }}
           />
         ) : (
-          <CustomText type="title">No trailers available</CustomText>
+          <CustomText type="subtitle">No trailers available</CustomText>
         )}
       </View>
     </View>
