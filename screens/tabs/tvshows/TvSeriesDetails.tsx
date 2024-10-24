@@ -76,7 +76,13 @@ const TvSeriesDetails: React.FC<TvShowDetailsProps> = ({
     }
   };
 
-  const SegmentSwitcher = ({ activeSegment, setActiveSegment }) => {
+  // Define an interface for the props
+  interface SegmentSwitcherProps {
+    activeSegment: string;
+    setActiveSegment: (segment: string) => void;
+  }
+
+  const SegmentSwitcher: React.FC<SegmentSwitcherProps> = ({ activeSegment, setActiveSegment }) => {
     return (
       <View style={styles.segmentSwitcher}>
         <TouchableOpacity

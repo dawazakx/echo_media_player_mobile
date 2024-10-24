@@ -29,13 +29,13 @@ export interface TvShowsProps {
   route?: RouteProp<TabParamList, "TvShows">;
   categories: Category[];
   flatListRef: RefObject<FlatList>;
-  onMovieLongPress: (movie: Show) => void;
+  onShowLongPress: (movie: Show) => void;
 }
 
 const TvShowsCategoryGroup = forwardRef<
   ElementRef<typeof FlatList<Category>>,
   TvShowsProps
->(({ navigation, categories, flatListRef, onMovieLongPress }, ref) => {
+>(({ navigation, categories, flatListRef, onShowLongPress }, ref) => {
   const renderCategorySection = ({ item }: { item: Category }) => {
     if (!item) {
       return null;
@@ -61,7 +61,7 @@ const TvShowsCategoryGroup = forwardRef<
         <TvShowsList
           categoryId={item.category_id}
           navigation={navigation}
-          onMovieLongPress={onMovieLongPress}
+          onShowLongPress={onShowLongPress}
         />
       </View>
     );
