@@ -8,6 +8,7 @@ import { SeriesProvider } from "./providers/SeriesProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import AppNavigator from "./navigation";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const queryClient = new QueryClient();
 
@@ -15,14 +16,13 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DeviceProvider>
-        <PlaylistProvider>
-          <SeriesProvider>
-            <QueryClientProvider client={queryClient}>
-              <StatusBar style="auto" />
-              <AppNavigator />
-            </QueryClientProvider>
-          </SeriesProvider>
+        <QueryClientProvider client={queryClient}>
+          <PlaylistProvider>
+            <BottomSheetModalProvider>
+              <AppNavigator/>
+            </BottomSheetModalProvider>
         </PlaylistProvider>
+        </QueryClientProvider>
       </DeviceProvider>
     </GestureHandlerRootView>
   );
