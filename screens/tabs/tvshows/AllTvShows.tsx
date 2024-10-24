@@ -42,7 +42,7 @@ const AllTvShows: React.FC<AllTvShowsProps> = ({ route, navigation }) => {
   const renderMovieItem = ({ item }: { item: Show }) => (
     <Pressable
       style={styles.movieItem}
-      onPress={() => navigation.navigate("TvSeriesDetails", { movie: item })}
+      onPress={() => navigation.navigate("TvSeriesDetails", { tvshow: item })}
     >
       <Image
         source={{ uri: item.cover || PLACEHOLDER_IMAGE }}

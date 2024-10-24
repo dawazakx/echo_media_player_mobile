@@ -44,7 +44,7 @@ const MovieCategoryGroup = forwardRef<
     return (
       <View key={item.category_id} style={styles.categorySection}>
         <View style={styles.categoryHeader}>
-          <CustomText type="subtitle" style={styles.categoryTitle}>
+          <CustomText type="subtitle" style={styles.categoryTitle} numberOfLines={1}>
             {item.category_name}
           </CustomText>
           <Pressable
@@ -54,7 +54,7 @@ const MovieCategoryGroup = forwardRef<
               })
             }
           >
-            <CustomText type="default">See All</CustomText>
+            <CustomText type="default" style={styles.seeAllText}>See All</CustomText>
           </Pressable>
         </View>
 
@@ -109,8 +109,11 @@ const styles = StyleSheet.create({
   },
 
   categoryTitle: {
-    marginLeft: 10,
-    marginVertical: 10,
+    flex: 1,
+    marginRight: 10,
+  },
+  seeAllText: {
+    minWidth: 50, // Ensure minimum width for "See All"
   },
 });
 
