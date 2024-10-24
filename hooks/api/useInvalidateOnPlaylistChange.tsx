@@ -4,11 +4,13 @@ import { PlaylistContext } from "@/providers/PlaylistProvider";
 
 const useInvalidateOnPlaylistChange = () => {
   const queryClient = useQueryClient();
-  const { activePlaylist } = useContext(PlaylistContext);
+  const { activePlaylist, isPlaylistChanging } = useContext(PlaylistContext);
 
   useEffect(() => {
-    queryClient.invalidateQueries();
-  }, [activePlaylist, queryClient]);
+    if (isPlaylistChanging) {
+      queryClient.invalidateQueries();
+    }
+  }, [isPlaylistChanging, queryClient]);
 };
 
 export default useInvalidateOnPlaylistChange;

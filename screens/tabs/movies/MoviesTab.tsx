@@ -2,10 +2,13 @@ import React, {
   useState,
   useRef,
   useCallback,
+  useContext,
 } from "react";
 import {
   View,
   FlatList,
+  StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import {
   BottomTabScreenProps,
@@ -23,6 +26,8 @@ import { Movie } from "@/types";
 import PopularMoviesSection from "./components/PopularMoviesSection";
 import MovieCategoriesSection from "./components/MovieCategoriesSection";
 import MovieBottomSheet from "./components/MovieBottomSheet";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+import { CustomView } from "@/components/View";
 
 export interface MoviesProps {
   navigation: BottomTabScreenProps<TabParamList, "Movies">;
@@ -36,6 +41,8 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation }) => {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const { isPlaylistChanging } = useContext(PlaylistContext);
+
 
   const { data: categories, isLoading } = useGetMovieCategories();
 
@@ -59,8 +66,12 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation }) => {
     bottomSheetRef.current?.expand();
   }, []);
 
-  if (isLoading) {
-    return null; 
+  if (isLoading || isPlaylistChanging) {
+    return (
+      <CustomView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.white} />
+      </CustomView>
+    );
   }
 
   return (
@@ -92,5 +103,14 @@ const MoviesTab: React.FC<MoviesProps> = ({ navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.secBackground,
+  },
+});
 
 export default MoviesTab;

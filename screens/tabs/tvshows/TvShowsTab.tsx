@@ -2,10 +2,13 @@ import React, {
   useState,
   useRef,
   useCallback,
+  useContext,
 } from "react";
 import {
   View,
   FlatList,
+  ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import {
   BottomTabScreenProps,
@@ -23,6 +26,8 @@ import { Show } from "@/types";
 import TopRatedShowsSection from "./components/TopRatedShowsSection";
 import TvShowsCategoriesSection from "./components/TvShowsCategoriesSection";
 import TvShowBottomSheet from "./components/TvShowBottomSheet";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+import { CustomView } from "@/components/View";
 
 export interface TvShowsProps {
   navigation: BottomTabScreenProps<TabParamList, "TvShows">;
@@ -36,6 +41,8 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation }) => {
   const [selectedShow, setSelectedShow] = useState<Show | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const { isPlaylistChanging } = useContext(PlaylistContext);
+
 
   const { data: categories, isLoading } = useGetTvShowsCategories();
 
@@ -59,8 +66,12 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation }) => {
     bottomSheetRef.current?.expand();
   }, []);
 
-  if (isLoading) {
-    return null; 
+  if (isLoading || isPlaylistChanging) {
+    return (
+      <CustomView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.white} />
+      </CustomView>
+    );
   }
 
   return (
@@ -92,5 +103,14 @@ const TvShowsTab: React.FC<TvShowsProps> = ({ navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.secBackground,
+  },
+});
 
 export default TvShowsTab;

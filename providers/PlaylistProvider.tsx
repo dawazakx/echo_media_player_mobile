@@ -13,6 +13,7 @@ type PlaylistContextProps = {
   setActivePlaylist: Dispatch<SetStateAction<Playlist | null>>;
   setUserPlaylists: Dispatch<SetStateAction<Playlist[]>>;
   switchPlaylist: (playlistId: string) => void;
+  isPlaylistChanging: boolean;
 }
 
 const initialContext: PlaylistContextProps = {
@@ -21,6 +22,7 @@ const initialContext: PlaylistContextProps = {
   userPlaylists: [],
   setUserPlaylists: () => {},
   switchPlaylist: () => {},
+  isPlaylistChanging: false,
 };
 
 export const PlaylistContext = createContext(initialContext);
@@ -28,6 +30,7 @@ export const PlaylistContext = createContext(initialContext);
 export const PlaylistProvider = ({ children }: ReactChildrenProps) => {
   const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null);
   const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
+  const [isPlaylistChanging, setIsPlaylistChanging] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -60,21 +63,19 @@ export const PlaylistProvider = ({ children }: ReactChildrenProps) => {
     }
   }, [userPlaylists]);
 
-  const switchPlaylist = (playlistId: string) => {
+  const switchPlaylist = async (playlistId: string) => {
     const newActivePlaylist = userPlaylists.find(playlist => playlist._id === playlistId);
     if (newActivePlaylist && newActivePlaylist._id !== activePlaylist?._id) {
+      setIsPlaylistChanging(true);
       setActivePlaylist(newActivePlaylist);
       
       // Invalidate queries that depend on the playlist
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.liveStreamCategories] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.liveStreamContent] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.movieCategories] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.movieContent] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.tvShowsCategories] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.tvShowsContent] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.searchResult] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.liveStreamEpg] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.streamUrl] });
+      await queryClient.invalidateQueries();
+      
+      // Refetch all queries
+      await queryClient.refetchQueries();
+      
+      setIsPlaylistChanging(false);
     }
   };
 
@@ -85,7 +86,8 @@ export const PlaylistProvider = ({ children }: ReactChildrenProps) => {
         setActivePlaylist,
         userPlaylists,
         setUserPlaylists,
-        switchPlaylist
+        switchPlaylist,
+        isPlaylistChanging
       }}
     >
       {children}

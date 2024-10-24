@@ -1,15 +1,15 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { CustomText } from './Text';
 import { PlaylistContext } from '@/providers/PlaylistProvider';
 import { Colors } from '@/constants/Colors';
 
 const PlaylistBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
-  const { userPlaylists, activePlaylist, switchPlaylist } = useContext(PlaylistContext);
+  const { userPlaylists, activePlaylist, switchPlaylist, isPlaylistChanging } = useContext(PlaylistContext);
 
-  const handlePlaylistSelect = useCallback((playlistId: string) => {
-    switchPlaylist(playlistId);
+  const handlePlaylistSelect = useCallback(async (playlistId: string) => {
+    await switchPlaylist(playlistId);
     (ref as React.RefObject<BottomSheetModal>).current?.dismiss();
   }, [switchPlaylist]);
 
@@ -20,12 +20,16 @@ const PlaylistBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         item._id === activePlaylist?._id && styles.activePlaylistItem,
       ]}
       onPress={() => handlePlaylistSelect(item._id)}
+      disabled={isPlaylistChanging}
     >
       <CustomText type="defaultSemiBold" style={styles.playlistName}>
         {item.nickname}
       </CustomText>
+      {isPlaylistChanging && item._id === activePlaylist?._id && (
+        <ActivityIndicator size="small" color={Colors.white} />
+      )}
     </Pressable>
-  ), [activePlaylist, handlePlaylistSelect]);
+  ), [activePlaylist, handlePlaylistSelect, isPlaylistChanging]);
 
   return (
     <BottomSheetModal
@@ -74,6 +78,9 @@ const styles = StyleSheet.create({
       paddingHorizontal: 16,
       borderBottomWidth: 1,
       borderBottomColor: '#374151',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
     activePlaylistItem: {
       backgroundColor: '#374151',

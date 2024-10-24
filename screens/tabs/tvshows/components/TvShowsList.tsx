@@ -38,7 +38,7 @@ const TvShowsList = memo(
     const [page, setPage] = useState(1);
     const [localTvShows, setLocalTvShows] = useState<Show[]>([]);
 
-    const { data: tvshows, status, error } = useGetTvShowsContent();
+    const { data: tvshows, status, error } = useGetTvShowsContent(categoryId);
 
     useEffect(() => {
       if (tvshows) {

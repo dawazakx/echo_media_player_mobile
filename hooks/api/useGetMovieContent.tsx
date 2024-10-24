@@ -9,12 +9,12 @@ import type { Movie } from "@/types";
 import { BASE_URL } from "@/constants/api";
 import { QUERY_KEYS } from "@/constants";
 
-const useGetMovieContent = () => {
+const useGetMovieContent = (categoryId: string) => {
   const { activePlaylist } = useContext(PlaylistContext);
 
   const getMovieContent = async (): Promise<Movie[]> => {
     const response = await axios.get(
-      `${BASE_URL}vod-stream?category_id=${""}`,
+      `${BASE_URL}vod-stream?category_id=${categoryId}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -28,8 +28,9 @@ const useGetMovieContent = () => {
   };
 
   return useQuery({
-    queryKey: [QUERY_KEYS.movieContent],
+    queryKey: [QUERY_KEYS.movieContent, categoryId],
     queryFn: getMovieContent,
+    enabled: !!categoryId, // Only run query if categoryId is provided
   });
 };
 

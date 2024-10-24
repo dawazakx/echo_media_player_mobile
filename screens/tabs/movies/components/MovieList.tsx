@@ -27,7 +27,7 @@ const MovieList: React.FC<MovieListProps> = ({
   const [page, setPage] = useState(1);
   const [localMovies, setLocalMovies] = useState<Movie[]>([]);
 
-  const { data: allMovies, status, error } = useGetMovieContent();
+  const { data: allMovies, status, error } = useGetMovieContent(categoryId);
 
   useEffect(() => {
     if (allMovies) {

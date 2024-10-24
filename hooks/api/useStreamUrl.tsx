@@ -32,22 +32,26 @@ const useGetStreamUrl = (options: UseGetStreamUrlOptionsUnion) => {
   const getStreamUrl = async () => {
     let id: string | number;
     let containerExtension: string;
+    let endpoint: string;
 
     if ("movie" in options) {
       id = options.movie.stream_id;
       containerExtension = options.movie.container_extension;
+      endpoint = `${BASE_URL}stream-url`;
     } else if ("episode" in options) {
       id = options.episode.id;
       containerExtension = options.episode.container_extension;
+      endpoint = `${BASE_URL}series-url`;
     } else if ("stream" in options) {
       id = options.stream.stream_id;
       containerExtension = "mkv";
+      endpoint = `${BASE_URL}live-url`;
     } else {
       throw new Error("Invalid options object");
     }
 
     const response = await axios.get(
-      `${BASE_URL}stream-url?stream_id=${id}&stream_extension=${containerExtension}`,
+      `${endpoint}?stream_id=${id}&stream_extension=${containerExtension}`,
       {
         headers: {
           "Content-Type": "application/json",
