@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import AppNavigator from "./navigation";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import Toast from "react-native-toast-message";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ export default function App() {
         </PlaylistProvider>
         </QueryClientProvider>
       </DeviceProvider>
+      <Toast />
     </GestureHandlerRootView>
   );
 }

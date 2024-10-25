@@ -1,6 +1,9 @@
 import React, { useContext, useEffect } from "react";
-import { View, Image } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Feather } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+import * as Clipboard from 'expo-clipboard';
 
 import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
@@ -18,7 +21,6 @@ import {
   ADD_PLAYLIST_ROUTE,
   PLAYER_INDEX_ROUTE,
 } from "@/constants/Routes";
-import { Feather } from "@expo/vector-icons";
 
 export interface HomeProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -43,6 +45,17 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
       generateDeviceId({
         type: "mobile",
         os: "android",
+      });
+    }
+  };
+
+  const copyToClipboard = async () => {
+    if (deviceId) {
+      await Clipboard.setStringAsync(deviceId);
+      Toast.show({
+        type: "success",
+        text1: "Device ID copied to clipboard",
+        position: "bottom",
       });
     }
   };
@@ -104,9 +117,11 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
       </View>
 
       <View style={{ alignItems: "center", paddingTop: 90 }}>
-        <CustomText type="extraSmall" style={{ color: "gray" }}>
-          Device ID: {deviceId}
-        </CustomText>
+        <TouchableOpacity onPress={copyToClipboard}>
+          <CustomText type="extraSmall" style={{ color: "gray" }}>
+            Device ID: {deviceId}  <Feather name="copy" size={14} color="gray" />
+          </CustomText>
+        </TouchableOpacity>
       </View>
     </View>
   );
