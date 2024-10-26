@@ -3,16 +3,18 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import HomeScreen from "../screens/Home";
-import SearchScreen from "@/screens/SearchScreen";
-
 import PlaylistNavigator from "@/Navigators/PlaylistNavigator";
 import Tabs from "@/Navigators/TabNavigator";
-import MovieDetails from "@/screens/MovieDetails";
+
+import HomeScreen from "@/screens/Home";
+import SearchScreen from "@/screens/SearchScreen";
 import VideoPlayer from "@/screens/VideoPlayer";
-import LiveStreamDetails from "@/screens/LiveStreamDetails";
-import TvSeriesDetails from "@/screens/TvSeriesDetails";
+import LiveStreamDetails from "@/screens/tabs/livetv/LiveStreamDetails";
+import TvSeriesDetails from "@/screens/tabs/tvshows/TvSeriesDetails";
+
 import { RootStackParamList } from "@/constants/types";
+import MovieDetails from "@/screens/tabs/movies/MovieDetails";
+import PlaylistSelect from "@/screens/PlaylistSelect";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,6 +37,7 @@ function AppNavigator() {
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="Welcome" component={HomeScreen} />
+          <Stack.Screen name="Select" component={PlaylistSelect} />
           <Stack.Screen name="Playlist" component={PlaylistNavigator} />
           <Stack.Screen name="Home" component={Tabs} />
           <Stack.Screen name="MovieDetails" component={MovieDetails} />

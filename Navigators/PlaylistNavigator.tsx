@@ -1,9 +1,12 @@
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import AddPlaylistScreen from "../screens/playlist/AddPlaylist";
-import XtremeForm from "../screens/playlist/layers/xtreme";
-import M3uForm from "../screens/playlist/layers/m3u";
-import LocalForm from "../screens/playlist/layers/local";
-import SelectPlaylistModal from "../screens/playlist/layers/SelectPlaylist";
+
+import AddPlaylistScreen from "@/screens/playlist/AddPlaylist";
+import XtremeForm from "@/screens/playlist/layers/xtreme";
+import M3uForm from "@/screens/playlist/layers/m3u";
+import LocalForm from "@/screens/playlist/layers/local";
+import SelectPlaylistModal from "@/screens/playlist/layers/SelectPlaylist";
+
 import { PlaylistStackParamList } from "@/constants/types";
 
 const Stack = createNativeStackNavigator<PlaylistStackParamList>();

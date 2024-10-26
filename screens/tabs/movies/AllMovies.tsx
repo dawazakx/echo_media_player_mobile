@@ -19,6 +19,7 @@ import { fetchMoviesByCategory } from "@/providers/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
+import useGetMovieContent from "@/hooks/api/useGetMovieContent";
 
 export interface AllMoviesProps {
   route: RouteProp<{ params: { category: Category } }, "params">;
@@ -30,13 +31,13 @@ const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const AllMovies: React.FC<AllMoviesProps> = ({ route, navigation }) => {
   const { category } = route.params;
   const insets = useSafeAreaInsets();
-  const { deviceId } = useContext(DeviceContext);
 
-  const moviesQuery = useQuery({
-    queryKey: ["movies", category.category_id],
-    queryFn: () => fetchMoviesByCategory(deviceId!, category.category_id),
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
+  const categoryId = category.category_id;
+  const { data: movies, isError } = useGetMovieContent();
+
+  const categorymovies = movies?.filter(
+    (movies) => movies.category_id === categoryId
+  );
 
   const renderMovieItem = ({ item }: { item: Movie }) => (
     <Pressable
@@ -48,6 +49,12 @@ const AllMovies: React.FC<AllMoviesProps> = ({ route, navigation }) => {
         style={styles.movieImage}
         resizeMode="contain"
       />
+      <CustomText
+        type="extraSmall"
+        style={{ textAlign: "center", color: "#9ca3af" }}
+      >
+        {item.name}
+      </CustomText>
       <View style={styles.ratingTag}>
         <CustomText type="extraSmall">
           {Number(item.rating).toFixed(1)}
@@ -56,7 +63,7 @@ const AllMovies: React.FC<AllMoviesProps> = ({ route, navigation }) => {
     </Pressable>
   );
 
-  if (moviesQuery.data) {
+  if (categorymovies) {
     return (
       <CustomView
         style={{
@@ -78,7 +85,7 @@ const AllMovies: React.FC<AllMoviesProps> = ({ route, navigation }) => {
           <CustomText type="subtitle">{category.category_name}</CustomText>
         </View>
         <FlatList
-          data={moviesQuery.data}
+          data={categorymovies}
           keyExtractor={(movie) => movie.stream_id.toString()}
           renderItem={renderMovieItem}
           numColumns={3}
@@ -88,10 +95,10 @@ const AllMovies: React.FC<AllMoviesProps> = ({ route, navigation }) => {
     );
   }
 
-  if (moviesQuery.error) {
+  if (isError) {
     return (
       <CustomView style={styles.loadingContainer}>
-        <Text>Error: {moviesQuery.error.message}</Text>
+        <Text>Error</Text>
       </CustomView>
     );
   }
@@ -123,6 +130,7 @@ const styles = StyleSheet.create({
   },
   moviesContainer: {
     padding: 10,
+    gap: 5,
   },
   movieItem: {
     width: "30%",
@@ -131,7 +139,7 @@ const styles = StyleSheet.create({
   },
   movieImage: {
     width: "100%",
-    height: "100%",
+    height: "90%",
     borderRadius: 10,
   },
   ratingTag: {

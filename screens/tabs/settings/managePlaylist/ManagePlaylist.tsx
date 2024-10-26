@@ -1,16 +1,24 @@
+import React, { useCallback, useContext, useRef, useState } from "react";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+import { DeviceContext } from "@/providers/DeviceProvider";
+
 import CustomButton from "@/components/Button";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
-import { Colors } from "@/constants/Colors";
-import { PlaylistContext } from "@/providers/PlaylistProvider";
+
 import { Feather, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { useCallback, useContext, useRef, useState } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Colors } from "@/constants/Colors";
+import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
+
 const ManagePlaylist = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { currentPlaylist } = useContext(PlaylistContext);
+  const { activePlaylist, setActivePlaylist, userPlaylists } =
+    useContext(PlaylistContext);
   const snapPoints = ["30%"];
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -67,7 +75,7 @@ const ManagePlaylist = ({ navigation }) => {
 
       <CustomView
         style={{
-          flexDirection: "row",
+          flexDirection: "column",
           gap: 15,
           marginHorizontal: 12,
           alignSelf: "center",
@@ -75,37 +83,49 @@ const ManagePlaylist = ({ navigation }) => {
           backgroundColor: "transparent",
         }}
       >
-        <Pressable
-          style={{
-            gap: 2,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 15,
-            backgroundColor: "#8492a6",
-            borderRadius: 10,
-            width: "100%",
-          }}
-          onPress={handleOpenPress}
-        >
-          <View>
-            <CustomText type="defaultSemiBold">
-              {currentPlaylist?.nickname}
-            </CustomText>
-            <CustomText type="extraSmall">{currentPlaylist?.url}</CustomText>
-          </View>
-          <MaterialIcons
-            name="radio-button-checked"
-            size={24}
-            color={Colors.tint}
-          />
-          {/* Implement toggle active playlist */}
-          {/* <MaterialIcons
-            name="radio-button-unchecked"
-            size={24}
-            color={Colors.tint}
-          /> */}
-        </Pressable>
+        {userPlaylists.map((playlist) => (
+          <Pressable
+            style={{
+              gap: 2,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: 15,
+              backgroundColor: "#8492a6",
+              borderRadius: 10,
+              width: "100%",
+            }}
+            onPress={handleOpenPress}
+            key={playlist?._id}
+          >
+            <View>
+              <CustomText type="defaultSemiBold">
+                {playlist?.nickname}
+              </CustomText>
+              <CustomText type="extraSmall">{playlist?.url}</CustomText>
+            </View>
+            <Pressable
+              onPress={() => {
+                setActivePlaylist(playlist);
+                navigation.popToTop(PLAYER_INDEX_ROUTE);
+              }}
+            >
+              {activePlaylist?._id === playlist._id ? (
+                <MaterialIcons
+                  name="radio-button-checked"
+                  size={24}
+                  color={Colors.tint}
+                />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={24}
+                  color={Colors.tint}
+                />
+              )}
+            </Pressable>
+          </Pressable>
+        ))}
       </CustomView>
 
       <BottomSheet
@@ -121,7 +141,7 @@ const ManagePlaylist = ({ navigation }) => {
           type="subtitle"
           style={{ textAlign: "center", marginTop: 5 }}
         >
-          {currentPlaylist?.nickname}
+          {activePlaylist?.nickname}
         </CustomText>
         <View
           style={{
@@ -132,6 +152,27 @@ const ManagePlaylist = ({ navigation }) => {
             marginTop: 10,
           }}
         >
+          <Pressable
+            style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+            onPress={() => {
+              navigation.navigate("PlaylistDetails", {
+                playlistId: activePlaylist?._id,
+              });
+            }}
+          >
+            <Feather name="info" size={22} color={Colors.background} />
+            <CustomText type="subtitle" style={{ color: Colors.background }}>
+              Details
+            </CustomText>
+          </Pressable>
+          <View
+            style={{
+              width: "88%",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderBottomColor: Colors.secBackground,
+              alignSelf: "flex-end",
+            }}
+          />
           <Pressable
             style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
           >
@@ -190,7 +231,7 @@ const ManagePlaylist = ({ navigation }) => {
           <Fontisto name="plus-a" size={24} color={Colors.background} />
         }
         textColor={Colors.background}
-        onPress={() => navigation.navigate("AddPlaylist")}
+        onPress={() => navigation.navigate("add-playlist")}
       />
 
       <Modal

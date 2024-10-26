@@ -1,0 +1,116 @@
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useContext,
+} from "react";
+import {
+  View,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
+import {
+  BottomTabScreenProps,
+  useBottomTabBarHeight,
+} from "@react-navigation/bottom-tabs";
+import { RouteProp } from "@react-navigation/native";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { TabParamList } from "@/constants/types";
+import { Colors } from "@/constants/Colors";
+import useGetTvShowsCategories from "@/hooks/api/useGetTvShowsCategories";
+import useInvalidateOnPlaylistChange from "@/hooks/api/useInvalidateOnPlaylistChange";
+import CategoryFilter from "@/components/CategoryFilter";
+
+import { Show } from "@/types";
+import TopRatedShowsSection from "./components/TopRatedShowsSection";
+import TvShowsCategoriesSection from "./components/TvShowsCategoriesSection";
+import TvShowBottomSheet from "./components/TvShowBottomSheet";
+import { PlaylistContext } from "@/providers/PlaylistProvider";
+import { CustomView } from "@/components/View";
+
+export interface TvShowsProps {
+  navigation: BottomTabScreenProps<TabParamList, "TvShows">;
+  route: RouteProp<TabParamList, "TvShows">;
+}
+
+const TvShowsTab: React.FC<TvShowsProps> = ({ navigation }) => {
+  useInvalidateOnPlaylistChange();
+  const tabBarHeight = useBottomTabBarHeight();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedShow, setSelectedShow] = useState<Show | null>(null);
+  const flatListRef = useRef<FlatList>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const { isPlaylistChanging } = useContext(PlaylistContext);
+
+
+  const { data: categories, isLoading } = useGetTvShowsCategories();
+
+  const handleCategoryPress = useCallback((categoryId: string) => {
+    setSelectedCategory(categoryId);
+    const categoryIndex = categories?.findIndex(
+      (category) => category.category_id === categoryId
+    );
+    if (flatListRef.current && categoryIndex !== -1) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToOffset({
+          offset: 262 * categoryIndex! + 428,
+          animated: true,
+        });
+      }, 100);
+    }
+  }, [categories]);
+
+  const handleShowLongPress = useCallback((show: Show) => {
+    setSelectedShow(show);
+    bottomSheetRef.current?.expand();
+  }, []);
+
+  if (isLoading || isPlaylistChanging) {
+    return (
+      <CustomView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.white} />
+      </CustomView>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: Colors.secBackground, marginBottom: tabBarHeight }}>
+      <CategoryFilter
+        categories={categories!}
+        selectedCategory={selectedCategory}
+        onSelect={handleCategoryPress}
+        filterRoute="AllTvShows"
+      />
+      <FlatList
+        ref={flatListRef}
+        data={[{ key: 'topRated' }, { key: 'categories' }]}
+        renderItem={({ item }) => (
+          item.key === 'topRated' 
+            ? <TopRatedShowsSection /> 
+            : <TvShowsCategoriesSection 
+                navigation={navigation}
+                categories={categories!}
+                onShowLongPress={handleShowLongPress}
+              />
+        )}
+        keyExtractor={(item) => item.key}
+      />
+      <TvShowBottomSheet
+        ref={bottomSheetRef}
+        selectedShow={selectedShow}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.secBackground,
+  },
+});
+
+export default TvShowsTab;

@@ -14,11 +14,12 @@ import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";
 import { DeviceContext } from "@/providers/DeviceProvider";
 
-import { Movie, Category } from "@/types";
+import { Movie, Category, Show } from "@/types";
 import { fetchMoviesByCategory } from "@/providers/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialIcons } from "@expo/vector-icons";
+import useGetTvShowsContent from "@/hooks/api/useGetTvShowsContent";
 
 export interface AllTvShowsProps {
   route: RouteProp<{ params: { category: Category } }, "params">;
@@ -30,24 +31,30 @@ const PLACEHOLDER_IMAGE = "https://placehold.co/400/000000/FFFFFF/png";
 const AllTvShows: React.FC<AllTvShowsProps> = ({ route, navigation }) => {
   const { category } = route.params;
   const insets = useSafeAreaInsets();
-  const { deviceId } = useContext(DeviceContext);
 
-  const moviesQuery = useQuery({
-    queryKey: ["movies", category.category_id],
-    queryFn: () => fetchMoviesByCategory(deviceId!, category.category_id),
-    staleTime: 20 * 60 * 1000, // 20 minutes
-  });
+  const categoryId = category.category_id;
+  const { data: tvshows, isError } = useGetTvShowsContent();
 
-  const renderMovieItem = ({ item }: { item: Movie }) => (
+  const categorytvshows = tvshows?.filter(
+    (tvshows) => tvshows.category_id === categoryId
+  );
+
+  const renderMovieItem = ({ item }: { item: Show }) => (
     <Pressable
       style={styles.movieItem}
-      onPress={() => navigation.navigate("TvSeriesDetails", { movie: item })}
+      onPress={() => navigation.navigate("TvSeriesDetails", { tvshow: item })}
     >
       <Image
-        source={{ uri: item.stream_icon || PLACEHOLDER_IMAGE }}
+        source={{ uri: item.cover || PLACEHOLDER_IMAGE }}
         style={styles.movieImage}
         resizeMode="contain"
       />
+      <CustomText
+        type="extraSmall"
+        style={{ textAlign: "center", color: "#9ca3af" }}
+      >
+        {item.name}
+      </CustomText>
       <View style={styles.ratingTag}>
         <CustomText type="extraSmall">
           {Number(item.rating).toFixed(1)}
@@ -56,7 +63,7 @@ const AllTvShows: React.FC<AllTvShowsProps> = ({ route, navigation }) => {
     </Pressable>
   );
 
-  if (moviesQuery.data) {
+  if (categorytvshows) {
     return (
       <CustomView
         style={{
@@ -78,8 +85,8 @@ const AllTvShows: React.FC<AllTvShowsProps> = ({ route, navigation }) => {
           <CustomText type="subtitle">{category.category_name}</CustomText>
         </View>
         <FlatList
-          data={moviesQuery.data}
-          keyExtractor={(movie) => movie.stream_id.toString()}
+          data={categorytvshows}
+          keyExtractor={(movie) => movie.series_id.toString()}
           renderItem={renderMovieItem}
           numColumns={3}
           contentContainerStyle={styles.moviesContainer}
@@ -88,10 +95,10 @@ const AllTvShows: React.FC<AllTvShowsProps> = ({ route, navigation }) => {
     );
   }
 
-  if (moviesQuery.error) {
+  if (isError) {
     return (
       <CustomView style={styles.loadingContainer}>
-        <Text>Error: {moviesQuery.error.message}</Text>
+        <Text>Error</Text>
       </CustomView>
     );
   }
@@ -123,6 +130,7 @@ const styles = StyleSheet.create({
   },
   moviesContainer: {
     padding: 10,
+    gap: 5,
   },
   movieItem: {
     width: "30%",
@@ -131,7 +139,7 @@ const styles = StyleSheet.create({
   },
   movieImage: {
     width: "100%",
-    height: "100%",
+    height: "90%",
     borderRadius: 10,
   },
   ratingTag: {

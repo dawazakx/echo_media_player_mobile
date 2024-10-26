@@ -1,3 +1,4 @@
+import React from "react";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 import { Colors } from "@/constants/Colors";

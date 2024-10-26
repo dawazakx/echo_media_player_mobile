@@ -2,6 +2,7 @@ import { LiveStream, Movie, Show } from "@/types";
 
 export type RootStackParamList = {
   Welcome: undefined;
+  Select: undefined;
   Playlist: undefined;
   Home: undefined;
   Search: undefined;

@@ -29,13 +29,13 @@ export interface TvShowsProps {
   route?: RouteProp<TabParamList, "TvShows">;
   categories: Category[];
   flatListRef: RefObject<FlatList>;
-  onMovieLongPress: (movie: Show) => void;
+  onShowLongPress: (movie: Show) => void;
 }
 
 const TvShowsCategoryGroup = forwardRef<
   ElementRef<typeof FlatList<Category>>,
   TvShowsProps
->(({ navigation, categories, flatListRef, onMovieLongPress }, ref) => {
+>(({ navigation, categories, flatListRef, onShowLongPress }, ref) => {
   const renderCategorySection = ({ item }: { item: Category }) => {
     if (!item) {
       return null;
@@ -44,7 +44,7 @@ const TvShowsCategoryGroup = forwardRef<
     return (
       <View key={item.category_id} style={styles.categorySection}>
         <View style={styles.categoryHeader}>
-          <CustomText type="subtitle" style={styles.categoryTitle}>
+          <CustomText type="subtitle" style={styles.categoryTitle} numberOfLines={1}>
             {item.category_name}
           </CustomText>
           <Pressable
@@ -54,14 +54,14 @@ const TvShowsCategoryGroup = forwardRef<
               })
             }
           >
-            <CustomText type="default">See All</CustomText>
+            <CustomText type="default" style={styles.seeAllText}>See All</CustomText>
           </Pressable>
         </View>
 
         <TvShowsList
           categoryId={item.category_id}
           navigation={navigation}
-          onMovieLongPress={onMovieLongPress}
+          onShowLongPress={onShowLongPress}
         />
       </View>
     );
@@ -109,22 +109,11 @@ const styles = StyleSheet.create({
   },
 
   categoryTitle: {
-    marginLeft: 10,
-    marginVertical: 10,
+    flex: 1,
+    marginRight: 10,
   },
-
-  ratingTag: {
-    position: "absolute",
-    top: 6,
-    left: 6,
-    backgroundColor: "rgb(190 18 60)",
-    borderRadius: 5,
-    padding: 3,
-  },
-
-  emptyStateText: {
-    marginLeft: 10,
-    color: Colors.tint,
+  seeAllText: {
+    minWidth: 50, // Ensure minimum width for "See All"
   },
 });
 

@@ -1,23 +1,22 @@
-import { useContext, useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Alert, StyleSheet, View, Pressable } from "react-native";
-
-import { DeviceContext } from "@/providers/DeviceProvider";
-import { PlaylistContext } from "@/providers/PlaylistProvider";
-
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MaterialIcons } from "@expo/vector-icons";
+
+import { DeviceContext } from "@/providers/DeviceProvider";
 
 import Button from "@/components/Button";
 import CustomInput from "@/components/Input";
 import { CustomText } from "@/components/Text";
 import { CustomView } from "@/components/View";
 
+import useCreatePlaylist from "@/hooks/api/useCreatePlaylist";
+
 import { Colors } from "@/constants/Colors";
 import { PLAYER_INDEX_ROUTE } from "@/constants/Routes";
-import { BASE_URL } from "@/constants/api";
 import { PlaylistStackParamList, RootStackParamList } from "@/constants/types";
 
+import { MaterialIcons } from "@expo/vector-icons";
 
 export interface XtremePlaylistProps {
   navigation: CompositeNavigationProp<
@@ -26,45 +25,24 @@ export interface XtremePlaylistProps {
   >;
 }
 
-type dataProps = {
-  username: string;
-  nickname: string;
-  password: string;
-  url: string;
-};
-
-async function connectXtreme(
-  data: dataProps & { device_id: string | null }
-): Promise<any> {
-  const response = await fetch(`${BASE_URL}/connect-xstream`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Something went wrong!");
-  }
-
-  return response.json();
-}
-
 export default function XtremeForm({ navigation }: XtremePlaylistProps) {
-  // const [username, setUsername] = useState("Dawazak");
-  // const [nickname, setNickname] = useState("Dawazak");
-  // const [password, setPassword] = useState("wcunmgpamy");
-  // const [url, setUrl] = useState("https://ottkiller.pro");
+  const { deviceId } = useContext(DeviceContext);
   const [username, setUsername] = useState("");
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [url, setUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [username, setUsername] = useState("");
+  // const [nickname, setNickname] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [url, setUrl] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
 
-  const { deviceId } = useContext(DeviceContext);
-  const { setCurrentPlaylist } = useContext(PlaylistContext);
+  const {
+    mutate: connectXtreme,
+    isPending: isLoading,
+    isSuccess: createPlaylistSuccess,
+    error: createPlaylistError,
+  } = useCreatePlaylist();
 
   const validateForm = () => {
     return username && password && url && nickname;
@@ -72,61 +50,68 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      Alert.alert("Validation Error", "All fields are required.");
-      return;
+      return Alert.alert("Validation Error", "All fields are required.");
     }
 
-    setIsLoading(true);
-
     try {
-      const requestAddPlaylist = await connectXtreme({
+      connectXtreme({
         username,
         password,
         url,
         nickname,
-        device_id: deviceId,
+        device_id: deviceId || "",
       });
-
-      setCurrentPlaylist(requestAddPlaylist?.isConnected);
-      navigation.navigate(PLAYER_INDEX_ROUTE);
     } catch (error: any) {
       Alert.alert("Error", error.message);
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (createPlaylistError) {
+      Alert.alert("Error", createPlaylistError.message);
+    }
+  }, [createPlaylistError]);
+
+  useEffect(() => {
+    if (createPlaylistSuccess) {
+      navigation.navigate(PLAYER_INDEX_ROUTE);
+    }
+  }, [createPlaylistSuccess]);
+
   return (
     <CustomView style={styles.container}>
       <View style={styles.header}>
         <Pressable
           onPress={() => {
             navigation.goBack();
-          }}>
+          }}
+        >
           <MaterialIcons name="arrow-back" size={32} color={Colors.white} />
         </Pressable>
 
-        <CustomText type="subtitle">
-          Connect with Xtreme code
-        </CustomText>
+        <CustomText type="subtitle">Connect with Xtream Code</CustomText>
       </View>
-      
 
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Username"
         value={username}
         onChangeText={(text) => setUsername(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Password"
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Portal"
         value={url}
         onChangeText={(text) => setUrl(text)}
       />
       <CustomInput
+        containerStyle={{ width: "85%", alignSelf: "center" }}
         placeholder="Nickname"
         value={nickname}
         onChangeText={(text) => setNickname(text)}
@@ -134,8 +119,9 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
 
       <Button
         title="Next"
-        borderRadius={25}
-        width="100%"
+        borderRadius={10}
+        width="85%"
+        style={{ alignSelf: "center" }}
         textColor={Colors.background}
         onPress={handleSubmit}
         disabled={isLoading}
@@ -148,8 +134,9 @@ export default function XtremeForm({ navigation }: XtremePlaylistProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
+    padding: 10,
     gap: 30,
+    backgroundColor: Colors.secBackground,
   },
 
   header: {
@@ -158,6 +145,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 35,
   },
 });
